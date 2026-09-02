@@ -26,8 +26,25 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - `npm run build` - create a production build.
 - `npm run start` - run the production build.
 
+## Supabase setup
+
+The schema and access policies are defined in
+[`supabase/migrations/`](./supabase/migrations/). Create a Supabase project,
+then copy `.env.example` to `.env.local` and fill in its project URL and
+publishable key. Do not commit `.env.local`.
+
+To apply the migration to a linked project:
+
+```bash
+npx supabase login
+npx supabase link --project-ref <your-project-ref>
+npx supabase db push
+```
+
 ## Technology
 
 - Next.js App Router
 - React and TypeScript
 - Tailwind CSS
+- Supabase for authentication, PostgreSQL, row-level security, and real-time
+  updates

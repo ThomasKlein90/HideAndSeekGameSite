@@ -27,11 +27,11 @@ website. Update it as rules and priorities are agreed.
 - [ ] Establish deployment hosting and preview-environment workflow.
 - [ ] Set up environment-variable handling and separate local/production configuration.
 - [x] Create the responsive application shell and mobile navigation.
-- [ ] Establish authentication and secure game invitation flow.
+- [x] Establish the Supabase authentication and database foundation; implement the user-facing flow next.
 
 ## Phase 1 - Game Setup and Access Control
 
-- [ ] Create data models for games, players, teams, settings, and rounds.
+- [x] Create the initial data models and row-level access policies for games, players, teams, settings, and rounds.
 - [ ] Build the admin game-creation flow.
 - [ ] Support exactly two Hider Team members and two Seeker Team members for the initial format.
 - [ ] Build game join/invite flow and player display-name setup.
