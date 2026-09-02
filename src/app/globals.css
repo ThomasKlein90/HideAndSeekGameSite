@@ -1,0 +1,381 @@
+@import "tailwindcss";
+
+:root {
+  --ink: #132a36;
+  --muted-ink: #52626a;
+  --paper: #f8f5ed;
+  --paper-deep: #ece5d5;
+  --coral: #e95f4f;
+  --gold: #eca83a;
+  --sea: #1e9fb2;
+  --pine: #3e765e;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at 0% 0%, rgb(30 159 178 / 12%), transparent 25rem),
+    var(--paper);
+  color: var(--ink);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+a {
+  color: inherit;
+}
+
+.page-shell {
+  width: min(100%, 76rem);
+  margin: 0 auto;
+  padding: 1.25rem 1rem 2.5rem;
+}
+
+.site-header,
+.brand,
+.hero-actions,
+.getting-started {
+  display: flex;
+  align-items: center;
+}
+
+.site-header {
+  justify-content: space-between;
+}
+
+.brand {
+  gap: 0.65rem;
+  text-decoration: none;
+}
+
+.brand-mark {
+  display: grid;
+  width: 2.4rem;
+  height: 2.4rem;
+  place-items: center;
+  border-radius: 0.65rem;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.brand strong,
+.brand small {
+  display: block;
+}
+
+.brand strong {
+  font-size: 0.95rem;
+  letter-spacing: -0.02em;
+}
+
+.brand small,
+.status-pill,
+.eyebrow,
+.feature-number,
+.phase-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.brand small {
+  margin-top: 0.08rem;
+  color: var(--coral);
+}
+
+.status-pill,
+.phase-label {
+  border: 1px solid rgb(19 42 54 / 16%);
+  border-radius: 99rem;
+  padding: 0.45rem 0.65rem;
+  color: var(--muted-ink);
+}
+
+.hero {
+  display: grid;
+  gap: 2.25rem;
+  padding: 4.5rem 0 3.5rem;
+}
+
+.eyebrow,
+.feature-number {
+  margin: 0 0 0.8rem;
+  color: var(--coral);
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1,
+h2 {
+  font-family: Georgia, "Times New Roman", serif;
+  letter-spacing: -0.04em;
+}
+
+h1 {
+  max-width: 12ch;
+  margin-bottom: 1.1rem;
+  font-size: clamp(2.85rem, 12vw, 5.5rem);
+  line-height: 0.94;
+}
+
+.hero-description,
+.getting-started p {
+  max-width: 34rem;
+  color: var(--muted-ink);
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.hero-actions {
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.6rem;
+}
+
+.button {
+  min-height: 2.9rem;
+  padding: 0.78rem 1rem;
+  border-radius: 0.4rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.button-primary {
+  background: var(--ink);
+  color: white;
+}
+
+.button-secondary {
+  border: 1px solid rgb(19 42 54 / 20%);
+}
+
+.map-preview {
+  position: relative;
+  min-height: 21rem;
+  overflow: hidden;
+  border: 1px solid rgb(19 42 54 / 15%);
+  border-radius: 1rem;
+  background-color: #d9d4c3;
+  background-image: linear-gradient(30deg, transparent 48%, rgb(255 255 255 / 28%) 49%, transparent 50%);
+  box-shadow: 0 1.25rem 2.5rem rgb(19 42 54 / 10%);
+}
+
+.map-water {
+  position: absolute;
+  border-radius: 45% 55% 58% 42% / 55% 45% 55% 45%;
+  background: #9fd5d7;
+}
+
+.map-water-one {
+  width: 82%;
+  height: 58%;
+  right: -26%;
+  bottom: -22%;
+  transform: rotate(-12deg);
+}
+
+.map-water-two {
+  width: 49%;
+  height: 34%;
+  left: -29%;
+  top: 9%;
+}
+
+.transit-line {
+  position: absolute;
+  height: 0.5rem;
+  border-radius: 99rem;
+  transform-origin: left center;
+}
+
+.transit-line-red {
+  width: 77%;
+  top: 36%;
+  left: 8%;
+  background: var(--coral);
+  transform: rotate(-18deg);
+}
+
+.transit-line-gold {
+  width: 63%;
+  top: 60%;
+  left: 18%;
+  background: var(--gold);
+  transform: rotate(27deg);
+}
+
+.transit-line-blue {
+  width: 58%;
+  top: 22%;
+  left: 33%;
+  background: var(--sea);
+  transform: rotate(54deg);
+}
+
+.station {
+  position: absolute;
+  z-index: 1;
+  width: 0.85rem;
+  height: 0.85rem;
+  border: 0.2rem solid var(--ink);
+  border-radius: 50%;
+  background: var(--paper);
+}
+
+.station-one {
+  top: 31%;
+  left: 30%;
+}
+
+.station-two {
+  top: 48%;
+  left: 64%;
+}
+
+.station-three {
+  top: 58%;
+  left: 47%;
+}
+
+.map-label,
+.map-caption {
+  position: absolute;
+  z-index: 1;
+  margin: 0;
+  color: rgb(19 42 54 / 72%);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.label-kowloon {
+  top: 18%;
+  left: 14%;
+}
+
+.label-island {
+  bottom: 22%;
+  left: 10%;
+}
+
+.map-caption {
+  right: 1rem;
+  bottom: 1rem;
+}
+
+.map-pin {
+  position: absolute;
+  z-index: 2;
+  top: 39%;
+  right: 20%;
+  width: 2.8rem;
+  height: 2.8rem;
+  transform: rotate(-45deg);
+  border-radius: 50% 50% 50% 0;
+  background: var(--pine);
+  box-shadow: 0 0.35rem 0.75rem rgb(19 42 54 / 22%);
+}
+
+.map-pin span {
+  position: absolute;
+  inset: 0.75rem;
+  border-radius: 50%;
+  background: var(--paper);
+}
+
+.feature-grid {
+  display: grid;
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid rgb(19 42 54 / 15%);
+  border-radius: 1rem;
+  background: rgb(19 42 54 / 15%);
+}
+
+.feature-grid article {
+  padding: 1.5rem;
+  background: var(--paper);
+}
+
+.feature-grid h2,
+.getting-started h2 {
+  margin-bottom: 0.6rem;
+  font-size: 1.55rem;
+}
+
+.feature-grid p {
+  margin-bottom: 0;
+  color: var(--muted-ink);
+  line-height: 1.55;
+}
+
+.getting-started {
+  gap: 1rem;
+  justify-content: space-between;
+  margin-top: 1.5rem;
+  padding: 2rem 1.5rem;
+  border-radius: 1rem;
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.getting-started .eyebrow {
+  color: #f5c86d;
+}
+
+.getting-started h2 {
+  max-width: 19rem;
+  font-size: 2rem;
+}
+
+.getting-started p {
+  margin-bottom: 0;
+  color: rgb(248 245 237 / 73%);
+}
+
+.phase-label {
+  flex: 0 0 auto;
+  border-color: rgb(248 245 237 / 28%);
+  color: var(--paper);
+}
+
+@media (min-width: 44rem) {
+  .page-shell {
+    padding: 1.75rem 2rem 4rem;
+  }
+
+  .hero {
+    grid-template-columns: minmax(0, 1.05fr) minmax(19rem, 0.95fr);
+    align-items: center;
+    gap: 3rem;
+    padding: 6rem 0;
+  }
+
+  .map-preview {
+    min-height: 27rem;
+  }
+
+  .feature-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .getting-started {
+    padding: 3rem;
+  }
+}

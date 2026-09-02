@@ -23,10 +23,10 @@ website. Update it as rules and priorities are agreed.
 
 ## Phase 0 - Foundation
 
-- [ ] Choose and initialize the web framework, language, styling, and test tooling.
+- [x] Choose and initialize the web framework, language, styling, and test tooling.
 - [ ] Establish deployment hosting and preview-environment workflow.
 - [ ] Set up environment-variable handling and separate local/production configuration.
-- [ ] Create the responsive application shell and mobile navigation.
+- [x] Create the responsive application shell and mobile navigation.
 - [ ] Establish authentication and secure game invitation flow.
 
 ## Phase 1 - Game Setup and Access Control
