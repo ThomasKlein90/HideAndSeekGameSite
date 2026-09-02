@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { GameSetup } from "@/components/game-setup";
 
 export default function Home() {
   return (
@@ -79,18 +80,7 @@ export default function Home() {
         </article>
       </section>
 
-      <section className="getting-started" id="getting-started">
-        <div>
-          <p className="eyebrow">Now building</p>
-          <h2>The game setup is coming first.</h2>
-          <p>
-            This foundation will grow into the host setup, team dashboards,
-            and Hong Kong map. Live location and automated validation remain
-            intentionally out of scope for the first version.
-          </p>
-        </div>
-        <span className="phase-label">Phase 0</span>
-      </section>
+      <GameSetup />
     </main>
   );
 }
