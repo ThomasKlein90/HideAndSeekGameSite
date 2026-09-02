@@ -18,6 +18,8 @@ website. Update it as rules and priorities are agreed.
 - [x] Defer push notifications and game replay.
 - [x] Use placeholders for structured seeker questions until the group supplies its authorized list.
 - [x] Model question rewards as physical-card draws and hand management, not currency.
+- [x] Let players join with a shared game code; the host assigns teams after they join.
+- [x] Let the host choose whether they begin on the Hider Team or Seeker Team.
 - [ ] Confirm the exact question types, card draw/keep rules, and card effects.
 - [ ] Confirm the playable Hong Kong boundary and transit restrictions.
 
@@ -33,8 +35,8 @@ website. Update it as rules and priorities are agreed.
 
 - [x] Create the initial data models and row-level access policies for games, players, teams, settings, and rounds.
 - [ ] Build the admin game-creation flow.
-- [ ] Support exactly two Hider Team members and two Seeker Team members for the initial format.
-- [ ] Build game join/invite flow and player display-name setup.
+- [x] Support exactly two Hider Team members and two Seeker Team members for the initial format.
+- [x] Build the game-code join flow; add player display-name editing in the next pass.
 - [ ] Implement role-based page access and server-side data authorization.
 - [ ] Define game phases: setup, hider head start, active seeking, final hiding, round complete, and game complete.
 - [ ] Add admin controls to start, pause, resume, transition phases, and end a game.
@@ -55,8 +57,8 @@ website. Update it as rules and priorities are agreed.
 
 ## Phase 3 - Seeker Question Board
 
-- [ ] Create an editable placeholder question catalogue with category, cost/reward rule, answer type, and active status.
-- [ ] Display seeker questions grouped by category and cost/reward rule.
+- [x] Create an editable placeholder question catalogue with category, card-reward rule, answer type, and active status.
+- [x] Display the six placeholder seeker categories: Matching, Measuring, Thermometer, Radar, Tentacles, and Photos.
 - [ ] Let seekers submit a question after confirmation.
 - [ ] Deliver pending questions to the Hider Team view.
 - [ ] Store question status, answers, timestamps, and round history.
@@ -90,6 +92,30 @@ website. Update it as rules and priorities are agreed.
 - [ ] Add advisory station-radius and board-boundary checks; retain manual/admin override.
 - [ ] Add PWA installation support and consider push notifications.
 - [ ] Add post-game timeline and replay features.
+
+## Next Session Handoff
+
+Current state:
+
+- [x] Next.js mobile-first application and Supabase project are configured.
+- [x] Host can sign in by email, create a game, choose their initial team, and receive a game code.
+- [x] Players can join by game code and the host can assign up to two players per team.
+- [x] The Seeker Team has a placeholder board with Matching, Measuring,
+  Thermometer, Radar, Tentacles, and Photos categories.
+
+Start next:
+
+1. Add player display-name editing after email sign-in.
+2. Create question events so seekers can submit a selected placeholder question
+   and hiders can receive and answer it.
+3. Record question status, answer timestamp, and the manually logged
+   physical-card reward.
+4. Begin the Hong Kong map data/source assessment in parallel only after the
+   question event model is settled.
+
+Before implementing final question mechanics, collect the group-approved
+question text, expected answer formats, and card draw/keep rules. Do not copy
+or publish protected commercial game content.
 
 ## Open Decisions
 
