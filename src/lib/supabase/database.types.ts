@@ -15,6 +15,7 @@ export type QuestionCategory =
   | "tentacles"
   | "photos";
 export type QuestionAnswerType = "yes_no" | "number" | "text" | "photo";
+export type QuestionEventStatus = "pending" | "answered" | "cancelled";
 
 type NoRelationships = [];
 
@@ -169,6 +170,85 @@ export type Database = {
         Update: Partial<Database["public"]["Tables"]["question_templates"]["Insert"]>;
         Relationships: NoRelationships;
       };
+      question_events: {
+        Row: {
+          answer: string | null;
+          answered_at: string | null;
+          answered_by: string | null;
+          asked_by: string;
+          created_at: string;
+          game_id: string;
+          id: string;
+          question_template_id: string;
+          reward_logged_at: string | null;
+          reward_logged_by: string | null;
+          reward_note: string | null;
+          round_id: string | null;
+          status: QuestionEventStatus;
+          updated_at: string;
+        };
+        Insert: {
+          answer?: string | null;
+          answered_at?: string | null;
+          answered_by?: string | null;
+          asked_by: string;
+          created_at?: string;
+          game_id: string;
+          id?: string;
+          question_template_id: string;
+          reward_logged_at?: string | null;
+          reward_logged_by?: string | null;
+          reward_note?: string | null;
+          round_id?: string | null;
+          status?: QuestionEventStatus;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["question_events"]["Insert"]>;
+        Relationships: [
+          {
+            foreignKeyName: "question_events_game_id_fkey";
+            columns: ["game_id"];
+            isOneToOne: false;
+            referencedRelation: "games";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "question_events_question_template_id_fkey";
+            columns: ["question_template_id"];
+            isOneToOne: false;
+            referencedRelation: "question_templates";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "question_events_round_id_fkey";
+            columns: ["round_id"];
+            isOneToOne: false;
+            referencedRelation: "rounds";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "question_events_asked_by_fkey";
+            columns: ["asked_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "question_events_answered_by_fkey";
+            columns: ["answered_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "question_events_reward_logged_by_fkey";
+            columns: ["reward_logged_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       rounds: {
         Row: {
           created_at: string;
@@ -244,6 +324,7 @@ export type Database = {
       player_role: PlayerRole;
       question_answer_type: QuestionAnswerType;
       question_category: QuestionCategory;
+      question_event_status: QuestionEventStatus;
     };
     CompositeTypes: Record<string, never>;
   };
