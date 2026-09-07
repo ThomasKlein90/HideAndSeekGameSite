@@ -7,9 +7,9 @@ This file is the short operational record for resuming work after a Copilot sess
 - Last verified: 2026-09-07
 - Repository: `ThomasKlein90/HideAndSeekGameSite`
 - Integration branch: `main`
-- Working branch: `chore/clarify-handoff-workflow`
-- Baseline commit: `72c394f` (`Merge branch 'chore/document-workspace-state'`)
-- Previous pull request: [#4](https://github.com/ThomasKlein90/HideAndSeekGameSite/pull/4), merged
+- Working branch: `feature/player-display-names`
+- Baseline commit: `89e5c85` (merged handoff workflow branch)
+- Previous pull requests: [#4](https://github.com/ThomasKlein90/HideAndSeekGameSite/pull/4) and the handoff workflow PR, merged
 - Product stage: Foundation and game setup
 
 ## Implemented
@@ -34,12 +34,12 @@ merged into `main` as PR #4.
 
 ## Current Branch Change
 
-This branch makes the resume process explicit and corrects the post-merge
-status recorded by the previous handoff.
+This branch adds authenticated display-name editing to the existing game setup
+flow.
 
-- Updated the baseline to the merged `main` commit.
-- Recorded PR #4 as merged.
-- Added a fixed start-of-session and end-of-session procedure below.
+- Loads the signed-in user's profile display name.
+- Validates and saves a trimmed display name between 1 and 50 characters.
+- Uses the existing self-update profile policy; no migration was needed.
 
 ## Known Setup Gaps
 
@@ -51,16 +51,20 @@ status recorded by the previous handoff.
 ## Validation
 
 - `git status --short --branch`: clean at the start of this branch.
+- Workspace diagnostics for `src/components/game-setup.tsx`: passed.
 - `git diff --check`: passed.
 - `npm run lint`: blocked because `npm` is not available in the current PowerShell PATH.
 - `npm run build`: blocked because `npm` is not available in the current PowerShell PATH.
-- Manual Supabase flow validation: pending Supabase configuration.
+- Manual display-name validation: pending Supabase configuration.
 
 ## Next Development Slice
 
-After this branch is reviewed and merged, create `feature/player-display-names`
-from the updated `main`. Implement display-name editing after email sign-in,
-validate it, and merge that branch before beginning question-event work.
+The current feature commit is `062af30` (`feat: add player display-name editing`).
+Open a pull request for this branch before merging.
+
+After this branch is reviewed and merged, create `feature/question-events`
+from the updated `main`. Add the question-event migration and matching typed
+database contract before implementing seeker submission or hider answers.
 
 ## Start-Of-Session Procedure
 
