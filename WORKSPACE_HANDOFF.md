@@ -8,7 +8,7 @@ This file is the short operational record for resuming work after a Copilot sess
 - Repository: `ThomasKlein90/HideAndSeekGameSite`
 - Integration branch: `main`
 - Working branch: `feature/player-display-names`
-- Baseline commit: `72c394f` (`Merge branch 'chore/document-workspace-state'`)
+- Baseline commit: `89e5c85` (merged handoff workflow branch)
 - Previous pull requests: [#4](https://github.com/ThomasKlein90/HideAndSeekGameSite/pull/4) and the handoff workflow PR, merged
 - Product stage: Foundation and game setup
 
@@ -52,12 +52,15 @@ flow.
 
 - `git status --short --branch`: clean at the start of this branch.
 - Workspace diagnostics for `src/components/game-setup.tsx`: passed.
-- `git diff --check`: pending because the terminal stopped returning output.
+- `git diff --check`: passed.
 - `npm run lint`: blocked because `npm` is not available in the current PowerShell PATH.
 - `npm run build`: blocked because `npm` is not available in the current PowerShell PATH.
 - Manual display-name validation: pending Supabase configuration.
 
 ## Next Development Slice
+
+The current feature commit is `062af30` (`feat: add player display-name editing`).
+Open a pull request for this branch before merging.
 
 After this branch is reviewed and merged, create `feature/question-events`
 from the updated `main`. Add the question-event migration and matching typed
