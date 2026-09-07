@@ -7,9 +7,9 @@ This file is the short operational record for resuming work after a Copilot sess
 - Last verified: 2026-09-07
 - Repository: `ThomasKlein90/HideAndSeekGameSite`
 - Integration branch: `main`
-- Working branch: `feature/question-events`
-- Baseline commit: `af7c305` (merged player display-name feature)
-- Previous pull requests: documentation, handoff workflow, and display-name changes, all merged
+- Working branch: `main`
+- Baseline commit: `c7b36b0` (merged question-events feature)
+- Previous pull requests: #4, #5, #6, and #7, all reviewed and merged
 - Product stage: Foundation and game setup
 
 ## Implemented
@@ -19,7 +19,9 @@ This file is the short operational record for resuming work after a Copilot sess
 - Host game creation with initial team selection and game-code generation.
 - Game-code joining.
 - Host assignment of up to two players per team.
+- Authenticated player display-name editing.
 - Placeholder seeker question catalogue with Matching, Measuring, Thermometer, Radar, Tentacles, and Photos categories.
+- Question-event data model with statuses, answer timestamps, reward notes, and row-level access policies.
 - Supabase migrations and row-level access policies for the current setup flow.
 
 ## Previous Branch Change
@@ -32,17 +34,15 @@ merged into `main` as PR #4.
 - Added the pull-request checklist at `.github/pull_request_template.md`.
 - Updated the README and project plan with setup and branch workflow guidance.
 
-## Current Branch Change
+## Completed This Session
 
-This branch defines the question-event data model and typed database contract
-before adding question submission or answer controls.
+PR #7, `feat: add question event data model`, was reviewed and merged. The
+feature branch was deleted after merge.
 
-- Added `question_event_status` with pending, answered, and cancelled states.
-- Added question events linked to games, optional rounds, templates, players,
-	answers, answer timestamps, and manually logged reward notes.
-- Added row-level policies for member reads, seeker inserts, and hider/host
-	updates.
-- Updated `database.types.ts` to match the migration.
+- Merged commit: `c7b36b0`.
+- Migration: `supabase/migrations/20260907100000_question_events.sql`.
+- Types: `src/lib/supabase/database.types.ts`.
+- The migration has not yet been applied to a local or linked Supabase project.
 
 ## Known Setup Gaps
 
@@ -53,9 +53,9 @@ before adding question submission or answer controls.
 
 ## Validation
 
-- `git status --short --branch`: clean at the start of this branch.
+- `git status --short --branch`: main was clean after the feature merge.
 - Workspace diagnostics for `src/lib/supabase/database.types.ts`: passed.
-- `git diff --check`: passed.
+- `git diff --check`: passed before the feature merge.
 - `npm run lint`: blocked because `npm` is not available in the current PowerShell PATH.
 - `npm run build`: blocked because `npm` is not available in the current PowerShell PATH.
 - Migration application: not yet applied to a local or linked Supabase project.
@@ -63,13 +63,9 @@ before adding question submission or answer controls.
 
 ## Next Development Slice
 
-Open a pull request for this branch before merging. Review the migration and
-typed contract together, then apply the migration in a configured Supabase
-environment before implementing UI actions.
-
-After this branch is reviewed and merged, create
-`feature/seeker-question-submission` from the updated `main`. Implement seeker
-submission and the hider answer workflow against the question-event contract.
+Create `feature/seeker-question-submission` from the updated `main`. Apply the
+question-events migration in a configured Supabase environment, then implement
+seeker submission and the hider answer workflow against the event contract.
 
 ## Start-Of-Session Procedure
 
@@ -80,9 +76,23 @@ submission and the hider answer workflow against the question-event contract.
 5. Create a focused branch from the updated `main`.
 6. Confirm the exact next task and the validation command before editing.
 
-For the next development session, the expected branch is
+For the next session on Wednesday, 2026-09-09, the expected branch is
 `feature/seeker-question-submission` and the expected first task is connecting
 the seeker board to question-event creation.
+
+## Resume In Agent Window
+
+1. Open this repository folder in VS Code.
+2. Open Copilot Chat and select **Agent** mode, not Plan mode.
+3. Start from the clean `main` branch and update it from `origin/main`.
+4. Read this file, `PROJECT_PLAN.md`, `AGENTS.md`, and `.github/copilot-instructions.md`.
+5. Create `feature/seeker-question-submission` from updated `main`.
+6. Send this message in the Agent window:
+
+	`Resume from WORKSPACE_HANDOFF.md. Confirm the merged main baseline, create or verify feature/seeker-question-submission, and implement only the next documented slice. Check the relevant Next.js guidance before editing.`
+
+The Agent should confirm the branch, baseline commit, clean worktree, next task,
+and first validation command before changing code.
 
 ## End-Of-Session Checklist
 

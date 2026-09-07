@@ -34,9 +34,9 @@ website. Update it as rules and priorities are agreed.
 ## Phase 1 - Game Setup and Access Control
 
 - [x] Create the initial data models and row-level access policies for games, players, teams, settings, and rounds.
-- [ ] Build the admin game-creation flow.
+- [x] Build the admin game-creation flow.
 - [x] Support exactly two Hider Team members and two Seeker Team members for the initial format.
-- [x] Build the game-code join flow; add player display-name editing in the next pass.
+- [x] Build the game-code join flow and add player display-name editing.
 - [ ] Implement role-based page access and server-side data authorization.
 - [ ] Define game phases: setup, hider head start, active seeking, final hiding, round complete, and game complete.
 - [ ] Add admin controls to start, pause, resume, transition phases, and end a game.
@@ -59,6 +59,7 @@ website. Update it as rules and priorities are agreed.
 
 - [x] Create an editable placeholder question catalogue with category, card-reward rule, answer type, and active status.
 - [x] Display the six placeholder seeker categories: Matching, Measuring, Thermometer, Radar, Tentacles, and Photos.
+- [x] Define the question-event data model, status values, access policies, and typed database contract.
 - [ ] Let seekers submit a question after confirmation.
 - [ ] Deliver pending questions to the Hider Team view.
 - [ ] Store question status, answers, timestamps, and round history.
@@ -109,12 +110,12 @@ Current state:
 
 Start next:
 
-1. Add player display-name editing after email sign-in.
-2. Create question events so seekers can submit a selected placeholder question
-   and hiders can receive and answer it.
-3. Record question status, answer timestamp, and the manually logged
+1. Apply the question-events migration in a configured Supabase environment.
+2. Create question events when seekers submit a selected placeholder question
+   and deliver pending events to the Hider Team view.
+3. Let hiders answer events and record the answer timestamp and manually logged
    physical-card reward.
-4. Begin the Hong Kong map data/source assessment in parallel only after the
+4. Begin the Hong Kong map data/source assessment only after the
    question event model is settled.
 
 Before implementing final question mechanics, collect the group-approved

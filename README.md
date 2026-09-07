@@ -69,3 +69,11 @@ Before ending a session, update [WORKSPACE_HANDOFF.md](./WORKSPACE_HANDOFF.md)
 with the current branch, commit, files changed, validation results, migration
 status, pull request status, known issues, and the next action. Never record
 credentials or secret values there.
+
+To resume in VS Code, open Copilot Chat in **Agent** mode, read
+[WORKSPACE_HANDOFF.md](./WORKSPACE_HANDOFF.md), update `main`, and create the
+branch named by the handoff before editing. Start the Agent with:
+
+```text
+Resume from WORKSPACE_HANDOFF.md. Confirm the merged main baseline, create or verify the next documented feature branch, and implement only the next documented slice. Check the relevant Next.js guidance before editing.
+```
