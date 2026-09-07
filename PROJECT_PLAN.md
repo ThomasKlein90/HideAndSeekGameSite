@@ -95,6 +95,10 @@ website. Update it as rules and priorities are agreed.
 
 ## Next Session Handoff
 
+The operational resume record is maintained in
+[WORKSPACE_HANDOFF.md](./WORKSPACE_HANDOFF.md). Update it at the end of every
+session and after each major branch is merged.
+
 Current state:
 
 - [x] Next.js mobile-first application and Supabase project are configured.
