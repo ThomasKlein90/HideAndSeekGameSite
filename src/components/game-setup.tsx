@@ -25,6 +25,7 @@ type GamePlayer = {
 export function GameSetup() {
   const [session, setSession] = useState<Session | null>(null);
   const [email, setEmail] = useState("");
+  const [displayName, setDisplayName] = useState("");
   const [gameName, setGameName] = useState("Hong Kong Hide and Seek");
   const [headStartMinutes, setHeadStartMinutes] = useState("15");
   const [radiusMeters, setRadiusMeters] = useState("500");
@@ -40,6 +41,29 @@ export function GameSetup() {
   const [currentTeam, setCurrentTeam] = useState<"hiders" | "seekers" | null>(
     null,
   );
+
+  useEffect(() => {
+    if (!session) {
+      setDisplayName("");
+      return;
+    }
+
+    const supabase = createSupabaseBrowserClient();
+
+    void supabase
+      .from("profiles")
+      .select("display_name")
+      .eq("id", session.user.id)
+      .single()
+      .then(({ data, error: profileError }) => {
+        if (profileError) {
+          setError(profileError.message);
+          return;
+        }
+
+        setDisplayName(data.display_name);
+      });
+  }, [session]);
 
   async function loadPlayers(gameId: string) {
     const supabase = createSupabaseBrowserClient();
@@ -100,6 +124,35 @@ export function GameSetup() {
     }
 
     setStatus("Check your email for a secure sign-in link.");
+  }
+
+  async function saveDisplayName(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError("");
+    setStatus("");
+
+    const nextDisplayName = displayName.trim();
+
+    if (nextDisplayName.length < 1 || nextDisplayName.length > 50) {
+      setError("Display name must be between 1 and 50 characters.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    const supabase = createSupabaseBrowserClient();
+    const { error: profileError } = await supabase
+      .from("profiles")
+      .update({ display_name: nextDisplayName })
+      .eq("id", session?.user.id ?? "");
+    setIsSubmitting(false);
+
+    if (profileError) {
+      setError(profileError.message);
+      return;
+    }
+
+    setDisplayName(nextDisplayName);
+    setStatus("Display name updated.");
   }
 
   async function createGame(event: FormEvent<HTMLFormElement>) {
@@ -260,6 +313,19 @@ export function GameSetup() {
               Sign out
             </button>
           </div>
+          <form className="nested-form" onSubmit={saveDisplayName}>
+            <label htmlFor="display-name">Display name</label>
+            <input
+              id="display-name"
+              maxLength={50}
+              value={displayName}
+              onChange={(event) => setDisplayName(event.target.value)}
+              required
+            />
+            <button className="button button-secondary" disabled={isSubmitting} type="submit">
+              {isSubmitting ? "Saving name..." : "Save display name"}
+            </button>
+          </form>
           <div className="mode-switch" aria-label="Game action">
             <button
               aria-pressed={mode === "host"}
