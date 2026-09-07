@@ -7,9 +7,9 @@ This file is the short operational record for resuming work after a Copilot sess
 - Last verified: 2026-09-07
 - Repository: `ThomasKlein90/HideAndSeekGameSite`
 - Integration branch: `main`
-- Working branch: `chore/document-workspace-state`
-- Starting commit: `38e9926` (`Merge pull request #3 from ThomasKlein90/agents/game-setup-flow`)
-- Pull request: Not opened yet
+- Working branch: `chore/clarify-handoff-workflow`
+- Baseline commit: `72c394f` (`Merge branch 'chore/document-workspace-state'`)
+- Previous pull request: [#4](https://github.com/ThomasKlein90/HideAndSeekGameSite/pull/4), merged
 - Product stage: Foundation and game setup
 
 ## Implemented
@@ -22,14 +22,24 @@ This file is the short operational record for resuming work after a Copilot sess
 - Placeholder seeker question catalogue with Matching, Measuring, Thermometer, Radar, Tentacles, and Photos categories.
 - Supabase migrations and row-level access policies for the current setup flow.
 
-## Current Branch Change
+## Previous Branch Change
 
-This branch documents the workspace and establishes the repeatable handoff process.
+The documentation branch `chore/document-workspace-state` was reviewed and
+merged into `main` as PR #4.
 
 - Added `.env.example` with placeholder values only.
 - Added this handoff record.
 - Added the pull-request checklist at `.github/pull_request_template.md`.
 - Updated the README and project plan with setup and branch workflow guidance.
+
+## Current Branch Change
+
+This branch makes the resume process explicit and corrects the post-merge
+status recorded by the previous handoff.
+
+- Updated the baseline to the merged `main` commit.
+- Recorded PR #4 as merged.
+- Added a fixed start-of-session and end-of-session procedure below.
 
 ## Known Setup Gaps
 
@@ -48,17 +58,36 @@ This branch documents the workspace and establishes the repeatable handoff proce
 
 ## Next Development Slice
 
-After this branch is reviewed and merged, create `feature/player-display-names` from the updated `main`. Implement display-name editing after email sign-in, validate it, and merge that branch before beginning question-event work.
+After this branch is reviewed and merged, create `feature/player-display-names`
+from the updated `main`. Implement display-name editing after email sign-in,
+validate it, and merge that branch before beginning question-event work.
+
+## Start-Of-Session Procedure
+
+1. Open the repository at the workspace root.
+2. Read this file, [PROJECT_PLAN.md](PROJECT_PLAN.md), and the repository instructions.
+3. Confirm the current branch and worktree are clean.
+4. Update from `origin/main` before starting a new major change.
+5. Create a focused branch from the updated `main`.
+6. Confirm the exact next task and the validation command before editing.
+
+For the next development session, the expected branch is
+`feature/player-display-names` and the expected first task is display-name
+editing in `src/components/game-setup.tsx`.
 
 ## End-Of-Session Checklist
 
-1. Update `Last verified`, `Working branch`, and starting/current commit.
+1. Update `Last verified`, `Working branch`, and baseline/current commit.
 2. Record completed work and the files changed.
 3. Record lint, build, test, and manual validation results.
 4. Record migration status, including whether migrations were only created or also applied.
 5. Record known problems and the single best next action.
 6. Record the pull-request URL and status, or state `Not opened yet`.
 7. Confirm no credentials, keys, or machine-specific secrets were added.
+
+Before ending a session, leave the worktree either clean on `main` after a
+merged pull request or clearly marked on the active feature branch with its
+commit and pull-request status.
 
 ## Branch And Review Policy
 
