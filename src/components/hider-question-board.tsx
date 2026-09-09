@@ -112,7 +112,7 @@ export function HiderQuestionBoard({ gameId, userId }: HiderQuestionBoardProps) 
   }
 
   useEffect(() => {
-    void loadQuestions();
+    queueMicrotask(() => void loadQuestions());
   }, [loadQuestions]);
 
   const loadCards = useCallback(async () => {
@@ -135,7 +135,7 @@ export function HiderQuestionBoard({ gameId, userId }: HiderQuestionBoardProps) 
   }, [gameId]);
 
   useEffect(() => {
-    void loadCards();
+    queueMicrotask(() => void loadCards());
   }, [loadCards]);
 
   async function addCard(event: FormEvent<HTMLFormElement>) {

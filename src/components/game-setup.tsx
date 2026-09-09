@@ -45,7 +45,7 @@ export function GameSetup() {
 
   useEffect(() => {
     if (!session) {
-      setDisplayName("");
+      queueMicrotask(() => setDisplayName(""));
       return;
     }
 
