@@ -40,7 +40,7 @@ website. Update it as rules and priorities are agreed.
 - [ ] Implement role-based page access and server-side data authorization.
 - [ ] Define game phases: setup, hider head start, active seeking, final hiding, round complete, and game complete.
 - [ ] Add admin controls to start, pause, resume, transition phases, and end a game.
-- [ ] Record important host changes in an audit trail.
+- [x] Record important host changes in an audit trail.
 
 ## Phase 2 - Hong Kong Game Map
 

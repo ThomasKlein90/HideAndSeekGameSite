@@ -150,6 +150,42 @@ a {
   text-transform: uppercase;
 }
 
+.audit-log {
+  display: grid;
+  gap: 0.65rem;
+  padding-top: 0.25rem;
+}
+
+.audit-log > span {
+  color: var(--muted-ink);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.audit-log ul {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.audit-log li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.55rem 0;
+  border-top: 1px solid rgb(19 42 54 / 10%);
+}
+
+.audit-log time {
+  color: var(--muted-ink);
+  font-size: 0.8rem;
+  text-align: right;
+}
+
 .brand small {
   margin-top: 0.08rem;
   color: var(--coral);

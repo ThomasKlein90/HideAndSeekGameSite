@@ -7,8 +7,8 @@ This file is the short operational record for resuming work after a Copilot sess
 - Last verified: 2026-09-09
 - Repository: `ThomasKlein90/HideAndSeekGameSite`
 - Integration branch: `main`
-- Working branch: `feature/seeker-map-annotations`
-- Baseline commit: `69f5148` (merged duplicate question protection)
+- Working branch: `feature/game-audit-trail`
+- Baseline commit: `d1d2479` (merged host phase controls)
 - Previous pull requests: #4, #5, #6, and #7, all reviewed and merged
 - Product stage: Foundation and game setup
 
@@ -89,8 +89,8 @@ implemented on `feature/seeker-map-annotations`.
 - The question-events migration is still not applied to a configured Supabase
   environment.
 
-The next session should validate annotation and card-log privacy/persistence
-against Supabase, then implement the current-round dashboard and timer.
+The next session should validate audit-log privacy/persistence against Supabase,
+then implement final-hiding reference points or the seeker-status panel.
 
 ## Start-Of-Session Procedure
 
