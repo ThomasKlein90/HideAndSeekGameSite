@@ -6,6 +6,7 @@ import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 type GameRoundDashboardProps = {
   gameId: string;
+  isHost: boolean;
 };
 
 type DashboardData = {
@@ -31,7 +32,7 @@ function formatDuration(totalSeconds: number) {
   return `${minutes}:${seconds.toString().padStart(2, "0")}`;
 }
 
-export function GameRoundDashboard({ gameId }: GameRoundDashboardProps) {
+export function GameRoundDashboard({ gameId, isHost }: GameRoundDashboardProps) {
   const [data, setData] = useState<DashboardData | null>(null);
   const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null);
   const [error, setError] = useState("");
@@ -79,6 +80,25 @@ export function GameRoundDashboard({ gameId }: GameRoundDashboardProps) {
       finalHidingRadiusMeters: settingsResult.data.final_hiding_radius_meters,
     });
   }, [gameId]);
+
+  async function transitionPhase(nextPhase: GamePhase) {
+    setError("");
+    const supabase = createSupabaseBrowserClient();
+    const { error: transitionError } = await supabase.rpc(
+      "transition_game_phase",
+      {
+        target_game_id: gameId,
+        next_phase: nextPhase,
+      },
+    );
+
+    if (transitionError) {
+      setError(transitionError.message);
+      return;
+    }
+
+    await loadDashboard();
+  }
 
   useEffect(() => {
     queueMicrotask(() => void loadDashboard());
@@ -152,6 +172,56 @@ export function GameRoundDashboard({ gameId }: GameRoundDashboardProps) {
             <span>Final hiding radius</span>
             <strong>{data.finalHidingRadiusMeters} m</strong>
           </div>
+        </div>
+      )}
+      {!error && data && isHost && (
+        <div className="phase-controls">
+          <span>Host controls</span>
+          {data.phase === "setup" && (
+            <button
+              className="button button-primary"
+              type="button"
+              onClick={() => void transitionPhase("hider_head_start")}
+            >
+              Start hider head start
+            </button>
+          )}
+          {data.phase === "hider_head_start" && (
+            <button
+              className="button button-primary"
+              type="button"
+              onClick={() => void transitionPhase("active_seeking")}
+            >
+              Begin active seeking
+            </button>
+          )}
+          {data.phase === "active_seeking" && (
+            <button
+              className="button button-primary"
+              type="button"
+              onClick={() => void transitionPhase("final_hiding")}
+            >
+              Start final hiding
+            </button>
+          )}
+          {data.phase === "final_hiding" && (
+            <button
+              className="button button-primary"
+              type="button"
+              onClick={() => void transitionPhase("round_complete")}
+            >
+              Complete round
+            </button>
+          )}
+          {data.phase === "round_complete" && (
+            <button
+              className="button button-primary"
+              type="button"
+              onClick={() => void transitionPhase("game_complete")}
+            >
+              End game
+            </button>
+          )}
         </div>
       )}
     </section>
