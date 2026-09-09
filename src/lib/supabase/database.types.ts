@@ -439,6 +439,13 @@ export type Database = {
           phase: GamePhase;
         }[];
       };
+      transition_game_phase: {
+        Args: {
+          next_phase: GamePhase;
+          target_game_id: string;
+        };
+        Returns: GamePhase;
+      };
     };
     Enums: {
       game_phase: GamePhase;

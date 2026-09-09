@@ -492,7 +492,9 @@ export function GameSetup() {
           )}
         </div>
       )}
-      {createdGame && <GameRoundDashboard gameId={createdGame.id} />}
+      {createdGame && (
+        <GameRoundDashboard gameId={createdGame.id} isHost={isGameHost} />
+      )}
       {createdGame && currentTeam === "seekers" && session && (
         <SeekerQuestionBoard gameId={createdGame.id} userId={session.user.id} />
       )}

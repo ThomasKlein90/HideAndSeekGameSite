@@ -136,6 +136,20 @@ a {
   font-size: 1.05rem;
 }
 
+.phase-controls {
+  display: grid;
+  gap: 0.65rem;
+  padding-top: 0.25rem;
+}
+
+.phase-controls > span {
+  color: var(--muted-ink);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
 .brand small {
   margin-top: 0.08rem;
   color: var(--coral);
