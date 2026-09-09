@@ -1,7 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import type { QuestionAnswerType } from "@/lib/supabase/database.types";
+import type { FormEvent } from "react";
+import type {
+  CardLogStatus,
+  QuestionAnswerType,
+} from "@/lib/supabase/database.types";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 type PendingQuestion = {
@@ -13,6 +17,14 @@ type PendingQuestion = {
     answer_type: QuestionAnswerType;
     reward_rule: string;
   } | null;
+};
+
+type CardLog = {
+  id: string;
+  card_name: string;
+  status: CardLogStatus;
+  note: string;
+  received_at: string;
 };
 
 type HiderQuestionBoardProps = {
@@ -29,6 +41,11 @@ export function HiderQuestionBoard({ gameId, userId }: HiderQuestionBoardProps) 
     null,
   );
   const [isLoading, setIsLoading] = useState(true);
+  const [cards, setCards] = useState<CardLog[]>([]);
+  const [cardName, setCardName] = useState("");
+  const [cardNote, setCardNote] = useState("");
+  const [isCardLoading, setIsCardLoading] = useState(true);
+  const [isCardSubmitting, setIsCardSubmitting] = useState(false);
 
   const loadQuestions = useCallback(async () => {
     setError("");
@@ -97,6 +114,87 @@ export function HiderQuestionBoard({ gameId, userId }: HiderQuestionBoardProps) 
   useEffect(() => {
     void loadQuestions();
   }, [loadQuestions]);
+
+  const loadCards = useCallback(async () => {
+    setIsCardLoading(true);
+    const supabase = createSupabaseBrowserClient();
+    const { data, error: cardError } = await supabase
+      .from("hider_card_log")
+      .select("id, card_name, status, note, received_at")
+      .eq("game_id", gameId)
+      .order("received_at", { ascending: false });
+
+    setIsCardLoading(false);
+
+    if (cardError) {
+      setError(cardError.message);
+      return;
+    }
+
+    setCards(data as CardLog[]);
+  }, [gameId]);
+
+  useEffect(() => {
+    void loadCards();
+  }, [loadCards]);
+
+  async function addCard(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const nextCardName = cardName.trim();
+
+    if (!nextCardName || isCardSubmitting) {
+      return;
+    }
+
+    setError("");
+    setIsCardSubmitting(true);
+    const supabase = createSupabaseBrowserClient();
+    const { data, error: cardError } = await supabase
+      .from("hider_card_log")
+      .insert({
+        game_id: gameId,
+        recorded_by: userId,
+        card_name: nextCardName,
+        note: cardNote.trim(),
+      })
+      .select("id, card_name, status, note, received_at")
+      .single();
+
+    setIsCardSubmitting(false);
+
+    if (cardError) {
+      setError(cardError.message);
+      return;
+    }
+
+    setCards((currentCards) => [data as CardLog, ...currentCards]);
+    setCardName("");
+    setCardNote("");
+  }
+
+  async function updateCardStatus(card: CardLog, status: CardLogStatus) {
+    const supabase = createSupabaseBrowserClient();
+    const { data, error: cardError } = await supabase
+      .from("hider_card_log")
+      .update({
+        status,
+        used_at: status === "held" ? null : new Date().toISOString(),
+      })
+      .eq("id", card.id)
+      .select("id, card_name, status, note, received_at")
+      .single();
+
+    if (cardError) {
+      setError(cardError.message);
+      return;
+    }
+
+    setCards((currentCards) =>
+      currentCards.map((currentCard) =>
+        currentCard.id === card.id ? (data as CardLog) : currentCard,
+      ),
+    );
+  }
 
   return (
     <section className="hider-board" aria-labelledby="hider-board-heading">
@@ -226,6 +324,76 @@ export function HiderQuestionBoard({ gameId, userId }: HiderQuestionBoardProps) 
           ))}
         </div>
       )}
+      <section className="card-hand" aria-labelledby="card-hand-heading">
+        <div className="board-heading">
+          <div>
+            <p className="eyebrow">Physical cards</p>
+            <h3 id="card-hand-heading">Hider Team card hand.</h3>
+          </div>
+          <button
+            className="text-button"
+            disabled={isCardLoading}
+            type="button"
+            onClick={() => void loadCards()}
+          >
+            Refresh
+          </button>
+        </div>
+        <form className="card-log-form" onSubmit={addCard}>
+          <label htmlFor="card-name">Card name</label>
+          <input
+            id="card-name"
+            maxLength={100}
+            value={cardName}
+            onChange={(event) => setCardName(event.target.value)}
+            required
+          />
+          <label htmlFor="card-note">Note (optional)</label>
+          <input
+            id="card-note"
+            maxLength={300}
+            value={cardNote}
+            onChange={(event) => setCardNote(event.target.value)}
+          />
+          <button className="button button-primary" disabled={isCardSubmitting} type="submit">
+            {isCardSubmitting ? "Logging..." : "Log received card"}
+          </button>
+        </form>
+        {isCardLoading ? (
+          <p className="board-loading" role="status">Loading card hand...</p>
+        ) : cards.length ? (
+          <div className="card-list">
+            {cards.map((card) => (
+              <article className="card-item" key={card.id}>
+                <div>
+                  <strong>{card.card_name}</strong>
+                  <span>{card.status}</span>
+                </div>
+                {card.note && <p>{card.note}</p>}
+                <div className="card-actions">
+                  {card.status === "held" && (
+                    <>
+                      <button type="button" onClick={() => void updateCardStatus(card, "used")}>
+                        Mark used
+                      </button>
+                      <button type="button" onClick={() => void updateCardStatus(card, "expired")}>
+                        Mark expired
+                      </button>
+                    </>
+                  )}
+                  {card.status !== "held" && (
+                    <button type="button" onClick={() => void updateCardStatus(card, "held")}>
+                      Return to hand
+                    </button>
+                  )}
+                </div>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <p className="board-loading" role="status">No physical cards logged yet.</p>
+        )}
+      </section>
     </section>
   );
 }

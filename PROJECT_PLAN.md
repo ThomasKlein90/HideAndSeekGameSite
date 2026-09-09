@@ -64,7 +64,7 @@ website. Update it as rules and priorities are agreed.
 - [x] Deliver pending questions to the Hider Team view.
 - [x] Store question status, answers, timestamps, and round history.
 - [x] Prevent accidental duplicate submissions while allowing admin corrections.
-- [ ] Add seeker-only notes, pins, and eliminated-area annotations to the map.
+- [x] Add seeker-only notes, pins, and eliminated-area annotations to the map.
 
 ## Phase 4 - Hider Dashboard
 
@@ -72,7 +72,7 @@ website. Update it as rules and priorities are agreed.
 - [x] Show incoming questions with clear answer controls.
 - [x] Record the selected answer type and submit answer history to seekers.
 - [x] Log physical-card rewards received for answering each question.
-- [ ] Show the Hider Team's current card hand/log, including use and expiry where applicable.
+- [x] Show the Hider Team's current card hand/log, including use and expiry where applicable.
 - [ ] Display the configured final-hiding radius and a manually selected/reference hiding point.
 - [ ] Add a dedicated seeker-status panel ready for future check-ins or consented locations.
 
