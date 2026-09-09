@@ -7,8 +7,8 @@ This file is the short operational record for resuming work after a Copilot sess
 - Last verified: 2026-09-09
 - Repository: `ThomasKlein90/HideAndSeekGameSite`
 - Integration branch: `main`
-- Working branch: `feature/seeker-question-submission`
-- Baseline commit: `1013f7b` (merged handoff documentation on `main`)
+- Working branch: `feature/hider-question-view`
+- Baseline commit: `40743e0` (merged seeker question submission PR #8)
 - Previous pull requests: #4, #5, #6, and #7, all reviewed and merged
 - Product stage: Foundation and game setup
 
@@ -60,26 +60,27 @@ feature branch was deleted after merge.
 - `npm run build`: blocked because `npm` is not available in the current PowerShell PATH.
 - Migration application: not yet applied to a local or linked Supabase project.
 - Manual question-event validation: pending Supabase configuration.
-- Current seeker-submission diff: `git diff --check` passed.
+- Current hider-answer diff: `git diff --check` passed.
 
-## Next Development Slice
+## Current Development Slice
 
-The seeker submission slice is implemented on
-`feature/seeker-question-submission`, based on the updated `main` baseline.
+The seeker submission slice was merged as PR #8. The Hider Team pending-question
+view is now implemented on `feature/hider-question-view`, based on the updated
+`main` baseline.
 
-- The seeker board accepts `gameId` and `userId` from the authenticated game
-  setup flow.
-- Seekers must confirm a selected question before a typed insert creates a
-  pending `question_events` row.
-- The board reports submission success and prevents resubmitting the same
-  template during the current board session.
-- The hider answer workflow and pending-event view remain the next application
-  slice.
+- Hider players can load pending question events for their game and submit
+  answers with the template's expected answer control.
+- Answer submissions set the event to `answered`, record the answering player
+  and timestamp, and optionally record a physical-card reward note.
+- Joined players refresh their assigned team after joining, allowing the Hider
+  Team view to render when assignment is already available.
+- Round history, seeker answer history, and realtime updates remain future
+  slices.
 - The question-events migration is still not applied to a configured Supabase
   environment.
 
-The next session should validate this flow against Supabase, then implement the
-pending question view for the Hider Team.
+The next session should validate this workflow against Supabase, then implement
+seeker answer history and round-history persistence.
 
 ## Start-Of-Session Procedure
 
@@ -90,9 +91,8 @@ pending question view for the Hider Team.
 5. Create a focused branch from the updated `main`.
 6. Confirm the exact next task and the validation command before editing.
 
-For the next session on Wednesday, 2026-09-09, the expected branch is
-`feature/seeker-question-submission` and the expected first task is connecting
-the seeker board to question-event creation.
+The current session branch is `feature/hider-question-view`, created from
+merged `main` commit `40743e0`.
 
 ## Resume In Agent Window
 

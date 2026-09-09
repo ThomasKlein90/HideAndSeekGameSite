@@ -61,7 +61,7 @@ website. Update it as rules and priorities are agreed.
 - [x] Display the six placeholder seeker categories: Matching, Measuring, Thermometer, Radar, Tentacles, and Photos.
 - [x] Define the question-event data model, status values, access policies, and typed database contract.
 - [x] Let seekers submit a question after confirmation.
-- [ ] Deliver pending questions to the Hider Team view.
+- [x] Deliver pending questions to the Hider Team view.
 - [ ] Store question status, answers, timestamps, and round history.
 - [ ] Prevent accidental duplicate submissions while allowing admin corrections.
 - [ ] Add seeker-only notes, pins, and eliminated-area annotations to the map.
@@ -69,9 +69,9 @@ website. Update it as rules and priorities are agreed.
 ## Phase 4 - Hider Dashboard
 
 - [ ] Display current round, phase, and a server-authoritative hiding timer.
-- [ ] Show incoming questions with clear answer controls.
-- [ ] Record the selected answer type and submit answer history to seekers.
-- [ ] Log physical-card rewards received for answering each question.
+- [x] Show incoming questions with clear answer controls.
+- [x] Record the selected answer type and submit answer history to seekers.
+- [x] Log physical-card rewards received for answering each question.
 - [ ] Show the Hider Team's current card hand/log, including use and expiry where applicable.
 - [ ] Display the configured final-hiding radius and a manually selected/reference hiding point.
 - [ ] Add a dedicated seeker-status panel ready for future check-ins or consented locations.

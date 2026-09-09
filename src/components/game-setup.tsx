@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
+import { HiderQuestionBoard } from "@/components/hider-question-board";
 import { SeekerQuestionBoard } from "@/components/seeker-question-board";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
@@ -78,7 +79,9 @@ export function GameSetup() {
       return;
     }
 
-    setPlayers(data as GamePlayer[]);
+    const loadedPlayers = data as GamePlayer[];
+    setPlayers(loadedPlayers);
+    return loadedPlayers;
   }
 
   useEffect(() => {
@@ -237,7 +240,15 @@ export function GameSetup() {
 
     setCreatedGame(game);
     setIsGameHost(false);
-    setCurrentTeam(null);
+    const loadedPlayers = await loadPlayers(game.id);
+    if (!loadedPlayers) {
+      return;
+    }
+
+    setCurrentTeam(
+      loadedPlayers.find((player) => player.user_id === session?.user.id)?.team ??
+        null,
+    );
     setStatus("You joined the game. The host will assign your team.");
   }
 
@@ -482,6 +493,9 @@ export function GameSetup() {
       )}
       {createdGame && currentTeam === "seekers" && session && (
         <SeekerQuestionBoard gameId={createdGame.id} userId={session.user.id} />
+      )}
+      {createdGame && currentTeam === "hiders" && session && (
+        <HiderQuestionBoard gameId={createdGame.id} userId={session.user.id} />
       )}
     </section>
   );
