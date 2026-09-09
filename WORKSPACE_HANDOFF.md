@@ -7,8 +7,8 @@ This file is the short operational record for resuming work after a Copilot sess
 - Last verified: 2026-09-09
 - Repository: `ThomasKlein90/HideAndSeekGameSite`
 - Integration branch: `main`
-- Working branch: `feature/seeker-answer-history`
-- Baseline commit: `4e118cf` (merged hider question workflow)
+- Working branch: `feature/question-round-history`
+- Baseline commit: `0a73087` (merged seeker answer history)
 - Previous pull requests: #4, #5, #6, and #7, all reviewed and merged
 - Product stage: Foundation and game setup
 
@@ -61,13 +61,13 @@ feature branch was deleted after merge.
 - Migration application: not yet applied to a local or linked Supabase project.
 - Manual question-event validation: pending Supabase configuration.
 - Current seeker-answer-history diff: `git diff --check` passed.
+- Current question-round-history diff: `git diff --check` passed.
 
 ## Current Development Slice
 
-The seeker submission slice was merged as PR #8. The Hider Team pending-question
-and answer workflow was merged into `main` as commit `4e118cf`. The seeker
-answer-history view is now being implemented on
-`feature/seeker-answer-history`.
+The seeker submission, Hider Team answer workflow, and seeker answer-history
+slices are merged into `main`. Round-history persistence is now being
+implemented on `feature/question-round-history`.
 
 - Hider players can load pending question events for their game and submit
   answers with the template's expected answer control.
@@ -77,12 +77,12 @@ answer-history view is now being implemented on
   answer timestamp and optional reward note, and manually refresh the history.
 - Joined players refresh their assigned team after joining, allowing the Hider
   Team view to render when assignment is already available.
-- Round history and realtime updates remain future slices.
+- Realtime updates remain a future slice.
 - The question-events migration is still not applied to a configured Supabase
   environment.
 
-The next session should validate this history view against Supabase, then
-implement round-history persistence.
+The next session should validate round association against Supabase, then
+implement duplicate-submission protection and admin corrections.
 
 ## Start-Of-Session Procedure
 
@@ -93,8 +93,8 @@ implement round-history persistence.
 5. Create a focused branch from the updated `main`.
 6. Confirm the exact next task and the validation command before editing.
 
-The current session branch is `feature/seeker-answer-history`, created from
-merged `main` commit `4e118cf`.
+The current session branch is `feature/question-round-history`, created from
+merged `main` commit `0a73087`.
 
 ## Resume In Agent Window
 

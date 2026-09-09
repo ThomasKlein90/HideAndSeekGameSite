@@ -62,7 +62,7 @@ website. Update it as rules and priorities are agreed.
 - [x] Define the question-event data model, status values, access policies, and typed database contract.
 - [x] Let seekers submit a question after confirmation.
 - [x] Deliver pending questions to the Hider Team view.
-- [ ] Store question status, answers, timestamps, and round history.
+- [x] Store question status, answers, timestamps, and round history.
 - [ ] Prevent accidental duplicate submissions while allowing admin corrections.
 - [ ] Add seeker-only notes, pins, and eliminated-area annotations to the map.
 
@@ -93,6 +93,18 @@ website. Update it as rules and priorities are agreed.
 - [ ] Add advisory station-radius and board-boundary checks; retain manual/admin override.
 - [ ] Add PWA installation support and consider push notifications.
 - [ ] Add post-game timeline and replay features.
+
+## Final Validation Stage - Simulated Game Testing
+
+- [ ] Add a development-only simulation mode that creates a disposable game with
+  seeded players, teams, rounds, question events, answers, and reward notes.
+- [ ] Provide deterministic controls to advance game phases, submit questions,
+  answer them, and complete rounds without requiring four live accounts.
+- [ ] Add a reset/cleanup action that removes simulation data and clearly marks
+  simulated games so they cannot be mistaken for live games.
+- [ ] Document a manual browser walkthrough for entering representative inputs
+  and verifying the seeker, hider, host, and round-history views.
+- [ ] Use the simulation flow for regression checks before live-device testing.
 
 ## Next Session Handoff
 
