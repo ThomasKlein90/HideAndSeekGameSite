@@ -33,58 +33,6 @@ export type Database = {
           team: GameTeam;
           user_id: string;
         };
-        hider_card_log: {
-          Row: {
-            card_name: string;
-            created_at: string;
-            game_id: string;
-            id: string;
-            note: string;
-            received_at: string;
-            recorded_by: string;
-            round_id: string | null;
-            status: CardLogStatus;
-            updated_at: string;
-            used_at: string | null;
-          };
-          Insert: {
-            card_name: string;
-            created_at?: string;
-            game_id: string;
-            id?: string;
-            note?: string;
-            received_at?: string;
-            recorded_by: string;
-            round_id?: string | null;
-            status?: CardLogStatus;
-            updated_at?: string;
-            used_at?: string | null;
-          };
-          Update: Partial<Database["public"]["Tables"]["hider_card_log"]["Insert"]>;
-          Relationships: [
-            {
-              foreignKeyName: "hider_card_log_game_id_fkey";
-              columns: ["game_id"];
-              isOneToOne: false;
-              referencedRelation: "games";
-              referencedColumns: ["id"];
-            },
-            {
-              foreignKeyName: "hider_card_log_round_id_fkey";
-              columns: ["round_id"];
-              isOneToOne: false;
-              referencedRelation: "rounds";
-              referencedColumns: ["id"];
-            },
-            {
-              foreignKeyName: "hider_card_log_recorded_by_fkey";
-              columns: ["recorded_by"];
-              isOneToOne: false;
-              referencedRelation: "profiles";
-              referencedColumns: ["id"];
-            },
-          ];
-        };
         Insert: {
           created_at?: string;
           game_id: string;
@@ -112,6 +60,70 @@ export type Database = {
           {
             foreignKeyName: "game_players_user_id_fkey";
             columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      hider_card_log: {
+        Row: {
+          card_name: string;
+          created_at: string;
+          game_id: string;
+          id: string;
+          note: string;
+          received_at: string;
+          recorded_by: string;
+          round_id: string | null;
+          status: CardLogStatus;
+          updated_at: string;
+          used_at: string | null;
+        };
+        Insert: {
+          card_name: string;
+          created_at?: string;
+          game_id: string;
+          id?: string;
+          note?: string;
+          received_at?: string;
+          recorded_by: string;
+          round_id?: string | null;
+          status?: CardLogStatus;
+          updated_at?: string;
+          used_at?: string | null;
+        };
+        Update: {
+          card_name?: string;
+          created_at?: string;
+          game_id?: string;
+          id?: string;
+          note?: string;
+          received_at?: string;
+          recorded_by?: string;
+          round_id?: string | null;
+          status?: CardLogStatus;
+          updated_at?: string;
+          used_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "hider_card_log_game_id_fkey";
+            columns: ["game_id"];
+            isOneToOne: false;
+            referencedRelation: "games";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "hider_card_log_round_id_fkey";
+            columns: ["round_id"];
+            isOneToOne: false;
+            referencedRelation: "rounds";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "hider_card_log_recorded_by_fkey";
+            columns: ["recorded_by"];
             isOneToOne: false;
             referencedRelation: "profiles";
             referencedColumns: ["id"];
@@ -158,6 +170,7 @@ export type Database = {
           join_code: string;
           name: string;
           phase: GamePhase;
+          phase_started_at: string | null;
           updated_at: string;
         };
         Insert: {
@@ -167,6 +180,7 @@ export type Database = {
           join_code: string;
           name: string;
           phase?: GamePhase;
+          phase_started_at?: string | null;
           updated_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["games"]["Insert"]>;

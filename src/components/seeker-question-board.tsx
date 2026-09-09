@@ -168,7 +168,7 @@ export function SeekerQuestionBoard({
   }, [gameId]);
 
   useEffect(() => {
-    void loadAnsweredQuestions();
+    queueMicrotask(() => void loadAnsweredQuestions());
   }, [loadAnsweredQuestions]);
 
   const loadAnnotations = useCallback(async () => {
@@ -191,7 +191,7 @@ export function SeekerQuestionBoard({
   }, [gameId]);
 
   useEffect(() => {
-    void loadAnnotations();
+    queueMicrotask(() => void loadAnnotations());
   }, [loadAnnotations]);
 
   async function createAnnotation(event: FormEvent<HTMLFormElement>) {

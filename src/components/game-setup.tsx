@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { HiderQuestionBoard } from "@/components/hider-question-board";
 import { SeekerQuestionBoard } from "@/components/seeker-question-board";
+import { GameRoundDashboard } from "@/components/game-round-dashboard";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 type CreatedGame = {
@@ -45,7 +46,7 @@ export function GameSetup() {
 
   useEffect(() => {
     if (!session) {
-      setDisplayName("");
+      queueMicrotask(() => setDisplayName(""));
       return;
     }
 
@@ -491,6 +492,7 @@ export function GameSetup() {
           )}
         </div>
       )}
+      {createdGame && <GameRoundDashboard gameId={createdGame.id} />}
       {createdGame && currentTeam === "seekers" && session && (
         <SeekerQuestionBoard gameId={createdGame.id} userId={session.user.id} />
       )}
