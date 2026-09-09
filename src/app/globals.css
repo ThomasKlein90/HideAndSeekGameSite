@@ -843,6 +843,57 @@ h1 {
   color: var(--muted-ink);
 }
 
+.answer-history {
+  margin-top: 1.5rem;
+  border-top: 1px solid rgb(19 42 54 / 15%);
+  padding-top: 1.5rem;
+}
+
+.answer-history .board-heading h3 {
+  margin-bottom: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.35rem;
+  letter-spacing: -0.03em;
+}
+
+.answer-history .text-button {
+  color: var(--pine);
+}
+
+.answer-history-list {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.answered-question {
+  border: 1px solid rgb(19 42 54 / 14%);
+  border-radius: 0.65rem;
+  padding: 1rem;
+  background: var(--paper);
+}
+
+.answered-question > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.answered-question strong {
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.answered-question span,
+.answered-question small {
+  color: var(--muted-ink);
+  font-size: 0.72rem;
+}
+
+.answered-question p {
+  margin: 0.6rem 0 0.35rem;
+  font-weight: 700;
+}
+
 @media (min-width: 36rem) {
   .field-pair {
     grid-template-columns: 1fr 1fr;
