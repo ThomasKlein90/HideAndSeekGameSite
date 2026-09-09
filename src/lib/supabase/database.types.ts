@@ -170,6 +170,7 @@ export type Database = {
           join_code: string;
           name: string;
           phase: GamePhase;
+          phase_started_at: string | null;
           updated_at: string;
         };
         Insert: {
@@ -179,6 +180,7 @@ export type Database = {
           join_code: string;
           name: string;
           phase?: GamePhase;
+          phase_started_at?: string | null;
           updated_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["games"]["Insert"]>;
