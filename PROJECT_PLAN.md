@@ -63,7 +63,7 @@ website. Update it as rules and priorities are agreed.
 - [x] Let seekers submit a question after confirmation.
 - [x] Deliver pending questions to the Hider Team view.
 - [x] Store question status, answers, timestamps, and round history.
-- [ ] Prevent accidental duplicate submissions while allowing admin corrections.
+- [x] Prevent accidental duplicate submissions while allowing admin corrections.
 - [ ] Add seeker-only notes, pins, and eliminated-area annotations to the map.
 
 ## Phase 4 - Hider Dashboard
