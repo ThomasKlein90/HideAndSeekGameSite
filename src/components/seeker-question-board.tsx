@@ -17,10 +17,14 @@ type AnsweredQuestion = {
   id: string;
   answer: string;
   answered_at: string;
+  round_id: string | null;
   reward_note: string | null;
   question_templates: {
     title: string;
     category: QuestionCategory;
+  } | null;
+  rounds: {
+    number: number;
   } | null;
 };
 
@@ -76,6 +80,7 @@ export function SeekerQuestionBoard({
     [],
   );
   const [isHistoryLoading, setIsHistoryLoading] = useState(true);
+  const [currentRoundId, setCurrentRoundId] = useState<string | null>(null);
 
   useEffect(() => {
     const supabase = createSupabaseBrowserClient();
@@ -103,7 +108,7 @@ export function SeekerQuestionBoard({
     const { data, error: historyError } = await supabase
       .from("question_events")
       .select(
-        "id, answer, answered_at, reward_note, question_templates(title, category)",
+        "id, answer, answered_at, round_id, reward_note, question_templates(title, category), rounds(number)",
       )
       .eq("game_id", gameId)
       .eq("status", "answered")
@@ -120,6 +125,27 @@ export function SeekerQuestionBoard({
   }, [gameId]);
 
   useEffect(() => {
+    const supabase = createSupabaseBrowserClient();
+
+    void supabase
+      .from("rounds")
+      .select("id")
+      .eq("game_id", gameId)
+      .is("ended_at", null)
+      .order("number", { ascending: false })
+      .limit(1)
+      .maybeSingle()
+      .then(({ data, error: roundError }) => {
+        if (roundError) {
+          setError(roundError.message);
+          return;
+        }
+
+        setCurrentRoundId(data?.id ?? null);
+      });
+  }, [gameId]);
+
+  useEffect(() => {
     void loadAnsweredQuestions();
   }, [loadAnsweredQuestions]);
 
@@ -132,6 +158,11 @@ export function SeekerQuestionBoard({
       return;
     }
 
+    if (!currentRoundId) {
+      setError("No active round is available for this game.");
+      return;
+    }
+
     setError("");
     setStatus("");
     setIsSubmitting(true);
@@ -139,6 +170,7 @@ export function SeekerQuestionBoard({
     const supabase = createSupabaseBrowserClient();
     const { error: submitError } = await supabase.from("question_events").insert({
       game_id: gameId,
+      round_id: currentRoundId,
       question_template_id: selectedQuestion.id,
       asked_by: userId,
     });
@@ -295,9 +327,9 @@ export function SeekerQuestionBoard({
                     {question.question_templates?.title ?? "Question"}
                   </strong>
                   <span>
-                    {question.question_templates
-                      ? categoryDetails[question.question_templates.category].label
-                      : "Answered"}
+                    {question.rounds
+                      ? `Round ${question.rounds.number}`
+                      : "No round"}
                   </span>
                 </div>
                 <p>{question.answer}</p>
