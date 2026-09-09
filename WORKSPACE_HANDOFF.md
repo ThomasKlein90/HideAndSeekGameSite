@@ -7,8 +7,8 @@ This file is the short operational record for resuming work after a Copilot sess
 - Last verified: 2026-09-09
 - Repository: `ThomasKlein90/HideAndSeekGameSite`
 - Integration branch: `main`
-- Working branch: `feature/question-round-history`
-- Baseline commit: `0a73087` (merged seeker answer history)
+- Working branch: `feature/question-duplicate-protection`
+- Baseline commit: `3409fb8` (merged question round history)
 - Previous pull requests: #4, #5, #6, and #7, all reviewed and merged
 - Product stage: Foundation and game setup
 
@@ -66,8 +66,8 @@ feature branch was deleted after merge.
 ## Current Development Slice
 
 The seeker submission, Hider Team answer workflow, and seeker answer-history
-slices are merged into `main`. Round-history persistence is now being
-implemented on `feature/question-round-history`.
+slices are merged into `main`. Round-history persistence was merged into `main` as PR #10. Duplicate question
+protection is now being implemented on `feature/question-duplicate-protection`.
 
 - Hider players can load pending question events for their game and submit
   answers with the template's expected answer control.
@@ -78,11 +78,14 @@ implemented on `feature/question-round-history`.
 - Joined players refresh their assigned team after joining, allowing the Hider
   Team view to render when assignment is already available.
 - Realtime updates remain a future slice.
+- A unique database index prevents the same active question template from being
+  submitted twice in one round; cancelled events remain resubmittable.
+- The existing host update policy preserves an admin correction path.
 - The question-events migration is still not applied to a configured Supabase
   environment.
 
-The next session should validate round association against Supabase, then
-implement duplicate-submission protection and admin corrections.
+The next session should validate duplicate protection against Supabase, then
+implement seeker-only notes, pins, and eliminated-area annotations.
 
 ## Start-Of-Session Procedure
 
@@ -93,8 +96,8 @@ implement duplicate-submission protection and admin corrections.
 5. Create a focused branch from the updated `main`.
 6. Confirm the exact next task and the validation command before editing.
 
-The current session branch is `feature/question-round-history`, created from
-merged `main` commit `0a73087`.
+The current session branch is `feature/question-duplicate-protection`, created
+from merged `main` commit `3409fb8`.
 
 ## Resume In Agent Window
 

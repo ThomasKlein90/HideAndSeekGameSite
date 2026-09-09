@@ -178,7 +178,11 @@ export function SeekerQuestionBoard({
     setIsSubmitting(false);
 
     if (submitError) {
-      setError(submitError.message);
+      setError(
+        submitError.code === "23505"
+          ? "This question has already been submitted for the current round."
+          : submitError.message,
+      );
       return;
     }
 
