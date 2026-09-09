@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { QuestionAnswerType, QuestionCategory } from "@/lib/supabase/database.types";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
@@ -11,6 +11,17 @@ type QuestionTemplate = {
   prompt: string;
   answer_type: QuestionAnswerType;
   reward_rule: string;
+};
+
+type AnsweredQuestion = {
+  id: string;
+  answer: string;
+  answered_at: string;
+  reward_note: string | null;
+  question_templates: {
+    title: string;
+    category: QuestionCategory;
+  } | null;
 };
 
 const categoryDetails: Record<
@@ -61,6 +72,10 @@ export function SeekerQuestionBoard({
   const [submittedQuestionIds, setSubmittedQuestionIds] = useState<Set<string>>(
     new Set(),
   );
+  const [answeredQuestions, setAnsweredQuestions] = useState<AnsweredQuestion[]>(
+    [],
+  );
+  const [isHistoryLoading, setIsHistoryLoading] = useState(true);
 
   useEffect(() => {
     const supabase = createSupabaseBrowserClient();
@@ -79,6 +94,34 @@ export function SeekerQuestionBoard({
         setQuestions(data);
       });
   }, []);
+
+  const loadAnsweredQuestions = useCallback(async () => {
+    setError("");
+    setIsHistoryLoading(true);
+
+    const supabase = createSupabaseBrowserClient();
+    const { data, error: historyError } = await supabase
+      .from("question_events")
+      .select(
+        "id, answer, answered_at, reward_note, question_templates(title, category)",
+      )
+      .eq("game_id", gameId)
+      .eq("status", "answered")
+      .order("answered_at", { ascending: false });
+
+    setIsHistoryLoading(false);
+
+    if (historyError) {
+      setError(historyError.message);
+      return;
+    }
+
+    setAnsweredQuestions(data as AnsweredQuestion[]);
+  }, [gameId]);
+
+  useEffect(() => {
+    void loadAnsweredQuestions();
+  }, [loadAnsweredQuestions]);
 
   const selectedQuestion = questions.find(
     (question) => question.category === selectedCategory,
@@ -224,6 +267,55 @@ export function SeekerQuestionBoard({
         </p>
       )}
       {!questions.length && !error && <p className="board-loading">Loading categories...</p>}
+      <section className="answer-history" aria-labelledby="answer-history-heading">
+        <div className="board-heading">
+          <div>
+            <p className="eyebrow">Answer history</p>
+            <h3 id="answer-history-heading">Questions already answered.</h3>
+          </div>
+          <button
+            className="text-button"
+            disabled={isHistoryLoading}
+            type="button"
+            onClick={() => void loadAnsweredQuestions()}
+          >
+            Refresh
+          </button>
+        </div>
+        {isHistoryLoading ? (
+          <p className="board-loading" role="status">
+            Loading answers...
+          </p>
+        ) : answeredQuestions.length ? (
+          <div className="answer-history-list">
+            {answeredQuestions.map((question) => (
+              <article className="answered-question" key={question.id}>
+                <div>
+                  <strong>
+                    {question.question_templates?.title ?? "Question"}
+                  </strong>
+                  <span>
+                    {question.question_templates
+                      ? categoryDetails[question.question_templates.category].label
+                      : "Answered"}
+                  </span>
+                </div>
+                <p>{question.answer}</p>
+                <small>
+                  Answered {new Date(question.answered_at).toLocaleString()}
+                  {question.reward_note
+                    ? ` · Reward: ${question.reward_note}`
+                    : ""}
+                </small>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <p className="board-loading" role="status">
+            No answered questions yet.
+          </p>
+        )}
+      </section>
     </section>
   );
 }

@@ -7,8 +7,8 @@ This file is the short operational record for resuming work after a Copilot sess
 - Last verified: 2026-09-09
 - Repository: `ThomasKlein90/HideAndSeekGameSite`
 - Integration branch: `main`
-- Working branch: `feature/hider-question-view`
-- Baseline commit: `40743e0` (merged seeker question submission PR #8)
+- Working branch: `feature/seeker-answer-history`
+- Baseline commit: `4e118cf` (merged hider question workflow)
 - Previous pull requests: #4, #5, #6, and #7, all reviewed and merged
 - Product stage: Foundation and game setup
 
@@ -60,27 +60,29 @@ feature branch was deleted after merge.
 - `npm run build`: blocked because `npm` is not available in the current PowerShell PATH.
 - Migration application: not yet applied to a local or linked Supabase project.
 - Manual question-event validation: pending Supabase configuration.
-- Current hider-answer diff: `git diff --check` passed.
+- Current seeker-answer-history diff: `git diff --check` passed.
 
 ## Current Development Slice
 
 The seeker submission slice was merged as PR #8. The Hider Team pending-question
-view is now implemented on `feature/hider-question-view`, based on the updated
-`main` baseline.
+and answer workflow was merged into `main` as commit `4e118cf`. The seeker
+answer-history view is now being implemented on
+`feature/seeker-answer-history`.
 
 - Hider players can load pending question events for their game and submit
   answers with the template's expected answer control.
 - Answer submissions set the event to `answered`, record the answering player
   and timestamp, and optionally record a physical-card reward note.
+- Seekers can review answered question events for their game, including the
+  answer timestamp and optional reward note, and manually refresh the history.
 - Joined players refresh their assigned team after joining, allowing the Hider
   Team view to render when assignment is already available.
-- Round history, seeker answer history, and realtime updates remain future
-  slices.
+- Round history and realtime updates remain future slices.
 - The question-events migration is still not applied to a configured Supabase
   environment.
 
-The next session should validate this workflow against Supabase, then implement
-seeker answer history and round-history persistence.
+The next session should validate this history view against Supabase, then
+implement round-history persistence.
 
 ## Start-Of-Session Procedure
 
@@ -91,8 +93,8 @@ seeker answer history and round-history persistence.
 5. Create a focused branch from the updated `main`.
 6. Confirm the exact next task and the validation command before editing.
 
-The current session branch is `feature/hider-question-view`, created from
-merged `main` commit `40743e0`.
+The current session branch is `feature/seeker-answer-history`, created from
+merged `main` commit `4e118cf`.
 
 ## Resume In Agent Window
 
