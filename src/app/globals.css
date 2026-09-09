@@ -699,6 +699,47 @@ h1 {
   text-transform: capitalize;
 }
 
+.question-detail .button-primary {
+  margin-top: 1rem;
+  background: #f5c86d;
+  color: var(--ink);
+}
+
+.question-confirmation {
+  margin-top: 1rem;
+  border-top: 1px solid rgb(255 255 255 / 24%);
+  padding-top: 1rem;
+}
+
+.question-confirmation p {
+  margin-bottom: 0.75rem;
+  color: rgb(255 255 255 / 82%);
+}
+
+.question-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.question-detail .text-button {
+  color: white;
+}
+
+.question-submitted {
+  margin: 1rem 0 0;
+  color: #f5c86d;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.board-status {
+  margin: 1rem 0 0;
+  color: var(--pine);
+  font-weight: 700;
+  line-height: 1.5;
+}
+
 .board-error {
   margin: 0;
   color: #9b2c21;

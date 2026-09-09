@@ -4,11 +4,11 @@ This file is the short operational record for resuming work after a Copilot sess
 
 ## Current Snapshot
 
-- Last verified: 2026-09-07
+- Last verified: 2026-09-09
 - Repository: `ThomasKlein90/HideAndSeekGameSite`
 - Integration branch: `main`
-- Working branch: `main`
-- Baseline commit: `c7b36b0` (merged question-events feature)
+- Working branch: `feature/seeker-question-submission`
+- Baseline commit: `1013f7b` (merged handoff documentation on `main`)
 - Previous pull requests: #4, #5, #6, and #7, all reviewed and merged
 - Product stage: Foundation and game setup
 
@@ -60,12 +60,26 @@ feature branch was deleted after merge.
 - `npm run build`: blocked because `npm` is not available in the current PowerShell PATH.
 - Migration application: not yet applied to a local or linked Supabase project.
 - Manual question-event validation: pending Supabase configuration.
+- Current seeker-submission diff: `git diff --check` passed.
 
 ## Next Development Slice
 
-Create `feature/seeker-question-submission` from the updated `main`. Apply the
-question-events migration in a configured Supabase environment, then implement
-seeker submission and the hider answer workflow against the event contract.
+The seeker submission slice is implemented on
+`feature/seeker-question-submission`, based on the updated `main` baseline.
+
+- The seeker board accepts `gameId` and `userId` from the authenticated game
+  setup flow.
+- Seekers must confirm a selected question before a typed insert creates a
+  pending `question_events` row.
+- The board reports submission success and prevents resubmitting the same
+  template during the current board session.
+- The hider answer workflow and pending-event view remain the next application
+  slice.
+- The question-events migration is still not applied to a configured Supabase
+  environment.
+
+The next session should validate this flow against Supabase, then implement the
+pending question view for the Hider Team.
 
 ## Start-Of-Session Procedure
 

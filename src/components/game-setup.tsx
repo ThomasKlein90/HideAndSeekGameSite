@@ -480,7 +480,9 @@ export function GameSetup() {
           )}
         </div>
       )}
-      {createdGame && currentTeam === "seekers" && <SeekerQuestionBoard />}
+      {createdGame && currentTeam === "seekers" && session && (
+        <SeekerQuestionBoard gameId={createdGame.id} userId={session.user.id} />
+      )}
     </section>
   );
 }

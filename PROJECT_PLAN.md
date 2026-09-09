@@ -60,7 +60,7 @@ website. Update it as rules and priorities are agreed.
 - [x] Create an editable placeholder question catalogue with category, card-reward rule, answer type, and active status.
 - [x] Display the six placeholder seeker categories: Matching, Measuring, Thermometer, Radar, Tentacles, and Photos.
 - [x] Define the question-event data model, status values, access policies, and typed database contract.
-- [ ] Let seekers submit a question after confirmation.
+- [x] Let seekers submit a question after confirmation.
 - [ ] Deliver pending questions to the Hider Team view.
 - [ ] Store question status, answers, timestamps, and round history.
 - [ ] Prevent accidental duplicate submissions while allowing admin corrections.

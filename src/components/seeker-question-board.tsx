@@ -43,10 +43,24 @@ const categoryDetails: Record<
   },
 };
 
-export function SeekerQuestionBoard() {
+type SeekerQuestionBoardProps = {
+  gameId: string;
+  userId: string;
+};
+
+export function SeekerQuestionBoard({
+  gameId,
+  userId,
+}: SeekerQuestionBoardProps) {
   const [questions, setQuestions] = useState<QuestionTemplate[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<QuestionCategory | null>(null);
   const [error, setError] = useState("");
+  const [status, setStatus] = useState("");
+  const [isConfirming, setIsConfirming] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submittedQuestionIds, setSubmittedQuestionIds] = useState<Set<string>>(
+    new Set(),
+  );
 
   useEffect(() => {
     const supabase = createSupabaseBrowserClient();
@@ -69,6 +83,38 @@ export function SeekerQuestionBoard() {
   const selectedQuestion = questions.find(
     (question) => question.category === selectedCategory,
   );
+
+  async function submitQuestion() {
+    if (!selectedQuestion || isSubmitting) {
+      return;
+    }
+
+    setError("");
+    setStatus("");
+    setIsSubmitting(true);
+
+    const supabase = createSupabaseBrowserClient();
+    const { error: submitError } = await supabase.from("question_events").insert({
+      game_id: gameId,
+      question_template_id: selectedQuestion.id,
+      asked_by: userId,
+    });
+
+    setIsSubmitting(false);
+
+    if (submitError) {
+      setError(submitError.message);
+      return;
+    }
+
+    setSubmittedQuestionIds((questionIds) => {
+      const nextQuestionIds = new Set(questionIds);
+      nextQuestionIds.add(selectedQuestion.id);
+      return nextQuestionIds;
+    });
+    setIsConfirming(false);
+    setStatus("Question sent to the Hider Team.");
+  }
 
   return (
     <section className="seeker-board" aria-labelledby="seeker-board-heading">
@@ -115,7 +161,7 @@ export function SeekerQuestionBoard() {
         </div>
       )}
       {selectedQuestion && (
-        <div className="question-detail" role="status">
+        <div className="question-detail">
           <p className="eyebrow">
             {categoryDetails[selectedQuestion.category].label}
           </p>
@@ -131,7 +177,51 @@ export function SeekerQuestionBoard() {
               <dd>{selectedQuestion.reward_rule}</dd>
             </div>
           </dl>
+          {submittedQuestionIds.has(selectedQuestion.id) ? (
+            <p className="question-submitted" role="status">
+              This question has been sent to the Hider Team.
+            </p>
+          ) : isConfirming ? (
+            <div className="question-confirmation">
+              <p>Send this question to the Hider Team?</p>
+              <div className="question-actions">
+                <button
+                  className="button button-primary"
+                  disabled={isSubmitting}
+                  type="button"
+                  onClick={() => void submitQuestion()}
+                >
+                  {isSubmitting ? "Sending..." : "Confirm and send"}
+                </button>
+                <button
+                  className="text-button"
+                  disabled={isSubmitting}
+                  type="button"
+                  onClick={() => setIsConfirming(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              className="button button-primary"
+              type="button"
+              onClick={() => {
+                setError("");
+                setStatus("");
+                setIsConfirming(true);
+              }}
+            >
+              Submit question
+            </button>
+          )}
         </div>
+      )}
+      {status && (
+        <p className="board-status" role="status">
+          {status}
+        </p>
       )}
       {!questions.length && !error && <p className="board-loading">Loading categories...</p>}
     </section>
