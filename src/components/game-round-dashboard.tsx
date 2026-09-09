@@ -17,6 +17,14 @@ type DashboardData = {
   finalHidingRadiusMeters: number;
 };
 
+type AuditEntry = {
+  id: string;
+  action: string;
+  from_phase: GamePhase | null;
+  to_phase: GamePhase | null;
+  created_at: string;
+};
+
 const phaseLabels: Record<GamePhase, string> = {
   setup: "Setup",
   hider_head_start: "Hider head start",
@@ -34,6 +42,7 @@ function formatDuration(totalSeconds: number) {
 
 export function GameRoundDashboard({ gameId, isHost }: GameRoundDashboardProps) {
   const [data, setData] = useState<DashboardData | null>(null);
+  const [auditEntries, setAuditEntries] = useState<AuditEntry[]>([]);
   const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -42,7 +51,7 @@ export function GameRoundDashboard({ gameId, isHost }: GameRoundDashboardProps) 
     setError("");
     setIsLoading(true);
     const supabase = createSupabaseBrowserClient();
-    const [gameResult, roundResult, settingsResult] = await Promise.all([
+    const [gameResult, roundResult, settingsResult, auditResult] = await Promise.all([
       supabase
         .from("games")
         .select("phase, phase_started_at")
@@ -61,12 +70,21 @@ export function GameRoundDashboard({ gameId, isHost }: GameRoundDashboardProps) 
         .select("hider_head_start_seconds, final_hiding_radius_meters")
         .eq("game_id", gameId)
         .single(),
+      supabase
+        .from("game_audit_log")
+        .select("id, action, from_phase, to_phase, created_at")
+        .eq("game_id", gameId)
+        .order("created_at", { ascending: false })
+        .limit(8),
     ]);
 
     setIsLoading(false);
 
     const loadError =
-      gameResult.error ?? roundResult.error ?? settingsResult.error;
+      gameResult.error ??
+      roundResult.error ??
+      settingsResult.error ??
+      auditResult.error;
     if (loadError || !gameResult.data || !settingsResult.data) {
       setError(loadError?.message ?? "The game dashboard could not be loaded.");
       return;
@@ -79,6 +97,7 @@ export function GameRoundDashboard({ gameId, isHost }: GameRoundDashboardProps) 
       headStartSeconds: settingsResult.data.hider_head_start_seconds,
       finalHidingRadiusMeters: settingsResult.data.final_hiding_radius_meters,
     });
+    setAuditEntries((auditResult.data ?? []) as AuditEntry[]);
   }, [gameId]);
 
   async function transitionPhase(nextPhase: GamePhase) {
@@ -222,6 +241,25 @@ export function GameRoundDashboard({ gameId, isHost }: GameRoundDashboardProps) 
               End game
             </button>
           )}
+        </div>
+      )}
+      {!error && auditEntries.length > 0 && (
+        <div className="audit-log">
+          <span>Recent host changes</span>
+          <ul>
+            {auditEntries.map((entry) => (
+              <li key={entry.id}>
+                <strong>
+                  {entry.from_phase
+                    ? `${phaseLabels[entry.from_phase]} → ${phaseLabels[entry.to_phase ?? entry.from_phase]}`
+                    : entry.action}
+                </strong>
+                <time dateTime={entry.created_at}>
+                  {new Date(entry.created_at).toLocaleString()}
+                </time>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
     </section>

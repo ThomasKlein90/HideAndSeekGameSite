@@ -162,6 +162,54 @@ export type Database = {
           },
         ];
       };
+      game_audit_log: {
+        Row: {
+          action: string;
+          actor_id: string;
+          created_at: string;
+          details: Json;
+          from_phase: GamePhase | null;
+          game_id: string;
+          id: string;
+          to_phase: GamePhase | null;
+        };
+        Insert: {
+          action: string;
+          actor_id: string;
+          created_at?: string;
+          details?: Json;
+          from_phase?: GamePhase | null;
+          game_id: string;
+          id?: string;
+          to_phase?: GamePhase | null;
+        };
+        Update: {
+          action?: string;
+          actor_id?: string;
+          created_at?: string;
+          details?: Json;
+          from_phase?: GamePhase | null;
+          game_id?: string;
+          id?: string;
+          to_phase?: GamePhase | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "game_audit_log_game_id_fkey";
+            columns: ["game_id"];
+            isOneToOne: false;
+            referencedRelation: "games";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "game_audit_log_actor_id_fkey";
+            columns: ["actor_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       games: {
         Row: {
           created_at: string;
