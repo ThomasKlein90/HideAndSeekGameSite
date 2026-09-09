@@ -7,8 +7,8 @@ This file is the short operational record for resuming work after a Copilot sess
 - Last verified: 2026-09-09
 - Repository: `ThomasKlein90/HideAndSeekGameSite`
 - Integration branch: `main`
-- Working branch: `feature/question-duplicate-protection`
-- Baseline commit: `3409fb8` (merged question round history)
+- Working branch: `feature/seeker-map-annotations`
+- Baseline commit: `69f5148` (merged duplicate question protection)
 - Previous pull requests: #4, #5, #6, and #7, all reviewed and merged
 - Product stage: Foundation and game setup
 
@@ -66,8 +66,9 @@ feature branch was deleted after merge.
 ## Current Development Slice
 
 The seeker submission, Hider Team answer workflow, and seeker answer-history
-slices are merged into `main`. Round-history persistence was merged into `main` as PR #10. Duplicate question
-protection is now being implemented on `feature/question-duplicate-protection`.
+slices are merged into `main`. Round-history persistence and duplicate question protection were merged into
+`main` as PRs #10 and #11. Seeker-only map annotations are now being
+implemented on `feature/seeker-map-annotations`.
 
 - Hider players can load pending question events for their game and submit
   answers with the template's expected answer control.
@@ -81,11 +82,15 @@ protection is now being implemented on `feature/question-duplicate-protection`.
 - A unique database index prevents the same active question template from being
   submitted twice in one round; cancelled events remain resubmittable.
 - The existing host update policy preserves an admin correction path.
+- Seekers can create, view, and delete private note, pin, and eliminated-area
+  annotations scoped to their current game and round.
+- Hiders can log physical cards and move cards between held, used, and expired
+  states.
 - The question-events migration is still not applied to a configured Supabase
   environment.
 
-The next session should validate duplicate protection against Supabase, then
-implement seeker-only notes, pins, and eliminated-area annotations.
+The next session should validate annotation and card-log privacy/persistence
+against Supabase, then implement the current-round dashboard and timer.
 
 ## Start-Of-Session Procedure
 
@@ -96,8 +101,8 @@ implement seeker-only notes, pins, and eliminated-area annotations.
 5. Create a focused branch from the updated `main`.
 6. Confirm the exact next task and the validation command before editing.
 
-The current session branch is `feature/question-duplicate-protection`, created
-from merged `main` commit `3409fb8`.
+The current session branch is `feature/seeker-map-annotations`, created from
+merged `main` commit `69f5148`.
 
 ## Resume In Agent Window
 

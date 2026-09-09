@@ -1,7 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import type { QuestionAnswerType, QuestionCategory } from "@/lib/supabase/database.types";
+import type { FormEvent } from "react";
+import type {
+  QuestionAnswerType,
+  QuestionCategory,
+  SeekerAnnotationType,
+} from "@/lib/supabase/database.types";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 type QuestionTemplate = {
@@ -26,6 +31,15 @@ type AnsweredQuestion = {
   rounds: {
     number: number;
   } | null;
+};
+
+type SeekerAnnotation = {
+  id: string;
+  annotation_type: SeekerAnnotationType;
+  title: string;
+  note: string;
+  location_label: string | null;
+  created_at: string;
 };
 
 const categoryDetails: Record<
@@ -81,6 +95,14 @@ export function SeekerQuestionBoard({
   );
   const [isHistoryLoading, setIsHistoryLoading] = useState(true);
   const [currentRoundId, setCurrentRoundId] = useState<string | null>(null);
+  const [annotations, setAnnotations] = useState<SeekerAnnotation[]>([]);
+  const [annotationType, setAnnotationType] =
+    useState<SeekerAnnotationType>("note");
+  const [annotationTitle, setAnnotationTitle] = useState("");
+  const [annotationNote, setAnnotationNote] = useState("");
+  const [annotationLocation, setAnnotationLocation] = useState("");
+  const [isAnnotationLoading, setIsAnnotationLoading] = useState(true);
+  const [isAnnotationSubmitting, setIsAnnotationSubmitting] = useState(false);
 
   useEffect(() => {
     const supabase = createSupabaseBrowserClient();
@@ -148,6 +170,93 @@ export function SeekerQuestionBoard({
   useEffect(() => {
     void loadAnsweredQuestions();
   }, [loadAnsweredQuestions]);
+
+  const loadAnnotations = useCallback(async () => {
+    setIsAnnotationLoading(true);
+    const supabase = createSupabaseBrowserClient();
+    const { data, error: annotationError } = await supabase
+      .from("seeker_annotations")
+      .select("id, annotation_type, title, note, location_label, created_at")
+      .eq("game_id", gameId)
+      .order("created_at", { ascending: false });
+
+    setIsAnnotationLoading(false);
+
+    if (annotationError) {
+      setError(annotationError.message);
+      return;
+    }
+
+    setAnnotations(data as SeekerAnnotation[]);
+  }, [gameId]);
+
+  useEffect(() => {
+    void loadAnnotations();
+  }, [loadAnnotations]);
+
+  async function createAnnotation(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const title = annotationTitle.trim();
+    const note = annotationNote.trim();
+    const locationLabel = annotationLocation.trim();
+
+    if (!title || isAnnotationSubmitting) {
+      return;
+    }
+
+    if (!currentRoundId) {
+      setError("No active round is available for this annotation.");
+      return;
+    }
+
+    setError("");
+    setIsAnnotationSubmitting(true);
+    const supabase = createSupabaseBrowserClient();
+    const { data, error: annotationError } = await supabase
+      .from("seeker_annotations")
+      .insert({
+        game_id: gameId,
+        round_id: currentRoundId,
+        created_by: userId,
+        annotation_type: annotationType,
+        title,
+        note,
+        location_label: locationLabel || null,
+      })
+      .select("id, annotation_type, title, note, location_label, created_at")
+      .single();
+
+    setIsAnnotationSubmitting(false);
+
+    if (annotationError) {
+      setError(annotationError.message);
+      return;
+    }
+
+    setAnnotations((currentAnnotations) => [data as SeekerAnnotation, ...currentAnnotations]);
+    setAnnotationTitle("");
+    setAnnotationNote("");
+    setAnnotationLocation("");
+    setStatus("Seeker annotation saved.");
+  }
+
+  async function deleteAnnotation(annotationId: string) {
+    setError("");
+    const supabase = createSupabaseBrowserClient();
+    const { error: deleteError } = await supabase
+      .from("seeker_annotations")
+      .delete()
+      .eq("id", annotationId);
+
+    if (deleteError) {
+      setError(deleteError.message);
+      return;
+    }
+
+    setAnnotations((currentAnnotations) =>
+      currentAnnotations.filter((annotation) => annotation.id !== annotationId),
+    );
+  }
 
   const selectedQuestion = questions.find(
     (question) => question.category === selectedCategory,
@@ -350,6 +459,97 @@ export function SeekerQuestionBoard({
           <p className="board-loading" role="status">
             No answered questions yet.
           </p>
+        )}
+      </section>
+      <section className="seeker-annotations" aria-labelledby="annotations-heading">
+        <div className="board-heading">
+          <div>
+            <p className="eyebrow">Seeker-only map notes</p>
+            <h3 id="annotations-heading">Track deductions privately.</h3>
+          </div>
+          <button
+            className="text-button"
+            disabled={isAnnotationLoading}
+            type="button"
+            onClick={() => void loadAnnotations()}
+          >
+            Refresh
+          </button>
+        </div>
+        <p className="board-description">
+          Save notes, map pins, and eliminated areas for your Seeker Team.
+        </p>
+        <form className="annotation-form" onSubmit={createAnnotation}>
+          <label htmlFor="annotation-type">Annotation type</label>
+          <select
+            id="annotation-type"
+            value={annotationType}
+            onChange={(event) => {
+              const nextType = event.target.value;
+              if (
+                nextType === "note" ||
+                nextType === "pin" ||
+                nextType === "eliminated_area"
+              ) {
+                setAnnotationType(nextType);
+              }
+            }}
+          >
+            <option value="note">Note</option>
+            <option value="pin">Map pin</option>
+            <option value="eliminated_area">Eliminated area</option>
+          </select>
+          <label htmlFor="annotation-title">Title</label>
+          <input
+            id="annotation-title"
+            maxLength={100}
+            value={annotationTitle}
+            onChange={(event) => setAnnotationTitle(event.target.value)}
+            required
+          />
+          <label htmlFor="annotation-location">Location label (optional)</label>
+          <input
+            id="annotation-location"
+            maxLength={150}
+            placeholder="District, station, or landmark"
+            value={annotationLocation}
+            onChange={(event) => setAnnotationLocation(event.target.value)}
+          />
+          <label htmlFor="annotation-note">Details (optional)</label>
+          <textarea
+            id="annotation-note"
+            maxLength={500}
+            value={annotationNote}
+            onChange={(event) => setAnnotationNote(event.target.value)}
+          />
+          <button className="button button-primary" disabled={isAnnotationSubmitting} type="submit">
+            {isAnnotationSubmitting ? "Saving..." : "Save annotation"}
+          </button>
+        </form>
+        {isAnnotationLoading ? (
+          <p className="board-loading" role="status">Loading annotations...</p>
+        ) : annotations.length ? (
+          <div className="annotation-list">
+            {annotations.map((annotation) => (
+              <article className="annotation-item" key={annotation.id}>
+                <div>
+                  <strong>{annotation.title}</strong>
+                  <span>{annotation.annotation_type.replace("_", " ")}</span>
+                </div>
+                {annotation.location_label && <p>{annotation.location_label}</p>}
+                {annotation.note && <p>{annotation.note}</p>}
+                <button
+                  className="text-button"
+                  type="button"
+                  onClick={() => void deleteAnnotation(annotation.id)}
+                >
+                  Delete
+                </button>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <p className="board-loading" role="status">No seeker annotations yet.</p>
         )}
       </section>
     </section>

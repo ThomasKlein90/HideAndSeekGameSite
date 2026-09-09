@@ -16,6 +16,8 @@ export type QuestionCategory =
   | "photos";
 export type QuestionAnswerType = "yes_no" | "number" | "text" | "photo";
 export type QuestionEventStatus = "pending" | "answered" | "cancelled";
+export type SeekerAnnotationType = "note" | "pin" | "eliminated_area";
+export type CardLogStatus = "held" | "used" | "expired";
 
 type NoRelationships = [];
 
@@ -30,6 +32,58 @@ export type Database = {
           role: PlayerRole;
           team: GameTeam;
           user_id: string;
+        };
+        hider_card_log: {
+          Row: {
+            card_name: string;
+            created_at: string;
+            game_id: string;
+            id: string;
+            note: string;
+            received_at: string;
+            recorded_by: string;
+            round_id: string | null;
+            status: CardLogStatus;
+            updated_at: string;
+            used_at: string | null;
+          };
+          Insert: {
+            card_name: string;
+            created_at?: string;
+            game_id: string;
+            id?: string;
+            note?: string;
+            received_at?: string;
+            recorded_by: string;
+            round_id?: string | null;
+            status?: CardLogStatus;
+            updated_at?: string;
+            used_at?: string | null;
+          };
+          Update: Partial<Database["public"]["Tables"]["hider_card_log"]["Insert"]>;
+          Relationships: [
+            {
+              foreignKeyName: "hider_card_log_game_id_fkey";
+              columns: ["game_id"];
+              isOneToOne: false;
+              referencedRelation: "games";
+              referencedColumns: ["id"];
+            },
+            {
+              foreignKeyName: "hider_card_log_round_id_fkey";
+              columns: ["round_id"];
+              isOneToOne: false;
+              referencedRelation: "rounds";
+              referencedColumns: ["id"];
+            },
+            {
+              foreignKeyName: "hider_card_log_recorded_by_fkey";
+              columns: ["recorded_by"];
+              isOneToOne: false;
+              referencedRelation: "profiles";
+              referencedColumns: ["id"];
+            },
+          ];
         };
         Insert: {
           created_at?: string;
@@ -249,6 +303,60 @@ export type Database = {
           },
         ];
       };
+      seeker_annotations: {
+        Row: {
+          annotation_type: SeekerAnnotationType;
+          created_at: string;
+          created_by: string;
+          game_id: string;
+          id: string;
+          latitude: number | null;
+          location_label: string | null;
+          longitude: number | null;
+          note: string;
+          round_id: string | null;
+          title: string;
+          updated_at: string;
+        };
+        Insert: {
+          annotation_type: SeekerAnnotationType;
+          created_at?: string;
+          created_by: string;
+          game_id: string;
+          id?: string;
+          latitude?: number | null;
+          location_label?: string | null;
+          longitude?: number | null;
+          note?: string;
+          round_id?: string | null;
+          title: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["seeker_annotations"]["Insert"]>;
+        Relationships: [
+          {
+            foreignKeyName: "seeker_annotations_game_id_fkey";
+            columns: ["game_id"];
+            isOneToOne: false;
+            referencedRelation: "games";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "seeker_annotations_round_id_fkey";
+            columns: ["round_id"];
+            isOneToOne: false;
+            referencedRelation: "rounds";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "seeker_annotations_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       rounds: {
         Row: {
           created_at: string;
@@ -325,6 +433,8 @@ export type Database = {
       question_answer_type: QuestionAnswerType;
       question_category: QuestionCategory;
       question_event_status: QuestionEventStatus;
+      seeker_annotation_type: SeekerAnnotationType;
+      card_log_status: CardLogStatus;
     };
     CompositeTypes: Record<string, never>;
   };
