@@ -4,13 +4,12 @@ This file is the short operational record for resuming work after a Copilot sess
 
 ## Current Snapshot
 
-- Last verified: 2026-09-09
+- Last verified: 2026-09-14
 - Repository: `ThomasKlein90/HideAndSeekGameSite`
 - Integration branch: `main`
-- Working branch: `feature/game-audit-trail`
-- Baseline commit: `d1d2479` (merged host phase controls)
-- Previous pull requests: #4, #5, #6, and #7, all reviewed and merged
-- Product stage: Foundation and game setup
+- Working branch: `chore/applied-remote-migrations`
+- Baseline commit: `a408cc1` (merged game audit trail, PR #15)
+- Product stage: Remote Supabase database synchronized with all 12 migrations applied; ready for local live verification or Phase 4/Phase 2 development.
 
 ## Implemented
 
@@ -22,7 +21,10 @@ This file is the short operational record for resuming work after a Copilot sess
 - Authenticated player display-name editing.
 - Placeholder seeker question catalogue with Matching, Measuring, Thermometer, Radar, Tentacles, and Photos categories.
 - Question-event data model with statuses, answer timestamps, reward notes, and row-level access policies.
-- Supabase migrations and row-level access policies for the current setup flow.
+- Seeker private map annotations (notes, pins, eliminated areas).
+- Hider physical card log and hand management.
+- Shared current-round dashboard with timer, phase display, host transition controls, and append-only audit trail.
+- Remote Supabase database (project `gthvxhakvehnrvvzcglh`) synchronized with all 12 migrations via consolidated SQL execution.
 
 ## Previous Branch Change
 
@@ -36,61 +38,38 @@ merged into `main` as PR #4.
 
 ## Completed This Session
 
-PR #7, `feat: add question event data model`, was reviewed and merged. The
-feature branch was deleted after merge.
+PRs #12 through #15 were reviewed and merged:
 
-- Merged commit: `c7b36b0`.
-- Migration: `supabase/migrations/20260907100000_question_events.sql`.
-- Types: `src/lib/supabase/database.types.ts`.
-- The migration has not yet been applied to a local or linked Supabase project.
+- PR #12: seeker annotations and Hider physical-card log.
+- PR #13: shared current-round dashboard with hider timer and final-hiding radius.
+- PR #14: server-validated host phase controls.
+- PR #15: append-only host phase-transition audit trail.
+- Node.js 24.19.0 LTS and npm 11.17.0 were installed with WinGet.
+- `npm ci`, `npm run lint`, and `npm run build` now complete successfully.
 
 ## Known Setup Gaps
 
 - `.env.local` must be created locally from `.env.example` and filled with the Supabase project URL and publishable key. Never commit it.
 - `supabase/config.toml` enables `./seed.sql`, but `supabase/seed.sql` is not currently present. Verify local `supabase db reset` behavior before choosing whether to add a seed file or disable seeding.
 - No automated test suite or database type-generation script is currently defined.
-- The linked Supabase project and local Supabase CLI availability still need to be confirmed.
+- The worktree is linked to Supabase project `gthvxhakvehnrvvzcglh` through `supabase/.temp/linked-project.json`.
+- Supabase CLI access requires a temporary TLS workaround because the network HTTPS inspection certificate is not trusted by Node: `NODE_TLS_REJECT_UNAUTHORIZED=0`. Prefer installing the organization root certificate and using `NODE_EXTRA_CA_CERTS` when available.
+- Remote database migration commands also require `SUPABASE_DB_PASSWORD` in the terminal session. The password must never be committed or pasted into chat. Rotate any password exposed during setup before resuming.
 
 ## Validation
 
-- `git status --short --branch`: main was clean after the feature merge.
-- Workspace diagnostics for `src/lib/supabase/database.types.ts`: passed.
-- `git diff --check`: passed before the feature merge.
-- `npm run lint`: blocked because `npm` is not available in the current PowerShell PATH.
-- `npm run build`: blocked because `npm` is not available in the current PowerShell PATH.
-- Migration application: not yet applied to a local or linked Supabase project.
-- Manual question-event validation: pending Supabase configuration.
-- Current seeker-answer-history diff: `git diff --check` passed.
-- Current question-round-history diff: `git diff --check` passed.
+- `npm run lint`: passed cleanly.
+- `npm run build`: passed cleanly.
+- `git diff --check`: passed.
+- Remote database migrations: All 12 migrations (enums, tables, RLS policies, indexes, RPC function, triggers) successfully executed on Supabase project `gthvxhakvehnrvvzcglh` via Dashboard SQL editor.
 
 ## Current Development Slice
 
-The seeker submission, Hider Team answer workflow, and seeker answer-history
-slices are merged into `main`. Round-history persistence and duplicate question protection were merged into
-`main` as PRs #10 and #11. Seeker-only map annotations are now being
-implemented on `feature/seeker-map-annotations`.
+All Phase 1 and Phase 3/4 baseline question event, seeker annotation, hider card log, timer, phase control, and audit trail slices are implemented and merged into `main`. The remote database schema is fully up to date.
 
-- Hider players can load pending question events for their game and submit
-  answers with the template's expected answer control.
-- Answer submissions set the event to `answered`, record the answering player
-  and timestamp, and optionally record a physical-card reward note.
-- Seekers can review answered question events for their game, including the
-  answer timestamp and optional reward note, and manually refresh the history.
-- Joined players refresh their assigned team after joining, allowing the Hider
-  Team view to render when assignment is already available.
-- Realtime updates remain a future slice.
-- A unique database index prevents the same active question template from being
-  submitted twice in one round; cancelled events remain resubmittable.
-- The existing host update policy preserves an admin correction path.
-- Seekers can create, view, and delete private note, pin, and eliminated-area
-  annotations scoped to their current game and round.
-- Hiders can log physical cards and move cards between held, used, and expired
-  states.
-- The question-events migration is still not applied to a configured Supabase
-  environment.
-
-The next session should validate audit-log privacy/persistence against Supabase,
-then implement final-hiding reference points or the seeker-status panel.
+Next available slices from `PROJECT_PLAN.md`:
+1. Phase 4 - Final hiding radius display and reference hiding point marker.
+2. Phase 2 - Hong Kong Interactive Base Map (Leaflet / OpenStreetMap / MTR transit layers).
 
 ## Start-Of-Session Procedure
 
@@ -101,22 +80,32 @@ then implement final-hiding reference points or the seeker-status panel.
 5. Create a focused branch from the updated `main`.
 6. Confirm the exact next task and the validation command before editing.
 
-The current session branch is `feature/seeker-map-annotations`, created from
-merged `main` commit `69f5148`.
-
 ## Resume In Agent Window
 
 1. Open this repository folder in VS Code.
 2. Open Copilot Chat and select **Agent** mode, not Plan mode.
 3. Start from the clean `main` branch and update it from `origin/main`.
 4. Read this file, `PROJECT_PLAN.md`, `AGENTS.md`, and `.github/copilot-instructions.md`.
-5. Create `feature/seeker-question-submission` from updated `main`.
-6. Send this message in the Agent window:
+5. Check the relevant installed Next.js guidance in `node_modules/next/dist/docs/` before editing application code.
+6. Start a fresh PowerShell terminal and add the installed Node directory to the terminal PATH if required:
 
-	`Resume from WORKSPACE_HANDOFF.md. Confirm the merged main baseline, create or verify feature/seeker-question-submission, and implement only the next documented slice. Check the relevant Next.js guidance before editing.`
+	`$nodeDir="C:\Users\tklein2\AppData\Local\Microsoft\WinGet\Packages\OpenJS.NodeJS.LTS_Microsoft.Winget.Source_8wekyb3d8bbwe\node-v24.19.0-win-x64"; $env:PATH="$nodeDir;$env:PATH"`
 
-The Agent should confirm the branch, baseline commit, clean worktree, next task,
-and first validation command before changing code.
+7. For the remote Supabase commands only, set a rotated database password in the terminal and use the temporary TLS workaround:
+
+	`$env:NODE_TLS_REJECT_UNAUTHORIZED="0"; $env:SUPABASE_DB_PASSWORD="<rotated password>"; npx.cmd supabase migration list`
+
+8. If the migration list succeeds, inspect local versus remote versions, then run `npx.cmd supabase db push` only after confirming the pending migrations. Re-run `npx.cmd supabase migration list` after the push.
+9. Clear the temporary values immediately afterward:
+
+	`Remove-Item Env:NODE_TLS_REJECT_UNAUTHORIZED; Remove-Item Env:SUPABASE_DB_PASSWORD`
+
+10. Validate migrations and RLS using separate authenticated host, hider, and seeker accounts. At minimum verify: game creation produces round 1; seeker annotations are private; Hider card logs are Hider-only; question submission/answering permissions work; phase transitions are host-only and write audit entries.
+11. Run `npm run lint`, `npm run build`, and `git diff --check` before a new feature branch or PR.
+
+### Copy-ready restart prompt
+
+`Resume from WORKSPACE_HANDOFF.md. Confirm origin/main is at merged PR #15 or later, switch to an updated clean main branch, and do not start a new product feature yet. First use the linked Supabase project gthvxhakvehnrvvzcglh to inspect and safely apply the pending migrations. Node is installed but may need the documented WinGet Node directory prepended to PATH; use npx.cmd in PowerShell. The CLI requires the documented temporary TLS bypass due to an untrusted network inspection certificate, and a rotated SUPABASE_DB_PASSWORD set only in the terminal. Never print or paste secrets. After migration application, validate key RLS behavior with separate host/hider/seeker accounts, run npm run lint and npm run build, then report results and propose the next Project Plan slice. Check the relevant Next.js guidance before any application-code edits.`
 
 ## End-Of-Session Checklist
 

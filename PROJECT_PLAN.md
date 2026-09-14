@@ -38,8 +38,8 @@ website. Update it as rules and priorities are agreed.
 - [x] Support exactly two Hider Team members and two Seeker Team members for the initial format.
 - [x] Build the game-code join flow and add player display-name editing.
 - [ ] Implement role-based page access and server-side data authorization.
-- [ ] Define game phases: setup, hider head start, active seeking, final hiding, round complete, and game complete.
-- [ ] Add admin controls to start, pause, resume, transition phases, and end a game.
+- [x] Define game phases: setup, hider head start, active seeking, final hiding, round complete, and game complete.
+- [x] Add admin controls to start, pause, resume, transition phases, and end a game.
 - [x] Record important host changes in an audit trail.
 
 ## Phase 2 - Hong Kong Game Map
@@ -68,7 +68,7 @@ website. Update it as rules and priorities are agreed.
 
 ## Phase 4 - Hider Dashboard
 
-- [ ] Display current round, phase, and a server-authoritative hiding timer.
+- [x] Display current round, phase, and a server-authoritative hiding timer.
 - [x] Show incoming questions with clear answer controls.
 - [x] Record the selected answer type and submit answer history to seekers.
 - [x] Log physical-card rewards received for answering each question.
