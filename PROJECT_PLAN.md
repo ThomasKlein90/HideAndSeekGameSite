@@ -38,7 +38,7 @@ website. Update it as rules and priorities are agreed.
 - [x] Support exactly two Hider Team members and two Seeker Team members for the initial format.
 - [x] Build the game-code join flow and add player display-name editing.
 - [x] Restore active game sessions on page reload and allow switching/leaving games.
-- [ ] Add password-based email login option alongside magic links for hosts and recurring players.
+- [x] Add password-based email login option alongside magic links for hosts and recurring players.
 - [ ] Implement role-based page access and server-side data authorization.
 - [x] Define game phases: setup, hider head start, active seeking, final hiding, round complete, and game complete.
 - [x] Add admin controls to start, pause, resume, transition phases, and end a game.
