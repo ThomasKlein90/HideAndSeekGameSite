@@ -116,25 +116,19 @@ session and after each major branch is merged.
 
 Current state:
 
-- [x] Next.js mobile-first application and Supabase project are configured.
-- [x] Host can sign in by email, create a game, choose their initial team, and receive a game code.
-- [x] Players can join by game code and the host can assign up to two players per team.
-- [x] The Seeker Team has a placeholder board with Matching, Measuring,
-  Thermometer, Radar, Tentacles, and Photos categories.
+- [x] Next.js mobile-first application and Supabase project are configured and synchronized.
+- [x] Host can sign in by password or magic link, create a game, choose their initial team, and receive a game code.
+- [x] Players can sign up / sign in and join by game code; host can assign up to two players per team.
+- [x] Server-authoritative phase transitions (`setup` -> `hider_head_start` -> `active_seeking` -> `final_hiding` -> `round_complete` -> `game_complete`) and timers are live with audit trail.
+- [x] Seeker Team can submit questions and view answered history; Hider Team receives pending questions, submits answers, and logs physical card rewards.
+- [x] Seeker private map annotations and active game session restoration on page reload are fully functional.
+- [x] End-to-end multi-role live smoke test passed across host, seeker, and hider roles.
 
 Start next:
 
-1. Apply the question-events migration in a configured Supabase environment.
-2. Create question events when seekers submit a selected placeholder question
-   and deliver pending events to the Hider Team view.
-3. Let hiders answer events and record the answer timestamp and manually logged
-   physical-card reward.
-4. Begin the Hong Kong map data/source assessment only after the
-   question event model is settled.
-
-Before implementing final question mechanics, collect the group-approved
-question text, expected answer formats, and card draw/keep rules. Do not copy
-or publish protected commercial game content.
+1. Phase 4: Implement final-hiding radius display and manually selected/reference hiding point for the Hider dashboard.
+2. Phase 2: Begin the Hong Kong interactive map (Leaflet / OpenStreetMap / MTR transit overlays).
+3. Confirm group-approved question catalogue and card draw rules.
 
 ## Open Decisions
 
