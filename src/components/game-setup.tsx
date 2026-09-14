@@ -26,7 +26,10 @@ type GamePlayer = {
 
 export function GameSetup() {
   const [session, setSession] = useState<Session | null>(null);
+  const [authMethod, setAuthMethod] = useState<"magic_link" | "password">("password");
+  const [authAction, setAuthAction] = useState<"sign_in" | "sign_up">("sign_in");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [gameName, setGameName] = useState("Hong Kong Hide and Seek");
   const [headStartMinutes, setHeadStartMinutes] = useState("15");
@@ -163,6 +166,49 @@ export function GameSetup() {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  async function handlePasswordAuth(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError("");
+    setStatus("");
+    setIsSubmitting(true);
+
+    const supabase = createSupabaseBrowserClient();
+
+    if (authAction === "sign_up") {
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+      setIsSubmitting(false);
+
+      if (signUpError) {
+        setError(signUpError.message);
+        return;
+      }
+
+      if (!data.session) {
+        setStatus(
+          "Account created! If email confirmation is enabled, please check your email.",
+        );
+      } else {
+        setStatus("Account created and signed in.");
+      }
+    } else {
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      setIsSubmitting(false);
+
+      if (signInError) {
+        setError(signInError.message);
+        return;
+      }
+
+      setStatus("Signed in successfully.");
+    }
+  }
 
   async function sendSignInLink(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -371,22 +417,115 @@ export function GameSetup() {
       </div>
 
       {!session ? (
-        <form className="setup-card" onSubmit={sendSignInLink}>
-          <h3>Sign in to host</h3>
-          <p>We use passwordless email links so no new password is needed.</p>
-          <label htmlFor="email">Email address</label>
-          <input
-            id="email"
-            type="email"
-            autoComplete="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            required
-          />
-          <button className="button button-primary" disabled={isSubmitting} type="submit">
-            {isSubmitting ? "Sending link..." : "Send sign-in link"}
-          </button>
-        </form>
+        <div className="setup-card">
+          <div className="auth-method-toggle" aria-label="Sign-in method">
+            <button
+              aria-pressed={authMethod === "password"}
+              className={authMethod === "password" ? "mode-button is-active" : "mode-button"}
+              type="button"
+              onClick={() => {
+                setError("");
+                setStatus("");
+                setAuthMethod("password");
+              }}
+            >
+              Email + Password
+            </button>
+            <button
+              aria-pressed={authMethod === "magic_link"}
+              className={authMethod === "magic_link" ? "mode-button is-active" : "mode-button"}
+              type="button"
+              onClick={() => {
+                setError("");
+                setStatus("");
+                setAuthMethod("magic_link");
+              }}
+            >
+              Magic Link
+            </button>
+          </div>
+
+          {authMethod === "password" ? (
+            <form className="nested-form" onSubmit={handlePasswordAuth}>
+              <div className="auth-action-toggle">
+                <button
+                  type="button"
+                  className={authAction === "sign_in" ? "auth-sub-tab is-active" : "auth-sub-tab"}
+                  onClick={() => {
+                    setError("");
+                    setStatus("");
+                    setAuthAction("sign_in");
+                  }}
+                >
+                  Sign in
+                </button>
+                <button
+                  type="button"
+                  className={authAction === "sign_up" ? "auth-sub-tab is-active" : "auth-sub-tab"}
+                  onClick={() => {
+                    setError("");
+                    setStatus("");
+                    setAuthAction("sign_up");
+                  }}
+                >
+                  Sign up
+                </button>
+              </div>
+
+              <label htmlFor="auth-email">Email address</label>
+              <input
+                id="auth-email"
+                type="email"
+                autoComplete="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                required
+              />
+
+              <label htmlFor="auth-password">Password</label>
+              <input
+                id="auth-password"
+                type="password"
+                autoComplete={authAction === "sign_up" ? "new-password" : "current-password"}
+                minLength={6}
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                required
+              />
+
+              <button className="button button-primary" disabled={isSubmitting} type="submit">
+                {isSubmitting
+                  ? "Processing..."
+                  : authAction === "sign_up"
+                    ? "Create account"
+                    : "Sign in"}
+              </button>
+            </form>
+          ) : (
+            <form className="nested-form" onSubmit={sendSignInLink}>
+              <h3>Sign in with magic link</h3>
+              <p>We use passwordless email links so no new password is needed.</p>
+              <label htmlFor="magic-email">Email address</label>
+              <input
+                id="magic-email"
+                type="email"
+                autoComplete="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                required
+              />
+              <button className="button button-primary" disabled={isSubmitting} type="submit">
+                {isSubmitting ? "Sending link..." : "Send sign-in link"}
+              </button>
+            </form>
+          )}
+
+          {(status || error) && (
+            <p className={error ? "form-message form-error" : "form-message"} role="status">
+              {error || status}
+            </p>
+          )}
+        </div>
       ) : (
         <div className="setup-card">
           <div className="signed-in-row">

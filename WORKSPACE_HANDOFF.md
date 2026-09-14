@@ -7,14 +7,14 @@ This file is the short operational record for resuming work after a Copilot sess
 - Last verified: 2026-09-14
 - Repository: `ThomasKlein90/HideAndSeekGameSite`
 - Integration branch: `main`
-- Working branch: `feature/rls-helpers-and-game-session-restore`
-- Baseline commit: `5f66903` (merged database status update, PR #16)
-- Product stage: RLS helper functions & join_game fix, active game session reload restore, and migration 20260914090000.
+- Working branch: `feature/password-authentication`
+- Baseline commit: `18067f0` (merged RLS helpers and active game restore, PR #17)
+- Product stage: Password authentication & magic link toggle implemented in game setup.
 
 ## Implemented
 
 - Next.js App Router application with TypeScript, Tailwind CSS, ESLint, and Supabase.
-- Email magic-link authentication.
+- Email password authentication and passwordless magic-link authentication with UI toggle.
 - Host game creation with initial team selection and game-code generation.
 - Game-code joining.
 - Host assignment of up to two players per team.
