@@ -7,9 +7,9 @@ This file is the short operational record for resuming work after a Copilot sess
 - Last verified: 2026-09-14
 - Repository: `ThomasKlein90/HideAndSeekGameSite`
 - Integration branch: `main`
-- Working branch: `chore/applied-remote-migrations`
-- Baseline commit: `a408cc1` (merged game audit trail, PR #15)
-- Product stage: Remote Supabase database synchronized with all 12 migrations applied; ready for local live verification or Phase 4/Phase 2 development.
+- Working branch: `feature/rls-helpers-and-game-session-restore`
+- Baseline commit: `5f66903` (merged database status update, PR #16)
+- Product stage: RLS helper functions & join_game fix, active game session reload restore, and migration 20260914090000.
 
 ## Implemented
 
@@ -24,7 +24,8 @@ This file is the short operational record for resuming work after a Copilot sess
 - Seeker private map annotations (notes, pins, eliminated areas).
 - Hider physical card log and hand management.
 - Shared current-round dashboard with timer, phase display, host transition controls, and append-only audit trail.
-- Remote Supabase database (project `gthvxhakvehnrvvzcglh`) synchronized with all 12 migrations via consolidated SQL execution.
+- Active game session restore on page reload and switch/leave game control.
+- Remote Supabase database (project `gthvxhakvehnrvvzcglh`) with PL/pgSQL SECURITY DEFINER helper functions, join_game disambiguation, and seeker annotation policy updates.
 
 ## Previous Branch Change
 

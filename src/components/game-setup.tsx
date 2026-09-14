@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useCallback, useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { HiderQuestionBoard } from "@/components/hider-question-board";
 import { SeekerQuestionBoard } from "@/components/seeker-question-board";
@@ -44,6 +44,78 @@ export function GameSetup() {
     null,
   );
 
+  const loadPlayers = useCallback(
+    async (gameId: string): Promise<GamePlayer[] | undefined> => {
+      const supabase = createSupabaseBrowserClient();
+      const { data, error: playersError } = await supabase
+        .from("game_players")
+        .select("user_id, team, role, is_team_assigned, profiles(display_name)")
+        .eq("game_id", gameId)
+        .order("created_at");
+
+      if (playersError) {
+        setError(playersError.message);
+        return;
+      }
+
+      const loadedPlayers = data as GamePlayer[];
+      setPlayers(loadedPlayers);
+      return loadedPlayers;
+    },
+    [],
+  );
+
+  const loadActiveGame = useCallback(
+    async (userId: string) => {
+      const supabase = createSupabaseBrowserClient();
+      const { data, error: membershipError } = await supabase
+        .from("game_players")
+        .select(
+          "game_id, team, role, is_team_assigned, games(id, name, join_code, phase, host_id)",
+        )
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false });
+
+      if (membershipError || !data || data.length === 0) {
+        return;
+      }
+
+      type MembershipEntry = {
+        game_id: string;
+        team: "hiders" | "seekers";
+        role: "host" | "player";
+        is_team_assigned: boolean;
+        games: {
+          id: string;
+          name: string;
+          join_code: string;
+          phase: string;
+          host_id: string;
+        } | null;
+      };
+
+      const entries = data as unknown as MembershipEntry[];
+      const activeEntry =
+        entries.find(
+          (entry) => entry.games && entry.games.phase !== "game_complete",
+        ) ?? entries[0];
+
+      if (activeEntry?.games) {
+        const game = activeEntry.games;
+        setCreatedGame({
+          id: game.id,
+          name: game.name,
+          join_code: game.join_code,
+          phase: game.phase,
+        });
+        setIsGameHost(activeEntry.role === "host" || game.host_id === userId);
+        setCurrentTeam(activeEntry.team);
+        void loadPlayers(game.id);
+      }
+    },
+    [loadPlayers],
+  );
+
   useEffect(() => {
     if (!session) {
       queueMicrotask(() => setDisplayName(""));
@@ -65,25 +137,11 @@ export function GameSetup() {
 
         setDisplayName(data.display_name);
       });
-  }, [session]);
 
-  async function loadPlayers(gameId: string) {
-    const supabase = createSupabaseBrowserClient();
-    const { data, error: playersError } = await supabase
-      .from("game_players")
-      .select("user_id, team, role, is_team_assigned, profiles(display_name)")
-      .eq("game_id", gameId)
-      .order("created_at");
-
-    if (playersError) {
-      setError(playersError.message);
-      return;
-    }
-
-    const loadedPlayers = data as GamePlayer[];
-    setPlayers(loadedPlayers);
-    return loadedPlayers;
-  }
+    queueMicrotask(() => {
+      void loadActiveGame(session.user.id);
+    });
+  }, [session, loadActiveGame]);
 
   useEffect(() => {
     const supabase = createSupabaseBrowserClient();
@@ -283,7 +341,22 @@ export function GameSetup() {
 
     if (signOutError) {
       setError(signOutError.message);
+      return;
     }
+
+    setCreatedGame(null);
+    setCurrentTeam(null);
+    setPlayers([]);
+    setIsGameHost(false);
+  }
+
+  function leaveCurrentGame() {
+    setCreatedGame(null);
+    setCurrentTeam(null);
+    setPlayers([]);
+    setIsGameHost(false);
+    setStatus("");
+    setError("");
   }
 
   return (
@@ -490,6 +563,15 @@ export function GameSetup() {
               ))}
             </div>
           )}
+          <div className="lobby-switch-action">
+            <button
+              className="button button-secondary"
+              type="button"
+              onClick={leaveCurrentGame}
+            >
+              Back to Lobby / Switch Game
+            </button>
+          </div>
         </div>
       )}
       {createdGame && (
