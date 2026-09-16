@@ -1,12 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import type { FormEvent } from "react";
 import type { GamePhase } from "@/lib/supabase/database.types";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 type GameRoundDashboardProps = {
   gameId: string;
   isHost: boolean;
+  canEditReferencePoint: boolean;
 };
 
 type DashboardData = {
@@ -15,6 +17,9 @@ type DashboardData = {
   roundNumber: number | null;
   headStartSeconds: number;
   finalHidingRadiusMeters: number;
+  referenceLabel: string | null;
+  referenceLatitude: number | null;
+  referenceLongitude: number | null;
 };
 
 type AuditEntry = {
@@ -40,12 +45,20 @@ function formatDuration(totalSeconds: number) {
   return `${minutes}:${seconds.toString().padStart(2, "0")}`;
 }
 
-export function GameRoundDashboard({ gameId, isHost }: GameRoundDashboardProps) {
+export function GameRoundDashboard({
+  gameId,
+  isHost,
+  canEditReferencePoint,
+}: GameRoundDashboardProps) {
   const [data, setData] = useState<DashboardData | null>(null);
   const [auditEntries, setAuditEntries] = useState<AuditEntry[]>([]);
   const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [referenceLabel, setReferenceLabel] = useState("");
+  const [referenceLatitude, setReferenceLatitude] = useState("");
+  const [referenceLongitude, setReferenceLongitude] = useState("");
+  const [isSavingReference, setIsSavingReference] = useState(false);
 
   const loadDashboard = useCallback(async () => {
     setError("");
@@ -67,7 +80,9 @@ export function GameRoundDashboard({ gameId, isHost }: GameRoundDashboardProps) 
         .maybeSingle(),
       supabase
         .from("game_settings")
-        .select("hider_head_start_seconds, final_hiding_radius_meters")
+        .select(
+          "hider_head_start_seconds, final_hiding_radius_meters, final_hiding_reference_label, final_hiding_reference_latitude, final_hiding_reference_longitude",
+        )
         .eq("game_id", gameId)
         .single(),
       supabase
@@ -96,9 +111,66 @@ export function GameRoundDashboard({ gameId, isHost }: GameRoundDashboardProps) 
       roundNumber: roundResult.data?.number ?? null,
       headStartSeconds: settingsResult.data.hider_head_start_seconds,
       finalHidingRadiusMeters: settingsResult.data.final_hiding_radius_meters,
+      referenceLabel: settingsResult.data.final_hiding_reference_label,
+      referenceLatitude: settingsResult.data.final_hiding_reference_latitude,
+      referenceLongitude: settingsResult.data.final_hiding_reference_longitude,
     });
+    setReferenceLabel(settingsResult.data.final_hiding_reference_label ?? "");
+    setReferenceLatitude(
+      settingsResult.data.final_hiding_reference_latitude?.toString() ?? "",
+    );
+    setReferenceLongitude(
+      settingsResult.data.final_hiding_reference_longitude?.toString() ?? "",
+    );
     setAuditEntries((auditResult.data ?? []) as AuditEntry[]);
   }, [gameId]);
+
+  async function saveReferencePoint(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError("");
+
+    const label = referenceLabel.trim();
+    const hasLatitude = referenceLatitude.trim() !== "";
+    const hasLongitude = referenceLongitude.trim() !== "";
+
+    if (hasLatitude !== hasLongitude) {
+      setError("Enter both a latitude and longitude, or leave both blank.");
+      return;
+    }
+
+    const latitude = hasLatitude ? Number(referenceLatitude) : null;
+    const longitude = hasLongitude ? Number(referenceLongitude) : null;
+
+    if (
+      (latitude !== null &&
+        (!Number.isFinite(latitude) || latitude < -90 || latitude > 90)) ||
+      (longitude !== null &&
+        (!Number.isFinite(longitude) || longitude < -180 || longitude > 180))
+    ) {
+      setError("Latitude must be -90 to 90 and longitude must be -180 to 180.");
+      return;
+    }
+
+    setIsSavingReference(true);
+    const supabase = createSupabaseBrowserClient();
+    const { error: saveError } = await supabase.rpc(
+      "set_final_hiding_reference_point",
+      {
+        target_game_id: gameId,
+        reference_label: label || null,
+        reference_latitude: latitude,
+        reference_longitude: longitude,
+      },
+    );
+    setIsSavingReference(false);
+
+    if (saveError) {
+      setError(saveError.message);
+      return;
+    }
+
+    await loadDashboard();
+  }
 
   async function transitionPhase(nextPhase: GamePhase) {
     setError("");
@@ -191,6 +263,67 @@ export function GameRoundDashboard({ gameId, isHost }: GameRoundDashboardProps) 
             <span>Final hiding radius</span>
             <strong>{data.finalHidingRadiusMeters} m</strong>
           </div>
+        </div>
+      )}
+      {!error && data && (
+        <div className="reference-point-panel">
+          <div>
+            <span>Final hiding reference point</span>
+            <strong>
+              {data.referenceLabel ??
+                (data.referenceLatitude !== null &&
+                data.referenceLongitude !== null
+                  ? `${data.referenceLatitude}, ${data.referenceLongitude}`
+                  : "Not set")}
+            </strong>
+            {data.referenceLatitude !== null &&
+              data.referenceLongitude !== null && (
+                <small>
+                  Within {data.finalHidingRadiusMeters} m of this reference.
+                </small>
+              )}
+          </div>
+          {canEditReferencePoint && (
+            <form className="reference-point-form" onSubmit={saveReferencePoint}>
+              <label htmlFor="reference-label">Location label</label>
+              <input
+                id="reference-label"
+                maxLength={150}
+                placeholder="e.g. Central station exit"
+                value={referenceLabel}
+                onChange={(event) => setReferenceLabel(event.target.value)}
+              />
+              <div className="field-pair">
+                <div>
+                  <label htmlFor="reference-latitude">Latitude</label>
+                  <input
+                    id="reference-latitude"
+                    inputMode="decimal"
+                    placeholder="22.3193"
+                    value={referenceLatitude}
+                    onChange={(event) => setReferenceLatitude(event.target.value)}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="reference-longitude">Longitude</label>
+                  <input
+                    id="reference-longitude"
+                    inputMode="decimal"
+                    placeholder="114.1694"
+                    value={referenceLongitude}
+                    onChange={(event) => setReferenceLongitude(event.target.value)}
+                  />
+                </div>
+              </div>
+              <button
+                className="button button-secondary"
+                disabled={isSavingReference}
+                type="submit"
+              >
+                {isSavingReference ? "Saving point..." : "Save reference point"}
+              </button>
+            </form>
+          )}
         </div>
       )}
       {!error && data && isHost && (

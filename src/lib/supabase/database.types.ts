@@ -136,6 +136,9 @@ export type Database = {
           board_boundary: Json | null;
           created_at: string;
           final_hiding_radius_meters: number;
+          final_hiding_reference_label: string | null;
+          final_hiding_reference_latitude: number | null;
+          final_hiding_reference_longitude: number | null;
           game_id: string;
           hider_head_start_seconds: number;
           no_go_areas: Json;
@@ -146,6 +149,9 @@ export type Database = {
           board_boundary?: Json | null;
           created_at?: string;
           final_hiding_radius_meters?: number;
+          final_hiding_reference_label?: string | null;
+          final_hiding_reference_latitude?: number | null;
+          final_hiding_reference_longitude?: number | null;
           game_id: string;
           hider_head_start_seconds?: number;
           no_go_areas?: Json;
@@ -493,6 +499,15 @@ export type Database = {
           target_game_id: string;
         };
         Returns: GamePhase;
+      };
+      set_final_hiding_reference_point: {
+        Args: {
+          reference_label?: string | null;
+          reference_latitude?: number | null;
+          reference_longitude?: number | null;
+          target_game_id: string;
+        };
+        Returns: undefined;
       };
     };
     Enums: {

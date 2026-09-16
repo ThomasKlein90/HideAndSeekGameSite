@@ -75,7 +75,7 @@ website. Update it as rules and priorities are agreed.
 - [x] Record the selected answer type and submit answer history to seekers.
 - [x] Log physical-card rewards received for answering each question.
 - [x] Show the Hider Team's current card hand/log, including use and expiry where applicable.
-- [ ] Display the configured final-hiding radius and a manually selected/reference hiding point.
+- [x] Display the configured final-hiding radius and a manually selected/reference hiding point.
 - [ ] Add a dedicated seeker-status panel ready for future check-ins or consented locations.
 
 ## Phase 5 - Manual Check-ins and Operational Reliability
