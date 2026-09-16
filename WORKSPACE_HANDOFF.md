@@ -4,12 +4,12 @@ This file is the short operational record for resuming work after a Copilot sess
 
 ## Current Snapshot
 
-- Last verified: 2026-09-14
+- Last verified: 2026-09-16
 - Repository: `ThomasKlein90/HideAndSeekGameSite`
 - Integration branch: `main`
-- Working branch: `feature/hider-final-hiding-point`
-- Baseline commit: `51c9bf4` (merged PR #19, smoke-test verification)
-- Product stage: Phase 4 final-hiding reference point implemented; migration pending remote application.
+- Working branch: `feature/hong-kong-interactive-map`
+- Baseline commit: `f9d7cc6` (merged PR #20)
+- Product stage: Phase 2 interactive OpenStreetMap base map implemented; transit and geographic overlays remain pending source review.
 
 ## Implemented & Verified in Live Smoke Test
 
@@ -46,13 +46,14 @@ This file is the short operational record for resuming work after a Copilot sess
 - `npm run lint`: **Passed** (clean, zero warnings/errors).
 - `npm run build`: **Passed** (Next.js App Router Turbopack production build clean).
 - Live multi-user smoke test: **Passed** (verified host game creation, second player join, seeker question submission, hider answer + card reward log, and seeker answer history).
-- Final-hiding reference point slice: **Passed** lint/build; remote migration `20260916100000_final_hiding_reference_point.sql` is pending Dashboard SQL application.
+- Final-hiding reference point slice: **Passed** lint/build; remote migration `20260916100000_final_hiding_reference_point.sql` was applied through the Supabase Dashboard.
+- Hong Kong interactive map slice: **Implemented** with Leaflet, OpenStreetMap tiles and attribution, Hong Kong center/radius preview, responsive styling, and a pending-layer legend. `npm run lint`, `npm run build`, and `git diff --check` passed.
 
 ## Next Development Slice
 
-Ready to begin from `PROJECT_PLAN.md` after applying the pending migration:
-1. **Phase 2 - Hong Kong Interactive Base Map**:
-   - Select map library (Leaflet / MapLibre) and integrate Hong Kong base map with MTR / Tram / Ferry / District layers.
+Pending review and merge:
+1. **Phase 2 - Transit and geographic overlays**:
+   - Assess licensed sources and add MTR, Tram, Ferry, district, search, and independent layer controls.
 2. **Phase 4 - Dedicated Seeker Status Panel**:
    - Prepare a role-restricted panel for future manual check-ins and consented locations.
 
@@ -62,13 +63,13 @@ Ready to begin from `PROJECT_PLAN.md` after applying the pending migration:
 2. Read this file, [PROJECT_PLAN.md](PROJECT_PLAN.md), and the repository instructions.
 3. Confirm working tree is clean on `main` branch.
 4. Pull latest `origin/main`.
-5. Apply and validate the pending `20260916100000_final_hiding_reference_point.sql` migration in Supabase Dashboard SQL Editor.
-6. Create a new focused feature branch (e.g. `feature/hong-kong-map`).
+5. Confirm the final-hiding migration remains applied in the Supabase Dashboard.
+6. Create a new focused feature branch from the latest merged `main`.
 
 ### Copy-ready restart prompt
 
 ```
-Resume from WORKSPACE_HANDOFF.md. Confirm origin/main is at merged PR #20 or later, switch to an updated clean main branch, first apply and validate migration 20260916100000_final_hiding_reference_point.sql in the linked Supabase project, then begin the next planned slice from PROJECT_PLAN.md (Phase 2 Hong Kong map). Check the relevant Next.js guidance before any application-code edits. Follow the standard development loop: create a focused feature branch, implement the feature, run npm run lint and npm run build, commit with a conventional commit message, and open a PR.
+Resume from WORKSPACE_HANDOFF.md. Confirm origin/main contains merged PR #20 or later and update a clean main branch, then begin the next planned Phase 2 slice from PROJECT_PLAN.md: assess and implement one licensed transit/geographic overlay. Check the relevant Next.js guidance before any application-code edits. Follow the standard development loop: create a focused feature branch, implement the feature, run npm run lint and npm run build, commit with a conventional commit message, and open a PR.
 ```
 
 Before ending a session, leave the worktree either clean on `main` after a
