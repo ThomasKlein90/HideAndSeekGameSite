@@ -46,8 +46,8 @@ website. Update it as rules and priorities are agreed.
 
 ## Phase 2 - Hong Kong Game Map
 
-- [ ] Select appropriately licensed map and geographic-data sources and document attribution.
-- [ ] Create a mobile-friendly interactive base map.
+- [x] Select an initial OpenStreetMap base layer and display its required attribution; document transit data as pending source review.
+- [x] Create a mobile-friendly interactive base map.
 - [ ] Add the main MTR routes, stations, and line labels.
 - [ ] Add Hong Kong Tramways route and stops where suitable.
 - [ ] Add MTR Light Rail routes and stops.

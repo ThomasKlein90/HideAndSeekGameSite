@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { GameSetup } from "@/components/game-setup";
+import { HongKongMapLoader } from "@/components/hong-kong-map-loader";
 
 export default function Home() {
   return (
@@ -79,6 +80,8 @@ export default function Home() {
           </p>
         </article>
       </section>
+
+      <HongKongMapLoader />
 
       <GameSetup />
     </main>
