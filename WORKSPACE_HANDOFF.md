@@ -7,9 +7,9 @@ This file is the short operational record for resuming work after a Copilot sess
 - Last verified: 2026-09-16
 - Repository: `ThomasKlein90/HideAndSeekGameSite`
 - Integration branch: `main`
-- Working branch: `feature/hong-kong-interactive-map`
-- Baseline commit: `f9d7cc6` (merged PR #20)
-- Product stage: Phase 2 interactive OpenStreetMap base map implemented; transit and geographic overlays remain pending source review.
+- Working branch: `feature/hong-kong-mtr-layer`
+- Baseline commit: `99bce76` (merged PR #21)
+- Product stage: Phase 2 interactive OpenStreetMap base map and initial MTR reference overlay implemented; remaining transit and geographic overlays remain pending source review.
 
 ## Implemented & Verified in Live Smoke Test
 
@@ -48,12 +48,13 @@ This file is the short operational record for resuming work after a Copilot sess
 - Live multi-user smoke test: **Passed** (verified host game creation, second player join, seeker question submission, hider answer + card reward log, and seeker answer history).
 - Final-hiding reference point slice: **Passed** lint/build; remote migration `20260916100000_final_hiding_reference_point.sql` was applied through the Supabase Dashboard.
 - Hong Kong interactive map slice: **Implemented** with Leaflet, OpenStreetMap tiles and attribution, Hong Kong center/radius preview, responsive styling, and a pending-layer legend. `npm run lint`, `npm run build`, and `git diff --check` passed.
+- MTR map slice: **Implemented** with a simplified, clearly labeled reference overlay, line colors, station markers/tooltips, independent layer toggles, and legend entries. The geometry is planning-only until a source is selected and visually validated.
 
 ## Next Development Slice
 
 Pending review and merge:
-1. **Phase 2 - Transit and geographic overlays**:
-   - Assess licensed sources and add MTR, Tram, Ferry, district, search, and independent layer controls.
+1. **Phase 2 - MTR source validation and remaining overlays**:
+   - Select an appropriately licensed MTR dataset, replace or verify the planning geometry, then add Tram, Ferry, district, and search layers.
 2. **Phase 4 - Dedicated Seeker Status Panel**:
    - Prepare a role-restricted panel for future manual check-ins and consented locations.
 
@@ -69,7 +70,7 @@ Pending review and merge:
 ### Copy-ready restart prompt
 
 ```
-Resume from WORKSPACE_HANDOFF.md. Confirm origin/main contains merged PR #20 or later and update a clean main branch, then begin the next planned Phase 2 slice from PROJECT_PLAN.md: assess and implement one licensed transit/geographic overlay. Check the relevant Next.js guidance before any application-code edits. Follow the standard development loop: create a focused feature branch, implement the feature, run npm run lint and npm run build, commit with a conventional commit message, and open a PR.
+Resume from WORKSPACE_HANDOFF.md. Confirm origin/main contains merged PR #21 or later and update a clean main branch, then continue the Phase 2 map work by validating the MTR reference geometry and selecting an appropriately licensed source before adding further transit or geographic layers. Check the relevant Next.js guidance before any application-code edits. Follow the standard development loop: create a focused feature branch, implement the feature, run npm run lint and npm run build, commit with a conventional commit message, and open a PR.
 ```
 
 Before ending a session, leave the worktree either clean on `main` after a
