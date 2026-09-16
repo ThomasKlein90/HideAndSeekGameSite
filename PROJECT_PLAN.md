@@ -53,7 +53,7 @@ website. Update it as rules and priorities are agreed.
 - [ ] Add MTR Light Rail routes and stops.
 - [ ] Add relevant ferry routes and terminals.
 - [ ] Add district boundaries, district labels, island labels, and search.
-- [ ] Add independent layer toggles and a clear map legend.
+- [x] Add independent layer toggles and a clear map legend.
 - [ ] Let the admin configure a game boundary and no-go areas.
 - [ ] Validate geographic layers visually on phone-sized screens.
 

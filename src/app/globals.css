@@ -537,6 +537,11 @@ h1 {
   border: 2px solid var(--pine);
 }
 
+.legend-swatch-mtr {
+  background: #fff;
+  border: 3px solid #007dc5;
+}
+
 .map-legend-pending {
   color: var(--coral);
 }
