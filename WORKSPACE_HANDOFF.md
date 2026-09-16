@@ -7,9 +7,9 @@ This file is the short operational record for resuming work after a Copilot sess
 - Last verified: 2026-09-14
 - Repository: `ThomasKlein90/HideAndSeekGameSite`
 - Integration branch: `main`
-- Working branch: `chore/smoke-test-verification`
-- Baseline commit: `5001f49` (merged PR #18, password authentication)
-- Product stage: Core game flow, role-based dashboards, authentication, timer, question engine, and card log fully verified in live smoke test against Supabase project `gthvxhakvehnrvvzcglh`.
+- Working branch: `feature/hider-final-hiding-point`
+- Baseline commit: `51c9bf4` (merged PR #19, smoke-test verification)
+- Product stage: Phase 4 final-hiding reference point implemented; migration pending remote application.
 
 ## Implemented & Verified in Live Smoke Test
 
@@ -36,6 +36,7 @@ This file is the short operational record for resuming work after a Copilot sess
   - Incoming pending question queue with expected answer types (Yes/No, number, text, photo).
   - Answer submission and physical card reward logging (`held`, `used`, `expired`).
   - Hider card hand management.
+  - Final-hiding radius display and host/Hider Team reference point entry with label and coordinates.
 - **Database & Security**:
   - All 13 migrations applied to Supabase project `gthvxhakvehnrvvzcglh`.
   - Row Level Security (RLS) enabled across all tables with `PL/pgSQL SECURITY DEFINER` helper functions (`is_game_host`, `is_game_member`, `is_seeker`, `is_hider`).
@@ -45,14 +46,15 @@ This file is the short operational record for resuming work after a Copilot sess
 - `npm run lint`: **Passed** (clean, zero warnings/errors).
 - `npm run build`: **Passed** (Next.js App Router Turbopack production build clean).
 - Live multi-user smoke test: **Passed** (verified host game creation, second player join, seeker question submission, hider answer + card reward log, and seeker answer history).
+- Final-hiding reference point slice: **Passed** lint/build; remote migration `20260916100000_final_hiding_reference_point.sql` is pending Dashboard SQL application.
 
 ## Next Development Slice
 
-Ready to begin from `PROJECT_PLAN.md`:
-1. **Phase 4 - Final Hiding Reference Point**:
-   - Add reference hiding point selector and final-hiding radius visual indicator on the Hider Dashboard.
-2. **Phase 2 - Hong Kong Interactive Base Map**:
+Ready to begin from `PROJECT_PLAN.md` after applying the pending migration:
+1. **Phase 2 - Hong Kong Interactive Base Map**:
    - Select map library (Leaflet / MapLibre) and integrate Hong Kong base map with MTR / Tram / Ferry / District layers.
+2. **Phase 4 - Dedicated Seeker Status Panel**:
+   - Prepare a role-restricted panel for future manual check-ins and consented locations.
 
 ## Start-Of-Session Procedure
 
@@ -60,12 +62,13 @@ Ready to begin from `PROJECT_PLAN.md`:
 2. Read this file, [PROJECT_PLAN.md](PROJECT_PLAN.md), and the repository instructions.
 3. Confirm working tree is clean on `main` branch.
 4. Pull latest `origin/main`.
-5. Create a new focused feature branch (e.g. `feature/hider-final-hiding-point` or `feature/hong-kong-map`).
+5. Apply and validate the pending `20260916100000_final_hiding_reference_point.sql` migration in Supabase Dashboard SQL Editor.
+6. Create a new focused feature branch (e.g. `feature/hong-kong-map`).
 
 ### Copy-ready restart prompt
 
 ```
-Resume from WORKSPACE_HANDOFF.md. Confirm origin/main is at merged PR #18 or later, switch to an updated clean main branch, and begin the next planned slice from PROJECT_PLAN.md (Phase 4 final hiding point or Phase 2 Hong Kong map). Check the relevant Next.js guidance before any application-code edits. Follow the standard development loop: create a focused feature branch, implement the feature, run npm run lint and npm run build, commit with conventional commit message, and open a PR.
+Resume from WORKSPACE_HANDOFF.md. Confirm origin/main is at merged PR #20 or later, switch to an updated clean main branch, first apply and validate migration 20260916100000_final_hiding_reference_point.sql in the linked Supabase project, then begin the next planned slice from PROJECT_PLAN.md (Phase 2 Hong Kong map). Check the relevant Next.js guidance before any application-code edits. Follow the standard development loop: create a focused feature branch, implement the feature, run npm run lint and npm run build, commit with a conventional commit message, and open a PR.
 ```
 
 Before ending a session, leave the worktree either clean on `main` after a
