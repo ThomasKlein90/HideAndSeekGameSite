@@ -546,6 +546,19 @@ h1 {
   color: var(--coral);
 }
 
+.map-source-note {
+  margin: 0;
+  color: var(--muted-ink);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.map-source-note a {
+  color: var(--pine);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
 .feature-grid h2,
 .getting-started h2 {
   margin-bottom: 0.6rem;
