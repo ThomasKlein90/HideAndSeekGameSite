@@ -7,9 +7,9 @@ This file is the short operational record for resuming work after a Copilot sess
 - Last verified: 2026-09-28
 - Repository: `ThomasKlein90/HideAndSeekGameSite`
 - Integration branch: `main`
-- Working branch: `feature/mtr-source-provenance`
-- Baseline commit: `5be6615` (merged PR #22)
-- Product stage: Phase 2 interactive OpenStreetMap base map and provisional MTR reference overlay implemented; source review found the official MTR station CSV lacks coordinates, so the geometry is still unvalidated.
+- Working branch: `feature/mtr-osm-geometry`
+- Baseline commit: `17099b6` (merged PR #23)
+- Product stage: Phase 2 OSM-derived MTR route/station geometry integrated with visible ODbL attribution; route-stop/station-code discrepancies remain for follow-up validation.
 
 ## Implemented & Verified in Live Smoke Test
 
@@ -47,17 +47,19 @@ This file is the short operational record for resuming work after a Copilot sess
 - `npm run build`: **Passed** (Next.js App Router Turbopack production build clean).
 - Live multi-user smoke test: **Passed** (verified host game creation, second player join, seeker question submission, hider answer + card reward log, and seeker answer history).
 - Final-hiding reference point slice: **Passed** lint/build; remote migration `20260916100000_final_hiding_reference_point.sql` was applied through the Supabase Dashboard.
-- Hong Kong interactive map slice: **Implemented** with Leaflet, OpenStreetMap tiles and attribution, Hong Kong center/radius preview, responsive styling, and a pending-layer legend. `npm run lint`, `npm run build`, and `git diff --check` passed.
-- MTR map slice: **Implemented** with a simplified, clearly labeled reference overlay, line colors, station markers/tooltips, independent layer toggles, and legend entries. The geometry is planning-only until a source is selected and visually validated.
-- MTR PR #22: **Merged** into `main`; `origin/main` is currently at `5be6615`.
-- MTR source review: DATA.GOV.HK lists the MTR Lines (except Light Rail) & Stations CSV, published by MTR Corporation Limited and last updated 2023-06-25. The CSV provides line/direction/station sequence but no coordinates. Its terms require attribution to the Government, relevant organisation, and DATA.GOV.HK. The map now discloses this limitation; no transit geometry is represented as authoritative.
+- Hong Kong interactive map slice: **Implemented** with Leaflet, OpenStreetMap tiles and attribution, Hong Kong center/radius preview, responsive styling, and independent layer controls. `npm run lint`, `npm run build`, and `git diff --check` passed.
+- MTR map slice: **Implemented** with OpenStreetMap-derived geometry for 10 MTR lines and 98 station points, independent route/station layer toggles, station tooltips, and visible OpenStreetMap contributor/ODbL attribution.
+- MTR PR #22 and provenance PR #23: **Merged** into `main`; latest confirmed `origin/main` is `17099b6`.
+- MTR source review: DATA.GOV.HK lists the MTR Lines (except Light Rail) & Stations CSV, published by MTR Corporation Limited and last updated 2023-06-25. It provides line/direction/station sequence but no coordinates. Its terms require attribution to the Government, relevant organisation, and DATA.GOV.HK. OSM was selected for coordinate-bearing route and station data; its ODbL attribution is displayed.
+- MTR OSM geometry slice: Branch `feature/mtr-osm-geometry` is based on `17099b6` (merged PR #23). The snapshot at `public/data/mtr-osm.geojson` was extracted from OpenStreetMap at `2026-09-28T06:51:02Z`; supplemental station points were queried at `2026-09-28T07:04:06Z`. ODbL 1.0 attribution and snapshot metadata are displayed in the map. Comparison results from the separately licensed MTR CSV are stored in `public/data/mtr-station-validation.json`, not bundled into the OSM GeoJSON.
+- Validation comparison: station-code coverage was compared with the 2023 MTR CSV; 14 of 54 OSM route relations exactly match a complete listed direction. Some relations represent split/variant services. Differences: AEL route-stop relations omit AWE; KTL/TKL omit TIK; TML omits ETS and SUW while OSM has SWT; EAL has OSM-only RAC. Additional OSM point features supply AWE, TIK, and ETS station markers, but route membership/order and the SWT/SUW discrepancy still need review.
+- A refresh utility is available as `npm run map:mtr:refresh`. It downloads route geometry and the MTR comparison CSV, then queries OSM station nodes missing from route-stop relations. For saved responses, run `node scripts/refresh-mtr-osm-data.mjs <overpass-json> <mtr-station-csv> <supplemental-stations-json>`.
 
 ## Current Development Slice
 
-The current branch adds an MTR source provenance disclosure. Commit `6079832` is pushed to `feature/mtr-source-provenance`; a PR is not yet open because the GitHub CLI is unavailable and the browser session is signed out. Create it from the compare page before merging. The displayed MTR lines remain schematic. Before adopting them for gameplay:
-1. Find and assess a coordinate-bearing source compatible with the project's use, or derive geometry from OpenStreetMap under ODbL with required attribution and share-alike handling.
-2. Validate route and station geometry visually and against current MTR station ordering.
-3. Only then add Tram, Ferry, district, search, or game-boundary layers.
+The current branch implements the OSM-derived MTR geometry snapshot and its generator. The map labels the OSM provenance and ODbL 1.0 license, and discloses comparison differences with the older MTR station CSV. The local browser check confirmed all 10 route features, 98 station points, attribution links, independent toggles, and mobile-width layout. Run lint/build after any follow-up changes.
+
+Next, validate the route shapes and known station-code/route-stop differences visually and against current MTR information. Do not mark the MTR layer authoritative or start more transit/geographic layers until these differences are reviewed. The user will create and merge PRs in their browser; after committing, push the branch but do not create a PR.
 
 ## Start-Of-Session Procedure
 
@@ -71,18 +73,18 @@ The current branch adds an MTR source provenance disclosure. Commit `6079832` is
 ### Copy-ready restart prompt
 
 ```
-Resume from WORKSPACE_HANDOFF.md. First open and merge the already-pushed MTR provenance branch PR (commit 6079832), then confirm origin/main includes it and update a clean main branch. Continue Phase 2 by finding a coordinate-bearing, appropriately licensed MTR source; the MTR Lines & Stations CSV reviewed on the previous slice has line/station sequence but no coordinates, so the current overlay remains schematic and unvalidated. Do not add more transit/geographic layers until the MTR geometry source is resolved. Check the relevant Next.js guidance before application-code edits. Follow the standard development loop: run npm run lint and npm run build, commit conventionally, push, and open a PR.
+Resume from WORKSPACE_HANDOFF.md. Confirm origin/main contains merged PR #23 or later (expected baseline 17099b6), update a clean main branch, and create a focused feature branch to continue validating the OSM-derived MTR routes and station locations. Check the installed Next.js guidance before application-code edits. Review known route-stop differences against current MTR information and visually inspect route geometry on mobile. Run npm run lint and npm run build, commit conventionally, and push the branch. The user will create and merge the PR separately; do not create one.
 ```
 
 Before ending a session, leave the worktree either clean on `main` after a
 merged pull request or clearly marked on the active feature branch with its
-commit and pull-request status.
+commit and pushed status. The user creates and merges pull requests separately.
 
 ## Branch And Review Policy
 
 - Keep `main` as the integration branch.
 - Create one focused branch from the latest merged `main` for each major change.
-- Open a pull request for every branch and use the repository pull-request checklist.
+- Push each focused branch after validation; the user creates and merges pull requests separately in their browser.
 - Run focused checks plus `npm run lint` and `npm run build` before review.
 - Review application code, migrations, generated types, and the final diff.
 - Merge only after approval and passing checks.
