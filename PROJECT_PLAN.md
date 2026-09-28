@@ -123,12 +123,13 @@ Current state:
 - [x] Seeker Team can submit questions and view answered history; Hider Team receives pending questions, submits answers, and logs physical card rewards.
 - [x] Seeker private map annotations and active game session restoration on page reload are fully functional.
 - [x] End-to-end multi-role live smoke test passed across host, seeker, and hider roles.
+- [x] Phase 2 interactive Hong Kong map and OSM-derived MTR route/station layers are integrated with visible source attribution and licensing (merged PR #24, baseline `8dd20ae`).
 
-Start next:
+Next:
 
-1. Phase 4: Implement final-hiding radius display and manually selected/reference hiding point for the Hider dashboard.
-2. Phase 2: Begin the Hong Kong interactive map (Leaflet / OpenStreetMap / MTR transit overlays).
-3. Confirm group-approved question catalogue and card draw rules.
+1. Visually validate the OSM-derived MTR routes and station locations, including the known route-stop/station-code differences, against current MTR information.
+2. Keep the MTR layer explicitly provisional until its geometry and discrepancies have been reviewed; do not add more transit or geographic layers before this validation.
+3. After that review, select the next map slice from the remaining Phase 2 items and confirm any needed transit or boundary rules with the group.
 
 ## Open Decisions
 
