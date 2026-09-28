@@ -54,7 +54,7 @@ This file is the short operational record for resuming work after a Copilot sess
 
 ## Current Development Slice
 
-The current branch adds an MTR source provenance disclosure. The displayed MTR lines remain schematic. Before adopting them for gameplay:
+The current branch adds an MTR source provenance disclosure. Commit `6079832` is pushed to `feature/mtr-source-provenance`; a PR is not yet open because the GitHub CLI is unavailable and the browser session is signed out. Create it from the compare page before merging. The displayed MTR lines remain schematic. Before adopting them for gameplay:
 1. Find and assess a coordinate-bearing source compatible with the project's use, or derive geometry from OpenStreetMap under ODbL with required attribution and share-alike handling.
 2. Validate route and station geometry visually and against current MTR station ordering.
 3. Only then add Tram, Ferry, district, search, or game-boundary layers.
@@ -71,7 +71,7 @@ The current branch adds an MTR source provenance disclosure. The displayed MTR l
 ### Copy-ready restart prompt
 
 ```
-Resume from WORKSPACE_HANDOFF.md. Confirm origin/main contains merged PR #22 or later (expected baseline 5be6615), update a clean main branch, and create a focused feature branch. Continue Phase 2 by finding a coordinate-bearing, appropriately licensed MTR source; the MTR Lines & Stations CSV reviewed on the previous slice has line/station sequence but no coordinates, so the current overlay remains schematic and unvalidated. Do not add more transit/geographic layers until the MTR geometry source is resolved. Check the relevant Next.js guidance before application-code edits. Follow the standard development loop: run npm run lint and npm run build, commit conventionally, push, and open a PR.
+Resume from WORKSPACE_HANDOFF.md. First open and merge the already-pushed MTR provenance branch PR (commit 6079832), then confirm origin/main includes it and update a clean main branch. Continue Phase 2 by finding a coordinate-bearing, appropriately licensed MTR source; the MTR Lines & Stations CSV reviewed on the previous slice has line/station sequence but no coordinates, so the current overlay remains schematic and unvalidated. Do not add more transit/geographic layers until the MTR geometry source is resolved. Check the relevant Next.js guidance before application-code edits. Follow the standard development loop: run npm run lint and npm run build, commit conventionally, push, and open a PR.
 ```
 
 Before ending a session, leave the worktree either clean on `main` after a
