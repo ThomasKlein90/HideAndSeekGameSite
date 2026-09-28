@@ -48,7 +48,7 @@ website. Update it as rules and priorities are agreed.
 
 - [x] Select an initial OpenStreetMap base layer and display its required attribution; document transit data as pending source review.
 - [x] Create a mobile-friendly interactive base map.
-- [ ] Validate and adopt an appropriately licensed MTR dataset for authoritative routes, stations, and line labels. The MTR Lines & Stations CSV is an assessed candidate for names and sequence only; it contains no coordinates, so the displayed reference geometry remains unvalidated.
+- [ ] Visually validate OSM-derived MTR route geometry and resolve route-stop/station-code differences against current MTR data before treating it as authoritative gameplay geography. Ten lines and 98 station points are integrated under ODbL with visible attribution; MTR comparison results are stored separately with their own source attribution.
 - [ ] Add Hong Kong Tramways route and stops where suitable.
 - [ ] Add MTR Light Rail routes and stops.
 - [ ] Add relevant ferry routes and terminals.

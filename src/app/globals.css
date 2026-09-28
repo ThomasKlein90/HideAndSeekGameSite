@@ -559,6 +559,25 @@ h1 {
   text-underline-offset: 0.15em;
 }
 
+.map-data-status {
+  margin: 0;
+  color: var(--muted-ink);
+  font-size: 0.8rem;
+}
+
+.map-data-error {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border: 1px solid #a33f32;
+  border-radius: 0.65rem;
+  padding: 0.75rem;
+  color: #7a2b22;
+  font-size: 0.85rem;
+}
+
 .feature-grid h2,
 .getting-started h2 {
   margin-bottom: 0.6rem;
