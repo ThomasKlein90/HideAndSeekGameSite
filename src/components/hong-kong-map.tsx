@@ -11,7 +11,11 @@ import {
   Tooltip,
   ZoomControl,
 } from "react-leaflet";
-import { mtrLines, mtrRouteFeatures } from "@/data/mtr-reference";
+import {
+  mtrDataSource,
+  mtrLines,
+  mtrRouteFeatures,
+} from "@/data/mtr-reference";
 
 const hongKongCenter: [number, number] = [22.3193, 114.1694];
 
@@ -100,6 +104,19 @@ export function HongKongMap() {
           MTR geometry requires source validation before gameplay use
         </span>
       </div>
+      <p className="map-source-note">
+        <strong>Source review:</strong>{" "}
+        <a href={mtrDataSource.catalogUrl} rel="noreferrer" target="_blank">
+          {mtrDataSource.name}
+        </a>{" "}
+        from {mtrDataSource.provider} was last updated{" "}
+        {mtrDataSource.updatedAt}. {mtrDataSource.limitation} The displayed
+        geometry is still schematic and is not derived from this CSV. See the{" "}
+        <a href={mtrDataSource.termsUrl} rel="noreferrer" target="_blank">
+          DATA.GOV.HK terms of use
+        </a>{" "}
+        for attribution and reuse conditions.
+      </p>
     </section>
   );
 }

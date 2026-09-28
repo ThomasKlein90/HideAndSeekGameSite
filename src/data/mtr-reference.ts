@@ -1,5 +1,18 @@
 import type { Feature, FeatureCollection, LineString } from "geojson";
 
+export const mtrDataSource = {
+  name: "MTR Lines (except Light Rail) & Stations",
+  provider: "MTR Corporation Limited via DATA.GOV.HK",
+  resourceUrl:
+    "https://opendata.mtr.com.hk/data/mtr_lines_and_stations.csv",
+  catalogUrl:
+    "https://data.gov.hk/en-data/dataset/mtr-data-routes-fares-barrier-free-facilities/resource/8daba4fe-b879-4a51-8962-27b4cffdc61c",
+  termsUrl: "https://data.gov.hk/en/terms-and-conditions",
+  updatedAt: "2023-06-25",
+  limitation:
+    "The CSV provides line, direction, station names, and sequence, but no geographic coordinates.",
+} as const;
+
 export type MtrLine = {
   id: string;
   name: string;

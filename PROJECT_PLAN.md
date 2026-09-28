@@ -48,7 +48,7 @@ website. Update it as rules and priorities are agreed.
 
 - [x] Select an initial OpenStreetMap base layer and display its required attribution; document transit data as pending source review.
 - [x] Create a mobile-friendly interactive base map.
-- [ ] Add the main MTR routes, stations, and line labels.
+- [ ] Validate and adopt an appropriately licensed MTR dataset for authoritative routes, stations, and line labels. The MTR Lines & Stations CSV is an assessed candidate for names and sequence only; it contains no coordinates, so the displayed reference geometry remains unvalidated.
 - [ ] Add Hong Kong Tramways route and stops where suitable.
 - [ ] Add MTR Light Rail routes and stops.
 - [ ] Add relevant ferry routes and terminals.

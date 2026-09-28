@@ -4,12 +4,12 @@ This file is the short operational record for resuming work after a Copilot sess
 
 ## Current Snapshot
 
-- Last verified: 2026-09-16
+- Last verified: 2026-09-28
 - Repository: `ThomasKlein90/HideAndSeekGameSite`
 - Integration branch: `main`
-- Working branch: `feature/hong-kong-mtr-layer`
-- Baseline commit: `99bce76` (merged PR #21)
-- Product stage: Phase 2 interactive OpenStreetMap base map and initial MTR reference overlay implemented; remaining transit and geographic overlays remain pending source review.
+- Working branch: `feature/mtr-source-provenance`
+- Baseline commit: `5be6615` (merged PR #22)
+- Product stage: Phase 2 interactive OpenStreetMap base map and provisional MTR reference overlay implemented; source review found the official MTR station CSV lacks coordinates, so the geometry is still unvalidated.
 
 ## Implemented & Verified in Live Smoke Test
 
@@ -49,14 +49,15 @@ This file is the short operational record for resuming work after a Copilot sess
 - Final-hiding reference point slice: **Passed** lint/build; remote migration `20260916100000_final_hiding_reference_point.sql` was applied through the Supabase Dashboard.
 - Hong Kong interactive map slice: **Implemented** with Leaflet, OpenStreetMap tiles and attribution, Hong Kong center/radius preview, responsive styling, and a pending-layer legend. `npm run lint`, `npm run build`, and `git diff --check` passed.
 - MTR map slice: **Implemented** with a simplified, clearly labeled reference overlay, line colors, station markers/tooltips, independent layer toggles, and legend entries. The geometry is planning-only until a source is selected and visually validated.
+- MTR PR #22: **Merged** into `main`; `origin/main` is currently at `5be6615`.
+- MTR source review: DATA.GOV.HK lists the MTR Lines (except Light Rail) & Stations CSV, published by MTR Corporation Limited and last updated 2023-06-25. The CSV provides line/direction/station sequence but no coordinates. Its terms require attribution to the Government, relevant organisation, and DATA.GOV.HK. The map now discloses this limitation; no transit geometry is represented as authoritative.
 
-## Next Development Slice
+## Current Development Slice
 
-Pending review and merge:
-1. **Phase 2 - MTR source validation and remaining overlays**:
-   - Select an appropriately licensed MTR dataset, replace or verify the planning geometry, then add Tram, Ferry, district, and search layers.
-2. **Phase 4 - Dedicated Seeker Status Panel**:
-   - Prepare a role-restricted panel for future manual check-ins and consented locations.
+The current branch adds an MTR source provenance disclosure. The displayed MTR lines remain schematic. Before adopting them for gameplay:
+1. Find and assess a coordinate-bearing source compatible with the project's use, or derive geometry from OpenStreetMap under ODbL with required attribution and share-alike handling.
+2. Validate route and station geometry visually and against current MTR station ordering.
+3. Only then add Tram, Ferry, district, search, or game-boundary layers.
 
 ## Start-Of-Session Procedure
 
@@ -70,7 +71,7 @@ Pending review and merge:
 ### Copy-ready restart prompt
 
 ```
-Resume from WORKSPACE_HANDOFF.md. Confirm origin/main contains merged PR #21 or later and update a clean main branch, then continue the Phase 2 map work by validating the MTR reference geometry and selecting an appropriately licensed source before adding further transit or geographic layers. Check the relevant Next.js guidance before any application-code edits. Follow the standard development loop: create a focused feature branch, implement the feature, run npm run lint and npm run build, commit with a conventional commit message, and open a PR.
+Resume from WORKSPACE_HANDOFF.md. Confirm origin/main contains merged PR #22 or later (expected baseline 5be6615), update a clean main branch, and create a focused feature branch. Continue Phase 2 by finding a coordinate-bearing, appropriately licensed MTR source; the MTR Lines & Stations CSV reviewed on the previous slice has line/station sequence but no coordinates, so the current overlay remains schematic and unvalidated. Do not add more transit/geographic layers until the MTR geometry source is resolved. Check the relevant Next.js guidance before application-code edits. Follow the standard development loop: run npm run lint and npm run build, commit conventionally, push, and open a PR.
 ```
 
 Before ending a session, leave the worktree either clean on `main` after a
