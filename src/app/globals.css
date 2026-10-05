@@ -542,6 +542,11 @@ h1 {
   border: 3px solid #007dc5;
 }
 
+.legend-swatch-tram {
+  background: #fff;
+  border: 3px solid #309ad0;
+}
+
 .map-legend-pending {
   color: var(--coral);
 }
