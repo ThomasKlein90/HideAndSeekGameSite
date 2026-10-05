@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "test:map:mtr": "node --test scripts/refresh-mtr-osm-data.test.mjs",
     "map:mtr:refresh": "node scripts/refresh-mtr-osm-data.mjs"
   },
   "dependencies": {

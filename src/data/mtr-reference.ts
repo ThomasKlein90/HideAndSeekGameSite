@@ -16,6 +16,8 @@ export const mtrDataSource = {
       "https://data.gov.hk/en-data/dataset/mtr-data-routes-fares-barrier-free-facilities/resource/8daba4fe-b879-4a51-8962-27b4cffdc61c",
     termsUrl: "https://data.gov.hk/en/terms-and-conditions",
     updatedAt: "2023-06-25",
+    systemMapUrl:
+      "https://www.mtr.com.hk/en/customer/services/system_map.html",
   },
 } as const;
 
@@ -43,7 +45,7 @@ export type MtrMapFeature =
 export type MtrStationSequenceComparison = {
   officialCount: number;
   osmCount: number;
-  missingFromOsm: string[];
+  missingFromRouteStops: string[];
   notInOfficialCsv: string[];
   relationSequenceComparison: {
     relationCount: number;
@@ -72,5 +74,10 @@ export type MtrStationValidation = {
   catalogUrl: string;
   termsUrl: string;
   updatedAt: string;
+  stationCodeAliases: Array<{
+    osmCode: string;
+    officialCode: string;
+    stationName: string;
+  }>;
   stationSequenceComparison: Record<string, MtrStationSequenceComparison>;
 };

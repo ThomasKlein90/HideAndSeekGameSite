@@ -1,5 +1,6 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 
 const bounds = "22.1,113.8,22.6,114.4";
 const query = `[out:json][timeout:90];relation[route=subway][operator~"MTR"](${bounds})->.routes;(.routes;node(r.routes););out body geom;`;
@@ -7,6 +8,11 @@ const overpassUrl = `https://overpass-api.de/api/interpreter?data=${encodeURICom
 const mtrCsvUrl = "https://opendata.mtr.com.hk/data/mtr_lines_and_stations.csv";
 const outputPath = resolve("public/data/mtr-osm.geojson");
 const validationOutputPath = resolve("public/data/mtr-station-validation.json");
+const officialStationCodeAliases = new Map([["SWT", "SUW"]]);
+
+function normalizeOfficialStationCode(stationCode) {
+  return officialStationCodeAliases.get(stationCode) ?? stationCode;
+}
 
 async function fetchText(url, resourceName) {
   const response = await fetch(url, {
@@ -95,7 +101,9 @@ function missingStationCodes(osm, officialCsv) {
     for (const member of relation.members ?? []) {
       if (member.type !== "node" || !member.role?.startsWith("stop")) continue;
       const stationCode = nodes.get(member.ref)?.tags?.ref;
-      if (stationCode) routeStopCodes.add(stationCode);
+      if (stationCode) {
+        routeStopCodes.add(normalizeOfficialStationCode(stationCode));
+      }
     }
   }
 
@@ -189,8 +197,8 @@ function buildGeoJson(osm, officialCsv, additionalStations) {
         continue;
       }
 
-      stationCodes.add(stationCode);
-      orderedStationCodes.push(stationCode);
+      stationCodes.add(normalizeOfficialStationCode(stationCode));
+      orderedStationCodes.push(normalizeOfficialStationCode(stationCode));
       const station = stations.get(stationCode) ?? {
         name: node.tags["name:en"] ?? node.tags.name ?? stationCode,
         coordinates: [],
@@ -261,7 +269,9 @@ function buildGeoJson(osm, officialCsv, additionalStations) {
     stationComparison[lineCode] = {
       officialCount: officialCodes.size,
       osmCount: osmCodes.size,
-      missingFromOsm: [...officialCodes].filter((code) => !osmCodes.has(code)).sort(),
+      missingFromRouteStops: [...officialCodes]
+        .filter((code) => !osmCodes.has(code))
+        .sort(),
       notInOfficialCsv: [...osmCodes].filter((code) => !officialCodes.has(code)).sort(),
       relationSequenceComparison: relationSequenceComparison.get(lineCode) ?? {
         relationCount: 0,
@@ -334,6 +344,13 @@ function buildGeoJson(osm, officialCsv, additionalStations) {
       "https://data.gov.hk/en-data/dataset/mtr-data-routes-fares-barrier-free-facilities/resource/8daba4fe-b879-4a51-8962-27b4cffdc61c",
     termsUrl: "https://data.gov.hk/en/terms-and-conditions",
     updatedAt: "2023-06-25",
+    stationCodeAliases: [
+      {
+        osmCode: "SWT",
+        officialCode: "SUW",
+        stationName: "Sung Wong Toi",
+      },
+    ],
     stationSequenceComparison: stationComparison,
   };
 
@@ -417,18 +434,25 @@ async function main() {
     stationValidation.stationSequenceComparison,
   )) {
     if (
-      result.missingFromOsm.length ||
+      result.missingFromRouteStops.length ||
       result.notInOfficialCsv.length ||
       result.relationSequenceComparison.unmatchedRelationIds.length
     ) {
       console.log(
-        `${lineCode}: ${result.relationSequenceComparison.exactOrderMatches}/${result.relationSequenceComparison.relationCount} exact direction-order matches; missing from OSM [${result.missingFromOsm.join(", ")}]; OSM-only [${result.notInOfficialCsv.join(", ")}]`,
+        `${lineCode}: ${result.relationSequenceComparison.exactOrderMatches}/${result.relationSequenceComparison.relationCount} exact direction-order matches; missing route-relation stops [${result.missingFromRouteStops.join(", ")}]; OSM-only [${result.notInOfficialCsv.join(", ")}]`,
       );
     }
   }
 }
 
-main().catch((error) => {
-  console.error("Failed to refresh MTR map data:", error);
-  process.exitCode = 1;
-});
+if (
+  process.argv[1] &&
+  import.meta.url === pathToFileURL(resolve(process.argv[1])).href
+) {
+  main().catch((error) => {
+    console.error("Failed to refresh MTR map data:", error);
+    process.exitCode = 1;
+  });
+}
+
+export { buildGeoJson, missingStationCodes, normalizeOfficialStationCode };
