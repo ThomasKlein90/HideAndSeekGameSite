@@ -95,6 +95,14 @@ function isMtrStationValidation(value: unknown): value is MtrStationValidation {
     typeof value.catalogUrl !== "string" ||
     typeof value.termsUrl !== "string" ||
     typeof value.updatedAt !== "string" ||
+    !Array.isArray(value.stationCodeAliases) ||
+    !value.stationCodeAliases.every(
+      (alias) =>
+        isRecord(alias) &&
+        typeof alias.osmCode === "string" &&
+        typeof alias.officialCode === "string" &&
+        typeof alias.stationName === "string",
+    ) ||
     !isRecord(value.stationSequenceComparison)
   ) {
     return false;
@@ -105,8 +113,8 @@ function isMtrStationValidation(value: unknown): value is MtrStationValidation {
       isRecord(comparison) &&
       typeof comparison.officialCount === "number" &&
       typeof comparison.osmCount === "number" &&
-      Array.isArray(comparison.missingFromOsm) &&
-      comparison.missingFromOsm.every(
+      Array.isArray(comparison.missingFromRouteStops) &&
+      comparison.missingFromRouteStops.every(
         (stationCode) => typeof stationCode === "string",
       ) &&
       Array.isArray(comparison.notInOfficialCsv) &&
@@ -215,14 +223,14 @@ export function HongKongMap() {
       )
         .filter(
           ([, comparison]) =>
-            comparison.missingFromOsm.length > 0 ||
+            comparison.missingFromRouteStops.length > 0 ||
             comparison.notInOfficialCsv.length > 0,
         )
         .map(([lineCode, comparison]) => {
           const differences: string[] = [];
-          if (comparison.missingFromOsm.length > 0) {
+          if (comparison.missingFromRouteStops.length > 0) {
             differences.push(
-              `route-stop relation omits ${comparison.missingFromOsm.join(", ")}`,
+              `official stop codes absent from OSM route relations: ${comparison.missingFromRouteStops.join(", ")}`,
             );
           }
           if (comparison.notInOfficialCsv.length > 0) {
@@ -374,11 +382,25 @@ export function HongKongMap() {
         {mtrDataSource.officialStationList.updatedAt});{" "}
         {routeSequenceSummary.matched}/{routeSequenceSummary.total} OSM route
         relation sequences exactly match a complete listed direction; other
-        relations may represent partial or variant services. Route-stop
-        differences remain between OSM and that older list
+        relations may represent partial or variant services. The differences
+        below compare OSM route-relation stop members; they do not necessarily
+        mean a station marker is missing
         {stationDiscrepancies.length > 0
           ? `: ${stationDiscrepancies.join("; ")}.`
           : "."}{" "}
+        {stationValidation?.stationCodeAliases.map(
+          ({ osmCode, officialCode, stationName }) =>
+            `For comparison only, OSM ${stationName} code ${osmCode} is matched to MTR code ${officialCode}; the OSM snapshot retains its original tag. `,
+        )}
+        OSM also includes EAL stop RAC (Racecourse), shown on the{" "}
+        <a
+          href={mtrDataSource.officialStationList.systemMapUrl}
+          rel="noreferrer"
+          target="_blank"
+        >
+          current MTR System Map
+        </a>
+        , but not listed in the MTR station-sequence CSV.{" "}
         The data is provided as-is and should be visually checked before
         gameplay use.{" "}
         <a href={mtrDataSource.officialStationList.termsUrl} rel="noreferrer" target="_blank">
