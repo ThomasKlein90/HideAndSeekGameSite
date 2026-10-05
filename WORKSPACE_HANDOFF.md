@@ -8,7 +8,7 @@ This file is the short operational record for resuming work after a Copilot sess
 - Repository: `ThomasKlein90/HideAndSeekGameSite`
 - Integration branch: `main`
 - Verified `origin/main`: `0e0388b` (merged PR #26); local `main` was fast-forwarded to the same baseline before starting this slice.
-- Current feature branch: `feature/hong-kong-tramways`, based on `0e0388b`.
+- Current feature branch: `feature/hong-kong-tramways`, based on `0e0388b`; implementation commit `74db58b` is pushed to `origin/feature/hong-kong-tramways` (no PR created).
 - Product stage: MTR route topology has been visually accepted by the user at overview scale for gameplay use. Hong Kong Tramways routes/stops are integrated from an ODbL OSM snapshot as a reference layer.
 
 ## Implemented & Verified in Live Smoke Test
