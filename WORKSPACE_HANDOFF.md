@@ -8,7 +8,7 @@ This file is the short operational record for resuming work after a Copilot sess
 - Repository: `ThomasKlein90/HideAndSeekGameSite`
 - Integration branch: `main`
 - Verified `origin/main`: `d71c050` (merged PR #25); the clean local `main` was fast-forwarded to this commit.
-- Current feature branch: `feature/mtr-route-validation`, created from `d71c050`.
+- Current feature branch: `feature/mtr-route-validation`, created from `d71c050`; implementation commit `a6f5c24` is pushed to `origin/feature/mtr-route-validation` (no PR created).
 - Product stage: Phase 2 OSM-derived MTR geometry is integrated with visible ODbL attribution; overview topology and several station-code differences have been reviewed, but precise geographic validation remains open and the layer is provisional.
 
 ## Implemented & Verified in Live Smoke Test
