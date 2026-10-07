@@ -547,6 +547,11 @@ h1 {
   border: 3px solid #309ad0;
 }
 
+.legend-swatch-light-rail {
+  background: #fff;
+  border: 3px solid #8552a3;
+}
+
 .map-legend-pending {
   color: var(--coral);
 }

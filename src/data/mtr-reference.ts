@@ -95,6 +95,34 @@ export type HongKongTramwaysFeatureCollection = FeatureCollection<
   extractionQuery: string;
 };
 
+export type LightRailRouteProperties = {
+  kind: "route";
+  routeCode: string;
+  name: string;
+  serviceNames: string[];
+  osmRelationIds: number[];
+  osmWayCount: number;
+};
+
+export type LightRailStopProperties = {
+  kind: "stop";
+  name: string;
+  reference: string | null;
+  routeCodes: string[];
+  osmNodeIds: number[];
+};
+
+export type MtrLightRailFeatureCollection = FeatureCollection<
+  MultiLineString | Point,
+  LightRailRouteProperties | LightRailStopProperties
+> & {
+  license: string;
+  attribution: string;
+  source: string;
+  extractedAt: string | null;
+  extractionQuery: string;
+};
+
 export type MtrStationValidation = {
   name: string;
   provider: string;
