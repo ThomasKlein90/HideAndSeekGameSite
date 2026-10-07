@@ -50,7 +50,8 @@ website. Update it as rules and priorities are agreed.
 - [x] Create a mobile-friendly interactive base map.
 - [x] Review OSM-derived MTR route topology against the current MTR System Map at overview scale; the user confirmed the route information looks correct for the game. Station-code aliases and route-stop metadata are documented. Treat this as visual acceptance for gameplay use, not survey-grade coordinate validation.
 - [x] Add Hong Kong Tramways route and stops from OSM: six service patterns (12 directional relations) and 118 unique stop locations, with visible ODbL attribution and independent route/stop controls. This OSM reference snapshot is not an operator-certified timetable or route feed.
-- [ ] Add MTR Light Rail routes and stops.
+- [x] Select OpenStreetMap as the coordinate-bearing source for the MTR Light Rail layer. The [DATA.GOV.HK MTR Lines & Stations resource](https://data.gov.hk/en-data/dataset/mtr-data-routes-fares-barrier-free-facilities/resource/8daba4fe-b879-4a51-8962-27b4cffdc61c) explicitly excludes Light Rail and has no coordinates; an Overpass review found mapped `route=light_rail` relations and stop/platform nodes. OSM's [ODbL licensing and attribution requirements](https://www.openstreetmap.org/copyright) apply. Keep the derived map as a reference layer, not an operator-certified service feed.
+- [x] Add MTR Light Rail routes and stop/platform locations from a versioned OSM snapshot: 12 route references and 144 stop/platform points, with independent controls and visible ODbL attribution.
 - [ ] Add relevant ferry routes and terminals.
 - [ ] Add district boundaries, district labels, island labels, and search.
 - [x] Add independent layer toggles and a clear map legend.
@@ -129,9 +130,9 @@ Current state:
 
 Next:
 
-1. After the tram slice is merged, identify a suitably licensed source for Hong Kong MTR Light Rail routes and stops.
+1. After the Light Rail slice is reviewed and merged, research a suitably licensed coordinate-bearing source for relevant ferry routes and terminals.
 2. Continue checking public-transit and playable-boundary rules with the group as map layers are added.
-3. Proceed to ferry routes, district/island labels, and configurable game/no-go boundaries as source availability and game rules allow.
+3. Proceed to district/island labels and configurable game/no-go boundaries as source availability and game rules allow.
 
 ## Open Decisions
 

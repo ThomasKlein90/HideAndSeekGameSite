@@ -9,8 +9,10 @@
     "lint": "eslint",
     "test:map:mtr": "node --test scripts/refresh-mtr-osm-data.test.mjs",
     "test:map:tram": "node --test scripts/refresh-hk-tramways-data.test.mjs",
+    "test:map:light-rail": "node --test scripts/refresh-mtr-light-rail-data.test.mjs",
     "map:mtr:refresh": "node scripts/refresh-mtr-osm-data.mjs",
-    "map:tram:refresh": "node scripts/refresh-hk-tramways-data.mjs"
+    "map:tram:refresh": "node scripts/refresh-hk-tramways-data.mjs",
+    "map:light-rail:refresh": "node scripts/refresh-mtr-light-rail-data.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.113.0",
