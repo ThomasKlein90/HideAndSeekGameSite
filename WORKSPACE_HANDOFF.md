@@ -8,7 +8,7 @@ This file is the short operational record for resuming work after a Copilot sess
 - Repository: `ThomasKlein90/HideAndSeekGameSite`
 - Integration branch: `main`
 - Verified `origin/main`: `d47e0dd` (merged PR #29, Hong Kong ferry layer); local `main` was fast-forwarded to this commit.
-- Current feature branch: `feature/hong-kong-district-boundaries`, based on `d47e0dd`; implementation is complete and validated but not yet committed or pushed. No PR was created.
+- Current feature branch: `feature/hong-kong-district-boundaries`, based on `d47e0dd`; implementation commit `4c1462e` is complete and validated but not yet pushed. No PR was created.
 - Product stage: MTR, Tramways, Light Rail, and the ferry reference layer are integrated in `main`; this branch adds district outlines and zoom-dependent labels from OSM.
 
 ## Implemented & Verified in Live Smoke Test
@@ -68,7 +68,7 @@ This file is the short operational record for resuming work after a Copilot sess
 
 MTR routes, Hong Kong Tramways, MTR Light Rail, and ferries are integrated into `main` through PR #29 (`d47e0dd`). Source details and validation history are recorded above.
 
-The active branch is `feature/hong-kong-district-boundaries`, based on merged PR #29 (`d47e0dd`). The OSM district implementation is complete and validated, but uncommitted/unpushed. `public/data/hong-kong-districts.geojson` contains all 18 Hong Kong admin-level-6 boundaries under ODbL-1.0; polygon geometry timestamp `2026-10-07T09:17:22Z`, label-center timestamp `2026-10-07T09:16:18Z`. The generator/test commands are `npm run map:districts:refresh` and `npm run test:map:districts`; pass a saved Overpass response to `node scripts/refresh-hk-district-data.mjs <overpass-json>`. The single district layer is independently toggleable, shows outlines and hover names at all scales, and reveals English labels at zoom 14+. Tests, lint, build, diff check, and phone-width visual/toggle checks passed. Review final diff, commit conventionally, and push; user handles PR creation/merge. Island labels/search and game boundaries remain future slices.
+The active branch is `feature/hong-kong-district-boundaries`, based on merged PR #29 (`d47e0dd`). The OSM district implementation is complete and validated at commit `4c1462e`, not yet pushed. `public/data/hong-kong-districts.geojson` contains all 18 Hong Kong admin-level-6 boundaries under ODbL-1.0; polygon geometry timestamp `2026-10-07T09:17:22Z`, label-center timestamp `2026-10-07T09:16:18Z`. The generator/test commands are `npm run map:districts:refresh` and `npm run test:map:districts`; pass a saved Overpass response to `node scripts/refresh-hk-district-data.mjs <overpass-json>`. The single district layer is independently toggleable, shows outlines and hover names at all scales, and reveals English labels at zoom 14+. Tests, lint, build, diff check, and phone-width visual/toggle checks passed. Push the branch; user handles PR creation/merge. Island labels/search and game boundaries remain future slices.
 
 ## Start-Of-Session Procedure
 
@@ -80,7 +80,7 @@ The active branch is `feature/hong-kong-district-boundaries`, based on merged PR
 ### Copy-ready restart prompt
 
 ```
-Resume from WORKSPACE_HANDOFF.md. The district-boundaries slice is on `feature/hong-kong-district-boundaries`, based on merged PR #29 (`d47e0dd`). It adds an OSM/ODbL snapshot of 18 Hong Kong district polygons, tested refresh/conversion script, toggleable boundary overlay with hover names and zoom-14 English labels, attribution, plan/handoff updates, and map status count. Tests, lint, build, diff check, and phone-width map/toggle/label checks passed. Review final diff, commit conventionally, and push; user creates and merges PRs separately. Island labels/search and game boundaries remain future map slices; refresh stale ferry pier-area data when Overpass is available.
+Resume from WORKSPACE_HANDOFF.md. The district-boundaries slice is on `feature/hong-kong-district-boundaries`, based on merged PR #29 (`d47e0dd`), implementation commit `4c1462e`. It adds an OSM/ODbL snapshot of 18 Hong Kong district polygons, tested refresh/conversion script, toggleable boundary overlay with hover names and zoom-14 English labels, attribution, plan/handoff updates, and map status count. Tests, lint, build, diff check, and phone-width map/toggle/label checks passed. Push the branch; user creates and merges PRs separately. Island labels/search and game boundaries remain future map slices; refresh stale ferry pier-area data when Overpass is available.
 ```
 
 Before ending a session, leave the worktree either clean on `main` after a
