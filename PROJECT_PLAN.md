@@ -48,8 +48,8 @@ website. Update it as rules and priorities are agreed.
 
 - [x] Select an initial OpenStreetMap base layer and display its required attribution; document transit data as pending source review.
 - [x] Create a mobile-friendly interactive base map.
-- [ ] Complete station-by-station geographic validation of OSM-derived MTR routes and station locations before treating them as authoritative gameplay geography. An overview comparison with the current MTR System Map found plausible network topology. The MTR CSV confirms AWE, TIK, ETS, and SUW; OSM route relations omit AWE, TIK, and ETS, but supplemental station points are present. OSM uses SWT for Sung Wong Toi, normalized to official code SUW for comparison only; the raw OSM tag is preserved. OSM's RAC (Racecourse) stop appears on the MTR System Map but is absent from the 2023 station-sequence CSV. Precise station-location and route-geometry validation remains open; keep the layer provisional.
-- [ ] Add Hong Kong Tramways route and stops where suitable.
+- [x] Review OSM-derived MTR route topology against the current MTR System Map at overview scale; the user confirmed the route information looks correct for the game. Station-code aliases and route-stop metadata are documented. Treat this as visual acceptance for gameplay use, not survey-grade coordinate validation.
+- [x] Add Hong Kong Tramways route and stops from OSM: six service patterns (12 directional relations) and 118 unique stop locations, with visible ODbL attribution and independent route/stop controls. This OSM reference snapshot is not an operator-certified timetable or route feed.
 - [ ] Add MTR Light Rail routes and stops.
 - [ ] Add relevant ferry routes and terminals.
 - [ ] Add district boundaries, district labels, island labels, and search.
@@ -124,13 +124,14 @@ Current state:
 - [x] Seeker private map annotations and active game session restoration on page reload are fully functional.
 - [x] End-to-end multi-role live smoke test passed across host, seeker, and hider roles.
 - [x] Phase 2 interactive Hong Kong map and OSM-derived MTR route/station layers are integrated with visible source attribution and licensing (merged PR #24).
-- [x] OSM geometry and MTR source-discrepancy review started on `feature/mtr-route-validation`; the latest `main` baseline before this slice is `d71c050` (merged documentation PR #25).
+- [x] MTR route topology and source differences reviewed; user accepted the overview geometry for gameplay use (merged PR #26, baseline `0e0388b`).
+- [x] Hong Kong Tramways OSM routes and stop snapshot implemented on `feature/hong-kong-tramways`; six service patterns and 118 stop points with visible ODbL attribution.
 
 Next:
 
-1. Validate route geometry and station locations at detailed scales against a suitable coordinate-bearing source; the current MTR system map is schematic and cannot establish geographic accuracy.
-2. Keep the MTR layer explicitly provisional and do not add more transit or geographic layers until the detailed validation is complete.
-3. After review, select the next map slice from the remaining Phase 2 items and confirm any needed transit or boundary rules with the group.
+1. After the tram slice is merged, identify a suitably licensed source for Hong Kong MTR Light Rail routes and stops.
+2. Continue checking public-transit and playable-boundary rules with the group as map layers are added.
+3. Proceed to ferry routes, district/island labels, and configurable game/no-go boundaries as source availability and game rules allow.
 
 ## Open Decisions
 

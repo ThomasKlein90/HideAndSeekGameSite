@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import type { Feature, FeatureCollection, MultiLineString, Point } from "geojson";
+import type {
+  Feature,
+  FeatureCollection,
+  GeoJsonProperties,
+  MultiLineString,
+  Point,
+} from "geojson";
 import {
   Circle,
   CircleMarker,
@@ -15,10 +21,13 @@ import {
 } from "react-leaflet";
 import {
   mtrDataSource,
+  type HongKongTramwaysFeatureCollection,
   type MtrMapFeatureCollection,
   type MtrRouteProperties,
   type MtrStationValidation,
   type MtrStationProperties,
+  type TramRouteProperties,
+  type TramStopProperties,
 } from "@/data/mtr-reference";
 
 const hongKongCenter: [number, number] = [22.3193, 114.1694];
@@ -132,14 +141,66 @@ function isMtrStationValidation(value: unknown): value is MtrStationValidation {
   );
 }
 
-function makeFeatureCollection<G extends MultiLineString | Point>(
-  features: Array<Feature<G, MtrRouteProperties | MtrStationProperties>>,
-): FeatureCollection<G, MtrRouteProperties | MtrStationProperties> {
+function isHongKongTramwaysData(
+  value: unknown,
+): value is HongKongTramwaysFeatureCollection {
+  if (
+    !isRecord(value) ||
+    value.type !== "FeatureCollection" ||
+    !Array.isArray(value.features) ||
+    typeof value.license !== "string" ||
+    typeof value.attribution !== "string" ||
+    typeof value.source !== "string" ||
+    typeof value.extractedAt !== "string" ||
+    typeof value.extractionQuery !== "string"
+  ) {
+    return false;
+  }
+
+  return value.features.every((feature: unknown) => {
+    if (!isRecord(feature) || feature.type !== "Feature") return false;
+    if (!isRecord(feature.properties) || !isRecord(feature.geometry)) return false;
+
+    if (feature.properties.kind === "route") {
+      return (
+        feature.geometry.type === "MultiLineString" &&
+        Array.isArray(feature.geometry.coordinates) &&
+        feature.geometry.coordinates.every(
+          (line: unknown) =>
+            Array.isArray(line) && line.length >= 2 && line.every(isPosition),
+        ) &&
+        typeof feature.properties.serviceName === "string" &&
+        typeof feature.properties.name === "string" &&
+        typeof feature.properties.color === "string"
+      );
+    }
+
+    return (
+      feature.properties.kind === "stop" &&
+      feature.geometry.type === "Point" &&
+      isPosition(feature.geometry.coordinates) &&
+      typeof feature.properties.name === "string" &&
+      (typeof feature.properties.reference === "string" ||
+        feature.properties.reference === null) &&
+      Array.isArray(feature.properties.serviceNames) &&
+      feature.properties.serviceNames.every(
+        (serviceName: unknown) => typeof serviceName === "string",
+      )
+    );
+  });
+}
+
+function makeFeatureCollection<
+  G extends MultiLineString | Point,
+  P extends GeoJsonProperties,
+>(features: Array<Feature<G, P>>): FeatureCollection<G, P> {
   return { type: "FeatureCollection", features };
 }
 
 export function HongKongMap() {
   const [mtrData, setMtrData] = useState<MtrMapFeatureCollection | null>(null);
+  const [tramData, setTramData] =
+    useState<HongKongTramwaysFeatureCollection | null>(null);
   const [stationValidation, setStationValidation] =
     useState<MtrStationValidation | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -152,30 +213,44 @@ export function HongKongMap() {
       setLoadError(null);
 
       try {
-        const [mapResponse, validationResponse] = await Promise.all([
+        const [mapResponse, validationResponse, tramResponse] = await Promise.all([
           fetch("/data/mtr-osm.geojson", { signal: controller.signal }),
           fetch("/data/mtr-station-validation.json", {
             signal: controller.signal,
           }),
+          fetch("/data/hong-kong-tramways.geojson", {
+            signal: controller.signal,
+          }),
         ]);
 
-        if (!mapResponse.ok || !validationResponse.ok) {
+        if (!mapResponse.ok || !validationResponse.ok || !tramResponse.ok) {
           throw new Error(
-            `Map data requests failed (${mapResponse.status}, ${validationResponse.status}).`,
+            `Map data requests failed (${mapResponse.status}, ${validationResponse.status}, ${tramResponse.status}).`,
           );
         }
 
-        const [mapResult, validationResult]: [unknown, unknown] =
-          await Promise.all([mapResponse.json(), validationResponse.json()]);
+        const [mapResult, validationResult, tramResult]: [
+          unknown,
+          unknown,
+          unknown,
+        ] = await Promise.all([
+          mapResponse.json(),
+          validationResponse.json(),
+          tramResponse.json(),
+        ]);
         if (!isMtrMapData(mapResult)) {
           throw new Error("The MTR GeoJSON file has an unexpected format.");
         }
         if (!isMtrStationValidation(validationResult)) {
           throw new Error("The MTR station comparison file is invalid.");
         }
+        if (!isHongKongTramwaysData(tramResult)) {
+          throw new Error("The Hong Kong Tramways GeoJSON file is invalid.");
+        }
 
         setMtrData(mapResult);
         setStationValidation(validationResult);
+        setTramData(tramResult);
       } catch (error) {
         if (controller.signal.aborted) return;
         setLoadError(
@@ -208,6 +283,24 @@ export function HongKongMap() {
       ) ?? [],
     [mtrData],
   );
+  const tramRouteFeatures = useMemo(
+    () =>
+      tramData?.features.filter(
+        (feature): feature is Feature<MultiLineString, TramRouteProperties> =>
+          feature.properties.kind === "route" &&
+          feature.geometry.type === "MultiLineString",
+      ) ?? [],
+    [tramData],
+  );
+  const tramStopFeatures = useMemo(
+    () =>
+      tramData?.features.filter(
+        (feature): feature is Feature<Point, TramStopProperties> =>
+          feature.properties.kind === "stop" &&
+          feature.geometry.type === "Point",
+      ) ?? [],
+    [tramData],
+  );
   const routeColors = useMemo(
     () => new Map(routeFeatures.map(({ properties }) => [properties.lineCode, properties.color])),
     [routeFeatures],
@@ -215,6 +308,10 @@ export function HongKongMap() {
   const routeCollection = useMemo(
     () => makeFeatureCollection(routeFeatures),
     [routeFeatures],
+  );
+  const tramRouteCollection = useMemo(
+    () => makeFeatureCollection(tramRouteFeatures),
+    [tramRouteFeatures],
   );
   const stationDiscrepancies = useMemo(
     () =>
@@ -267,11 +364,11 @@ export function HongKongMap() {
           <p className="eyebrow">Hong Kong game map</p>
           <h2 id="hong-kong-map-heading">Explore the playable city.</h2>
         </div>
-        <span className="map-status">MTR OSM data</span>
+        <span className="map-status">MTR + Tram OSM data</span>
       </div>
       <p className="map-description">
-        Explore OpenStreetMap-derived MTR routes and station locations. Toggle
-        the route and station overlays independently.
+        Explore OpenStreetMap-derived MTR and Hong Kong Tramways routes and
+        stops. Toggle each route and stop layer independently.
       </p>
       <div className="interactive-map-shell">
         <MapContainer
@@ -330,6 +427,49 @@ export function HongKongMap() {
                 </LayersControl.Overlay>
               </>
             )}
+            {tramData && (
+              <>
+                <LayersControl.Overlay checked name="Hong Kong Tramways routes">
+                  <GeoJSON
+                    data={tramRouteCollection}
+                    style={(feature) => ({
+                      color: feature?.properties?.color ?? "#309ad0",
+                      weight: 3,
+                      opacity: 0.9,
+                    })}
+                  />
+                </LayersControl.Overlay>
+                <LayersControl.Overlay checked name="Hong Kong Tramways stops">
+                  <FeatureGroup>
+                    {tramStopFeatures.map((feature) => {
+                      const [longitude, latitude] =
+                        feature.geometry.coordinates;
+
+                      return (
+                        <CircleMarker
+                          center={[latitude, longitude]}
+                          key={feature.properties.osmNodeIds[0]}
+                          pathOptions={{
+                            color: "#164c68",
+                            fillColor: "#ffffff",
+                            fillOpacity: 1,
+                            weight: 2,
+                          }}
+                          radius={2}
+                        >
+                          <Tooltip>
+                            {feature.properties.name}
+                            {feature.properties.reference
+                              ? ` (${feature.properties.reference})`
+                              : ""}
+                          </Tooltip>
+                        </CircleMarker>
+                      );
+                    })}
+                  </FeatureGroup>
+                </LayersControl.Overlay>
+              </>
+            )}
           </LayersControl>
           <Circle
             center={hongKongCenter}
@@ -349,6 +489,10 @@ export function HongKongMap() {
         </span>
         <span>
           <i className="legend-swatch legend-swatch-mtr" /> MTR routes and stations
+        </span>
+        <span>
+          <i className="legend-swatch legend-swatch-tram" /> Hong Kong Tramways
+          routes and stops
         </span>
       </div>
       <p className="map-source-note">
@@ -408,10 +552,26 @@ export function HongKongMap() {
         </a>
         .
       </p>
+      <p className="map-source-note">
+        Hong Kong Tramways routes and stops are also derived from{" "}
+        <a
+          href="https://www.openstreetmap.org/copyright"
+          rel="noreferrer"
+          target="_blank"
+        >
+          OpenStreetMap
+        </a>{" "}
+        under the ODbL 1.0; this snapshot includes {tramRouteFeatures.length}{" "}
+        route services and {tramStopFeatures.length} stop locations
+        {tramData?.extractedAt ? `, extracted ${tramData.extractedAt}` : ""}.
+        Route and stop coverage is based on OSM public transport relations and
+        should be treated as a reference layer.
+      </p>
       {mtrData && (
         <p className="map-data-status" role="status">
-          Loaded {routeFeatures.length} MTR lines and {stationFeatures.length}{" "}
-          station points from the versioned OSM snapshot.
+          Loaded {routeFeatures.length} MTR lines, {stationFeatures.length} MTR
+          station points, {tramRouteFeatures.length} tram services, and{" "}
+          {tramStopFeatures.length} tram stops from versioned OSM snapshots.
         </p>
       )}
       {!mtrData && !loadError && (

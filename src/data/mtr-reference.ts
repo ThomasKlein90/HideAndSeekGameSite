@@ -67,6 +67,34 @@ export type MtrMapFeatureCollection = FeatureCollection<
   };
 };
 
+export type TramRouteProperties = {
+  kind: "route";
+  serviceName: string;
+  name: string;
+  color: string;
+  osmRelationIds: number[];
+  osmWayCount: number;
+};
+
+export type TramStopProperties = {
+  kind: "stop";
+  name: string;
+  reference: string | null;
+  serviceNames: string[];
+  osmNodeIds: number[];
+};
+
+export type HongKongTramwaysFeatureCollection = FeatureCollection<
+  MultiLineString | Point,
+  TramRouteProperties | TramStopProperties
+> & {
+  license: string;
+  attribution: string;
+  source: string;
+  extractedAt: string;
+  extractionQuery: string;
+};
+
 export type MtrStationValidation = {
   name: string;
   provider: string;
