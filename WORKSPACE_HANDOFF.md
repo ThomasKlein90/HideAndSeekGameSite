@@ -8,8 +8,8 @@ This file is the short operational record for resuming work after a Copilot sess
 - Repository: `ThomasKlein90/HideAndSeekGameSite`
 - Integration branch: `main`
 - Verified `origin/main`: `e932323` (merged PR #28, MTR Light Rail); `feature/hong-kong-ferry-routes` is based on this merged baseline.
-- Current feature branch: `feature/hong-kong-ferry-routes`; ferry implementation is uncommitted and has not been pushed. No PR was created.
-- Product stage: MTR, Tramways, and Light Rail layers are integrated; the ferry layer is being added as an incomplete-coverage OSM reference layer. The user accepted MTR overview geometry for gameplay use.
+- Current feature branch: `feature/hong-kong-ferry-routes`, based on `e932323`; implementation commit `1136637` is pushed to `origin/feature/hong-kong-ferry-routes`. No PR was created.
+- Product stage: MTR, Tramways, and Light Rail layers are integrated; the ferry layer is implemented on its feature branch as an incomplete-coverage OSM reference layer. The user accepted MTR overview geometry for gameplay use.
 
 ## Implemented & Verified in Live Smoke Test
 
@@ -66,7 +66,7 @@ This file is the short operational record for resuming work after a Copilot sess
 
 MTR routes, Hong Kong Tramways, and MTR Light Rail are integrated into `main` through PR #28 (`e932323`). Tram and Light Rail source details and validation history are recorded above.
 
-The active branch is `feature/hong-kong-ferry-routes`; continue it rather than duplicating it. The ferry generator is `npm run map:ferry:refresh` (or run `node scripts/refresh-hk-ferry-data.mjs <overpass-json>` to use a saved Overpass response). The current snapshot's extraction timestamp is `2026-10-07T07:21:24Z`, with 14 route groups and 39 terminal points. Route and terminal layers have independent controls; the data note links OSM attribution and Transport Department ferry context, explicitly warns that coverage is incomplete, and discloses missing Star Ferry route geometry. The source refresh failed due to Overpass dispatcher timeouts, so do not describe the point-based snapshot as updated with area features. Tests, lint, build, mobile-width validation, and diff checks passed; review the final diff, commit conventionally, and push the branch. The user creates and merges PRs separately; do not create a PR.
+The active branch is `feature/hong-kong-ferry-routes`, with implementation commit `1136637` pushed to origin and no PR created. The ferry generator is `npm run map:ferry:refresh` (or run `node scripts/refresh-hk-ferry-data.mjs <overpass-json>` to use a saved Overpass response). The current snapshot's extraction timestamp is `2026-10-07T07:21:24Z`, with 14 route groups and 39 terminal points. Route and terminal layers have independent controls; the data note links OSM attribution and Transport Department ferry context, explicitly warns that coverage is incomplete, and discloses missing Star Ferry route geometry. The source refresh failed due to Overpass dispatcher timeouts, so do not describe the point-based snapshot as updated with area features. Tests, lint, build, mobile-width validation, and diff checks passed. The user creates and merges PRs separately; do not create a PR.
 
 ## Start-Of-Session Procedure
 
@@ -78,7 +78,7 @@ The active branch is `feature/hong-kong-ferry-routes`; continue it rather than d
 ### Copy-ready restart prompt
 
 ```
-Resume from WORKSPACE_HANDOFF.md. Continue the existing `feature/hong-kong-ferry-routes` branch based on merged PR #28 (`e932323`); do not duplicate the ferry work. The OSM/ODbL map layer currently contains 14 local route groups and 39 terminal points, snapshot timestamp `2026-10-07T07:21:24Z`; its UI discloses incomplete coverage and missing Star Ferry route geometry. The generator and tests accept terminal-area centers, but the snapshot was not refreshed with those area features because Overpass timed out. The four transit test files, lint, build, diff check, and phone-width map/toggle checks passed. Review the final diff, commit conventionally, push, and leave PR creation/merge to the user.
+Resume from WORKSPACE_HANDOFF.md. The ferry implementation is on `feature/hong-kong-ferry-routes`, based on merged PR #28 (`e932323`), and pushed at commit `1136637`; the user handles PR creation and merge. The OSM/ODbL map layer currently contains 14 local route groups and 39 terminal points, snapshot timestamp `2026-10-07T07:21:24Z`; its UI discloses incomplete coverage and missing Star Ferry route geometry. The generator and tests accept terminal-area centers, but the snapshot was not refreshed with those area features because Overpass timed out. The four transit test files, lint, build, diff check, and phone-width map/toggle checks passed. Wait for the user to create and merge the PR; after merge, fast-forward `main`, then refresh/validate ferry pier-area coverage when Overpass is available before selecting the next Phase 2 slice.
 ```
 
 Before ending a session, leave the worktree either clean on `main` after a
