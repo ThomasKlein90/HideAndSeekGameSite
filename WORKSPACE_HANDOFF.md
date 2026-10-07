@@ -8,7 +8,7 @@ This file is the short operational record for resuming work after a Copilot sess
 - Repository: `ThomasKlein90/HideAndSeekGameSite`
 - Integration branch: `main`
 - Verified `origin/main`: `6d87cee` (merged PR #27, Hong Kong Tramways); local `main` was fast-forwarded to this commit.
-- Current feature branch: `feature/mtr-light-rail-source-review`, created from `6d87cee`; Light Rail source selection and implementation are complete, pending commit/push.
+- Current feature branch: `feature/mtr-light-rail-source-review`, based on `6d87cee`; implementation commit `05506b5` is pushed to `origin/feature/mtr-light-rail-source-review` (no PR created).
 - Product stage: MTR routes and Hong Kong Tramways routes/stops are integrated as ODbL OpenStreetMap reference layers. The user accepted MTR overview geometry for gameplay use.
 
 ## Implemented & Verified in Live Smoke Test
