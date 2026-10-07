@@ -11,10 +11,12 @@
     "test:map:tram": "node --test scripts/refresh-hk-tramways-data.test.mjs",
     "test:map:light-rail": "node --test scripts/refresh-mtr-light-rail-data.test.mjs",
     "test:map:ferry": "node --test scripts/refresh-hk-ferry-data.test.mjs",
+    "test:map:districts": "node --test scripts/refresh-hk-district-data.test.mjs",
     "map:mtr:refresh": "node scripts/refresh-mtr-osm-data.mjs",
     "map:tram:refresh": "node scripts/refresh-hk-tramways-data.mjs",
     "map:light-rail:refresh": "node scripts/refresh-mtr-light-rail-data.mjs",
-    "map:ferry:refresh": "node scripts/refresh-hk-ferry-data.mjs"
+    "map:ferry:refresh": "node scripts/refresh-hk-ferry-data.mjs",
+    "map:districts:refresh": "node scripts/refresh-hk-district-data.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.113.0",
