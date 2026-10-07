@@ -123,6 +123,37 @@ export type MtrLightRailFeatureCollection = FeatureCollection<
   extractionQuery: string;
 };
 
+export type FerryRouteProperties = {
+  kind: "route";
+  serviceKey: string;
+  name: string;
+  serviceNames: string[];
+  operators: string[];
+  osmRelationIds: number[];
+  osmWayCount: number;
+  terminalNodeIds: number[];
+};
+
+export type FerryTerminalProperties = {
+  kind: "terminal";
+  name: string;
+  reference: string | null;
+  serviceNames: string[];
+  osmElementIds: string[];
+};
+
+export type HongKongFerryFeatureCollection = FeatureCollection<
+  MultiLineString | Point,
+  FerryRouteProperties | FerryTerminalProperties
+> & {
+  license: string;
+  attribution: string;
+  source: string;
+  extractedAt: string | null;
+  extractionQuery: string;
+  scope: string;
+};
+
 export type MtrStationValidation = {
   name: string;
   provider: string;

@@ -20,6 +20,9 @@ import {
   ZoomControl,
 } from "react-leaflet";
 import {
+  type FerryRouteProperties,
+  type FerryTerminalProperties,
+  type HongKongFerryFeatureCollection,
   mtrDataSource,
   type HongKongTramwaysFeatureCollection,
   type LightRailRouteProperties,
@@ -255,6 +258,73 @@ function isMtrLightRailData(
   });
 }
 
+function isHongKongFerryData(
+  value: unknown,
+): value is HongKongFerryFeatureCollection {
+  if (
+    !isRecord(value) ||
+    value.type !== "FeatureCollection" ||
+    !Array.isArray(value.features) ||
+    typeof value.license !== "string" ||
+    typeof value.attribution !== "string" ||
+    typeof value.source !== "string" ||
+    (value.extractedAt !== null && typeof value.extractedAt !== "string") ||
+    typeof value.extractionQuery !== "string" ||
+    typeof value.scope !== "string"
+  ) {
+    return false;
+  }
+
+  return value.features.every((feature: unknown) => {
+    if (!isRecord(feature) || feature.type !== "Feature") return false;
+    if (!isRecord(feature.properties) || !isRecord(feature.geometry)) return false;
+
+    if (feature.properties.kind === "route") {
+      return (
+        feature.geometry.type === "MultiLineString" &&
+        Array.isArray(feature.geometry.coordinates) &&
+        feature.geometry.coordinates.length > 0 &&
+        feature.geometry.coordinates.every(
+          (line: unknown) =>
+            Array.isArray(line) && line.length >= 2 && line.every(isPosition),
+        ) &&
+        typeof feature.properties.serviceKey === "string" &&
+        typeof feature.properties.name === "string" &&
+        Array.isArray(feature.properties.serviceNames) &&
+        feature.properties.serviceNames.every(
+          (serviceName: unknown) => typeof serviceName === "string",
+        ) &&
+        Array.isArray(feature.properties.operators) &&
+        feature.properties.operators.every(
+          (operator: unknown) => typeof operator === "string",
+        ) &&
+        Array.isArray(feature.properties.osmRelationIds) &&
+        feature.properties.osmRelationIds.every(
+          (relationId: unknown) => typeof relationId === "number",
+        )
+      );
+    }
+
+    return (
+      feature.properties.kind === "terminal" &&
+      feature.geometry.type === "Point" &&
+      isPosition(feature.geometry.coordinates) &&
+      typeof feature.properties.name === "string" &&
+      (typeof feature.properties.reference === "string" ||
+        feature.properties.reference === null) &&
+      Array.isArray(feature.properties.serviceNames) &&
+      feature.properties.serviceNames.every(
+        (serviceName: unknown) => typeof serviceName === "string",
+      ) &&
+      Array.isArray(feature.properties.osmElementIds) &&
+      feature.properties.osmElementIds.length > 0 &&
+      feature.properties.osmElementIds.every(
+        (elementId: unknown) => typeof elementId === "string",
+      )
+    );
+  });
+}
+
 function makeFeatureCollection<
   G extends MultiLineString | Point,
   P extends GeoJsonProperties,
@@ -268,6 +338,8 @@ export function HongKongMap() {
     useState<HongKongTramwaysFeatureCollection | null>(null);
   const [lightRailData, setLightRailData] =
     useState<MtrLightRailFeatureCollection | null>(null);
+  const [ferryData, setFerryData] =
+    useState<HongKongFerryFeatureCollection | null>(null);
   const [stationValidation, setStationValidation] =
     useState<MtrStationValidation | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -285,6 +357,7 @@ export function HongKongMap() {
           validationResponse,
           tramResponse,
           lightRailResponse,
+          ferryResponse,
         ] = await Promise.all([
           fetch("/data/mtr-osm.geojson", { signal: controller.signal }),
           fetch("/data/mtr-station-validation.json", {
@@ -296,16 +369,20 @@ export function HongKongMap() {
           fetch("/data/mtr-light-rail.geojson", {
             signal: controller.signal,
           }),
+          fetch("/data/hong-kong-ferries.geojson", {
+            signal: controller.signal,
+          }),
         ]);
 
         if (
           !mapResponse.ok ||
           !validationResponse.ok ||
           !tramResponse.ok ||
-          !lightRailResponse.ok
+          !lightRailResponse.ok ||
+          !ferryResponse.ok
         ) {
           throw new Error(
-            `Map data requests failed (${mapResponse.status}, ${validationResponse.status}, ${tramResponse.status}, ${lightRailResponse.status}).`,
+            `Map data requests failed (${mapResponse.status}, ${validationResponse.status}, ${tramResponse.status}, ${lightRailResponse.status}, ${ferryResponse.status}).`,
           );
         }
 
@@ -314,7 +391,9 @@ export function HongKongMap() {
           validationResult,
           tramResult,
           lightRailResult,
+          ferryResult,
         ]: [
+          unknown,
           unknown,
           unknown,
           unknown,
@@ -324,6 +403,7 @@ export function HongKongMap() {
           validationResponse.json(),
           tramResponse.json(),
           lightRailResponse.json(),
+          ferryResponse.json(),
         ]);
         if (!isMtrMapData(mapResult)) {
           throw new Error("The MTR GeoJSON file has an unexpected format.");
@@ -337,11 +417,15 @@ export function HongKongMap() {
         if (!isMtrLightRailData(lightRailResult)) {
           throw new Error("The MTR Light Rail GeoJSON file is invalid.");
         }
+        if (!isHongKongFerryData(ferryResult)) {
+          throw new Error("The Hong Kong ferry GeoJSON file is invalid.");
+        }
 
         setMtrData(mapResult);
         setStationValidation(validationResult);
         setTramData(tramResult);
         setLightRailData(lightRailResult);
+        setFerryData(ferryResult);
       } catch (error) {
         if (controller.signal.aborted) return;
         setLoadError(
@@ -410,6 +494,24 @@ export function HongKongMap() {
       ) ?? [],
     [lightRailData],
   );
+  const ferryRouteFeatures = useMemo(
+    () =>
+      ferryData?.features.filter(
+        (feature): feature is Feature<MultiLineString, FerryRouteProperties> =>
+          feature.properties.kind === "route" &&
+          feature.geometry.type === "MultiLineString",
+      ) ?? [],
+    [ferryData],
+  );
+  const ferryTerminalFeatures = useMemo(
+    () =>
+      ferryData?.features.filter(
+        (feature): feature is Feature<Point, FerryTerminalProperties> =>
+          feature.properties.kind === "terminal" &&
+          feature.geometry.type === "Point",
+      ) ?? [],
+    [ferryData],
+  );
   const routeColors = useMemo(
     () => new Map(routeFeatures.map(({ properties }) => [properties.lineCode, properties.color])),
     [routeFeatures],
@@ -425,6 +527,10 @@ export function HongKongMap() {
   const lightRailRouteCollection = useMemo(
     () => makeFeatureCollection(lightRailRouteFeatures),
     [lightRailRouteFeatures],
+  );
+  const ferryRouteCollection = useMemo(
+    () => makeFeatureCollection(ferryRouteFeatures),
+    [ferryRouteFeatures],
   );
   const stationDiscrepancies = useMemo(
     () =>
@@ -477,11 +583,13 @@ export function HongKongMap() {
           <p className="eyebrow">Hong Kong game map</p>
           <h2 id="hong-kong-map-heading">Explore the playable city.</h2>
         </div>
-        <span className="map-status">MTR + Tram + Light Rail OSM data</span>
+        <span className="map-status">
+          MTR + Tram + Light Rail + Ferry OSM data
+        </span>
       </div>
       <p className="map-description">
-        Explore OpenStreetMap-derived MTR, Hong Kong Tramways, and Light Rail
-        routes and stops. Toggle each route and stop layer independently.
+        Explore OpenStreetMap-derived MTR, Hong Kong Tramways, Light Rail, and
+        ferry routes and terminals. Toggle each layer independently.
       </p>
       <div className="interactive-map-shell">
         <MapContainer
@@ -631,6 +739,55 @@ export function HongKongMap() {
                 </LayersControl.Overlay>
               </>
             )}
+            {ferryData && (
+              <>
+                <LayersControl.Overlay checked name="Hong Kong ferry routes">
+                  <GeoJSON
+                    data={ferryRouteCollection}
+                    style={() => ({
+                      color: "#d16f42",
+                      dashArray: "6 5",
+                      opacity: 0.9,
+                      weight: 2,
+                    })}
+                    onEachFeature={(feature, layer) => {
+                      layer.bindTooltip(
+                        feature.properties?.name ?? "Hong Kong ferry route",
+                      );
+                    }}
+                  />
+                </LayersControl.Overlay>
+                <LayersControl.Overlay checked name="Hong Kong ferry terminals">
+                  <FeatureGroup>
+                    {ferryTerminalFeatures.map((feature) => {
+                      const [longitude, latitude] =
+                        feature.geometry.coordinates;
+
+                      return (
+                        <CircleMarker
+                          center={[latitude, longitude]}
+                          key={feature.properties.osmElementIds[0]}
+                          pathOptions={{
+                            color: "#8c4629",
+                            fillColor: "#fff4ec",
+                            fillOpacity: 1,
+                            weight: 2,
+                          }}
+                          radius={3}
+                        >
+                          <Tooltip>
+                            {feature.properties.name}
+                            {feature.properties.reference
+                              ? ` (${feature.properties.reference})`
+                              : ""}
+                          </Tooltip>
+                        </CircleMarker>
+                      );
+                    })}
+                  </FeatureGroup>
+                </LayersControl.Overlay>
+              </>
+            )}
           </LayersControl>
           <Circle
             center={hongKongCenter}
@@ -658,6 +815,10 @@ export function HongKongMap() {
         <span>
           <i className="legend-swatch legend-swatch-light-rail" /> MTR Light Rail
           routes and stops
+        </span>
+        <span>
+          <i className="legend-swatch legend-swatch-ferry" /> Hong Kong ferry
+          routes and terminals
         </span>
       </div>
       <p className="map-source-note">
@@ -750,13 +911,41 @@ export function HongKongMap() {
         . OSM route relations are a reference layer, not an operator-certified
         service feed.
       </p>
+      <p className="map-source-note">
+        Hong Kong local ferry routes and terminals are derived from{" "}
+        <a
+          href={mtrDataSource.openStreetMap.sourceUrl}
+          rel="noreferrer"
+          target="_blank"
+        >
+          OpenStreetMap
+        </a>{" "}
+        under the ODbL 1.0; this snapshot includes {ferryRouteFeatures.length}{" "}
+        mapped route groups and {ferryTerminalFeatures.length} terminal points
+        {ferryData?.extractedAt ? `, extracted ${ferryData.extractedAt}` : ""}.
+        Cross-border services are excluded. Coverage follows mapped local ferry
+        relations and terminals and is not an official service list or schedule.
+        The Transport Department{" "}
+        <a
+          href="https://www.td.gov.hk/en/transport_in_hong_kong/public_transport/ferries/index.html"
+          rel="noreferrer"
+          target="_blank"
+        >
+          ferry listings
+        </a>{" "}
+        report 21 regular licensed passenger services (as of 31 December 2024)
+        and two franchised Star Ferry routes. This OSM snapshot does not include
+        Star Ferry route geometry, so mapped coverage is incomplete.
+      </p>
       {mtrData && (
         <p className="map-data-status" role="status">
           Loaded {routeFeatures.length} MTR lines, {stationFeatures.length} MTR
           station points, {tramRouteFeatures.length} tram services,{" "}
           {tramStopFeatures.length} tram stops, {lightRailRouteFeatures.length}{" "}
-          Light Rail route references, and {lightRailStopFeatures.length} Light
-          Rail stop/platform points from versioned OSM snapshots.
+          Light Rail route references, {lightRailStopFeatures.length} Light
+          Rail stop/platform points, {ferryRouteFeatures.length} ferry route
+          groups, and {ferryTerminalFeatures.length} ferry terminals from
+          versioned OSM snapshots.
         </p>
       )}
       {!mtrData && !loadError && (

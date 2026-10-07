@@ -468,6 +468,7 @@ h1 {
 
 .map-section-heading {
   display: flex;
+  flex-wrap: wrap;
   align-items: start;
   justify-content: space-between;
   gap: 1rem;
@@ -485,7 +486,7 @@ h1 {
   color: var(--pine);
   font-size: 0.75rem;
   font-weight: 700;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .map-description {
@@ -550,6 +551,11 @@ h1 {
 .legend-swatch-light-rail {
   background: #fff;
   border: 3px solid #8552a3;
+}
+
+.legend-swatch-ferry {
+  background: #fff4ec;
+  border: 3px dashed #d16f42;
 }
 
 .map-legend-pending {
