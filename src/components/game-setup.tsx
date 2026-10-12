@@ -5,6 +5,7 @@ import type { Session } from "@supabase/supabase-js";
 import { HiderQuestionBoard } from "@/components/hider-question-board";
 import { SeekerQuestionBoard } from "@/components/seeker-question-board";
 import { GameRoundDashboard } from "@/components/game-round-dashboard";
+import { HONG_KONG_DISTRICT_NAMES } from "@/data/mtr-reference";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 type CreatedGame = {
@@ -34,6 +35,9 @@ export function GameSetup() {
   const [gameName, setGameName] = useState("Hong Kong Hide and Seek");
   const [headStartMinutes, setHeadStartMinutes] = useState("15");
   const [radiusMeters, setRadiusMeters] = useState("500");
+  const [playableDistricts, setPlayableDistricts] = useState<string[]>([
+    ...HONG_KONG_DISTRICT_NAMES,
+  ]);
   const [hostTeam, setHostTeam] = useState<"hiders" | "seekers">("seekers");
   const [joinCode, setJoinCode] = useState("");
   const [mode, setMode] = useState<"host" | "join">("host");
@@ -105,6 +109,31 @@ export function GameSetup() {
 
       if (activeEntry?.games) {
         const game = activeEntry.games;
+        const { data: settings, error: settingsError } = await supabase
+          .from("game_settings")
+          .select("playable_districts")
+          .eq("game_id", game.id)
+          .single();
+
+        if (settingsError) {
+          setError(settingsError.message);
+          return;
+        }
+
+        if (
+          settings.playable_districts.length === 0 ||
+          settings.playable_districts.some(
+            (district) =>
+              !HONG_KONG_DISTRICT_NAMES.some(
+                (validDistrict) => validDistrict === district,
+              ),
+          )
+        ) {
+          setError("The saved playable districts are invalid.");
+          return;
+        }
+
+        setPlayableDistricts(settings.playable_districts);
         setCreatedGame({
           id: game.id,
           name: game.name,
@@ -290,6 +319,14 @@ export function GameSetup() {
       return;
     }
 
+    if (playableDistricts.length === 0) {
+      setError("Select at least one playable district before creating the game.");
+      return;
+    }
+    const selectedPlayableDistricts = HONG_KONG_DISTRICT_NAMES.filter(
+      (district) => playableDistricts.includes(district),
+    );
+
     setIsSubmitting(true);
     const supabase = createSupabaseBrowserClient();
     const { data, error: createError } = await supabase.rpc("create_game", {
@@ -297,6 +334,7 @@ export function GameSetup() {
       host_team: hostTeam,
       hider_head_start_seconds: parsedHeadStartMinutes * 60,
       final_hiding_radius_meters: parsedRadiusMeters,
+      selected_playable_districts: selectedPlayableDistricts,
     });
     setIsSubmitting(false);
 
@@ -400,6 +438,7 @@ export function GameSetup() {
     setCreatedGame(null);
     setCurrentTeam(null);
     setPlayers([]);
+    setPlayableDistricts([...HONG_KONG_DISTRICT_NAMES]);
     setIsGameHost(false);
     setStatus("");
     setError("");
@@ -606,6 +645,61 @@ export function GameSetup() {
               />
             </div>
           </div>
+          <fieldset className="district-selection">
+            <legend>Playable districts</legend>
+            <p>
+              Ticked districts are playable. Unticked districts are no-go areas.
+              All 18 districts start selected.
+            </p>
+            <div className="district-selection-actions">
+              <button
+                className="text-button"
+                disabled={isSubmitting}
+                onClick={() =>
+                  setPlayableDistricts([...HONG_KONG_DISTRICT_NAMES])
+                }
+                type="button"
+              >
+                Select all
+              </button>
+              <button
+                className="text-button"
+                disabled={isSubmitting}
+                onClick={() => setPlayableDistricts([])}
+                type="button"
+              >
+                Clear all
+              </button>
+              <span aria-live="polite">
+                {playableDistricts.length} playable ·{" "}
+                {HONG_KONG_DISTRICT_NAMES.length - playableDistricts.length}{" "}
+                no-go
+              </span>
+            </div>
+            {playableDistricts.length === 0 && (
+              <p role="alert">Select at least one district to create a game.</p>
+            )}
+            <div className="district-selection-list">
+              {HONG_KONG_DISTRICT_NAMES.map((district) => (
+                <label key={district}>
+                  <input
+                    checked={playableDistricts.includes(district)}
+                    disabled={isSubmitting}
+                    onChange={(event) => {
+                      const isPlayable = event.currentTarget.checked;
+                      setPlayableDistricts((current) =>
+                        isPlayable
+                          ? [...current, district]
+                          : current.filter((item) => item !== district),
+                      );
+                    }}
+                    type="checkbox"
+                  />
+                  {district}
+                </label>
+              ))}
+            </div>
+          </fieldset>
           <fieldset className="team-choice">
             <legend>Your starting team</legend>
             <label>
@@ -629,7 +723,11 @@ export function GameSetup() {
               Seekers
             </label>
           </fieldset>
-          <button className="button button-primary" disabled={isSubmitting} type="submit">
+          <button
+            className="button button-primary"
+            disabled={isSubmitting || playableDistricts.length === 0}
+            type="submit"
+          >
             {isSubmitting ? "Creating game..." : "Create game"}
           </button>
             </form>
@@ -664,6 +762,16 @@ export function GameSetup() {
           <h3>{createdGame.name}</h3>
           <p>Share this join code with your players.</p>
           <strong>{createdGame.join_code}</strong>
+          <div className="district-boundary-summary">
+            <h4>Playable districts</h4>
+            <p>{playableDistricts.join(", ")}</p>
+            <h4>No-go districts</h4>
+            <p>
+              {HONG_KONG_DISTRICT_NAMES.filter(
+                (district) => !playableDistricts.includes(district),
+              ).join(", ") || "None"}
+            </p>
+          </div>
           {isGameHost && (
             <div className="player-roster">
               <h4>Team assignment</h4>

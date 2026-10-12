@@ -142,6 +142,7 @@ export type Database = {
           game_id: string;
           hider_head_start_seconds: number;
           no_go_areas: Json;
+          playable_districts: string[];
           updated_at: string;
         };
         Insert: {
@@ -155,6 +156,7 @@ export type Database = {
           game_id: string;
           hider_head_start_seconds?: number;
           no_go_areas?: Json;
+          playable_districts?: string[];
           updated_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["game_settings"]["Insert"]>;
@@ -474,6 +476,7 @@ export type Database = {
           game_name: string;
           hider_head_start_seconds?: number;
           host_team: GameTeam;
+          selected_playable_districts?: string[];
         };
         Returns: {
           id: string;

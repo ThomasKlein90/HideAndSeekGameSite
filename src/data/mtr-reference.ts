@@ -6,6 +6,27 @@ import type {
   Point,
 } from "geojson";
 
+export const HONG_KONG_DISTRICT_NAMES = [
+  "Central and Western District",
+  "Eastern District",
+  "Islands District",
+  "Kowloon City District",
+  "Kwai Tsing District",
+  "Kwun Tong District",
+  "North District",
+  "Sai Kung District",
+  "Sha Tin District",
+  "Sham Shui Po District",
+  "Southern District",
+  "Tai Po District",
+  "Tsuen Wan District",
+  "Tuen Mun District",
+  "Wan Chai District",
+  "Wong Tai Sin District",
+  "Yau Tsim Mong District",
+  "Yuen Long District",
+] as const;
+
 export const mtrDataSource = {
   openStreetMap: {
     name: "OpenStreetMap contributors",

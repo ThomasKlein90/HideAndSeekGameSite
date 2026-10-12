@@ -58,7 +58,7 @@ website. Update it as rules and priorities are agreed.
 - [x] Add a toggleable OSM/ODbL reference layer for labels on 24 major Hong Kong islands, shown only at closer zoom levels to reduce clutter.
 - [x] Add local map search across MTR/tram/Light Rail stops, ferry terminals, districts, and islands; selecting a result recenters and marks it without contacting an external geocoder.
 - [x] Add independent layer toggles and a clear map legend.
-- [ ] Let the admin configure a game boundary and no-go areas.
+- [x] Let the host select playable districts during game setup; unchecked districts are saved as no-go areas by complement, with all 18 selected by default.
 - [x] Validate geographic layers visually on phone-sized screens, including the island-label layer, independent toggle, and mobile-width overflow.
 
 ## Phase 3 - Seeker Question Board
@@ -135,7 +135,7 @@ Next:
 
 1. Refresh the versioned OSM snapshot when Overpass is available and validate major pier-area coverage.
 2. Continue checking public-transit and playable-boundary rules with the group as map layers are added.
-3. Address configurable game/no-go boundaries as source availability and game rules allow.
+3. Add visual highlighting and gameplay checks against the saved playable/no-go districts if the group wants boundary enforcement.
 
 ## Open Decisions
 
