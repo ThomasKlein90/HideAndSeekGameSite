@@ -8,7 +8,7 @@ This file is the short operational record for resuming work after a Copilot sess
 - Repository: `ThomasKlein90/HideAndSeekGameSite`
 - Integration branch: `main`
 - Verified `origin/main`: `9a9e6b4` (merged PR #32, Hong Kong map search); local `main` was fast-forwarded to this commit.
-- Current feature branch: `feature/game-boundaries`, based on `9a9e6b4`; implementation is complete but not yet committed or pushed. No PR was created.
+- Current feature branch: `feature/game-boundaries`, based on `9a9e6b4`; feature commit `90198e4` is validated but not yet pushed. No PR was created.
 - Product stage: MTR, Tramways, Light Rail, ferries, district boundaries, island labels, and map search are integrated in `main`; this branch adds host-configured playable/no-go districts at game creation.
 
 ## Implemented & Verified in Live Smoke Test
@@ -71,7 +71,7 @@ This file is the short operational record for resuming work after a Copilot sess
 
 MTR routes, Hong Kong Tramways, MTR Light Rail, ferries, district boundaries, island labels, and map search are integrated into `main` through PR #32 (`9a9e6b4`). Source details and validation history are recorded above.
 
-The active branch is `feature/game-boundaries`, based on merged PR #32 (`9a9e6b4`). It adds an 18-district checklist to host game setup, defaults all selected, classifies unchecked districts as no-go, persists the selected names in `game_settings.playable_districts`, validates the list through the database constraint/RPC, and displays saved playable/no-go districts to game participants. TypeScript/GeoJSON/SQL district-list consistency check, all six map-data test commands, lint, production build, and `git diff --check` pass. The authenticated game-creation UI has not been exercised in a browser, and migration `20261012170000_game_playable_districts.sql` has not been applied to Supabase; apply it before using the updated client. No PR was created; the user handles PR creation/merge. Future follow-up may add map highlighting and gameplay enforcement.
+The active branch is `feature/game-boundaries`, based on merged PR #32 (`9a9e6b4`), with feature commit `90198e4`. It adds an 18-district checklist to host game setup, defaults all selected, classifies unchecked districts as no-go, persists the selected names in `game_settings.playable_districts`, validates the list through the database constraint/RPC, and displays saved playable/no-go districts to game participants. TypeScript/GeoJSON/SQL district-list consistency check, all six map-data test commands, lint, production build, and `git diff --check` pass. The authenticated game-creation UI has not been exercised in a browser, and migration `20261012170000_game_playable_districts.sql` has not been applied to Supabase; apply it before using the updated client. Push the branch; no PR was created, and the user handles PR creation/merge. Future follow-up may add map highlighting and gameplay enforcement.
 
 ## Start-Of-Session Procedure
 
