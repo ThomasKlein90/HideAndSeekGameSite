@@ -8,7 +8,7 @@ This file is the short operational record for resuming work after a Copilot sess
 - Repository: `ThomasKlein90/HideAndSeekGameSite`
 - Integration branch: `main`
 - Verified `origin/main`: `1a32abd` (merged PR #30, Hong Kong district boundaries); local `main` was fast-forwarded to this commit.
-- Current feature branch: `feature/hong-kong-island-labels`, based on `1a32abd`; implementation and validation are in progress. No PR was created.
+- Current feature branch: `feature/hong-kong-island-labels`, based on `1a32abd`; implementation commit `749dfb8` is validated and pushed to `origin/feature/hong-kong-island-labels`. No PR was created.
 - Product stage: MTR, Tramways, Light Rail, ferries, and district boundaries/labels are integrated in `main`; this branch adds an independently toggleable OSM island-label layer.
 
 ## Implemented & Verified in Live Smoke Test
@@ -69,7 +69,7 @@ This file is the short operational record for resuming work after a Copilot sess
 
 MTR routes, Hong Kong Tramways, MTR Light Rail, ferries, and district boundaries are integrated into `main` through PR #30 (`1a32abd`). Source details and validation history are recorded above.
 
-The active branch is `feature/hong-kong-island-labels`, based on merged PR #30 (`1a32abd`). It adds 24 curated OSM island labels from a snapshot extracted at `2026-10-12T08:39:49Z`, visible ODbL attribution, an independently toggleable overlay shown from zoom 13, and a refresh utility with focused tests. The six map-data test commands, lint, production build, diff check, and 390px browser verification passed. The browser confirmed loaded map data, all 24 tooltips at close zoom, independent layer toggling, visible attribution, and no page-width overflow. Review final diff, commit, and push; the user handles PR creation/merge. Map search and configurable game/no-go boundaries remain future slices.
+The active branch is `feature/hong-kong-island-labels`, based on merged PR #30 (`1a32abd`), with commit `749dfb8` pushed to `origin/feature/hong-kong-island-labels`. It adds 24 curated OSM island labels from a snapshot extracted at `2026-10-12T08:39:49Z`, visible ODbL attribution, an independently toggleable overlay shown from zoom 13, and a refresh utility with focused tests. The six map-data test commands, lint, production build, diff check, and 390px browser verification passed. The browser confirmed loaded map data, all 24 tooltips at close zoom, independent layer toggling, visible attribution, and no page-width overflow. No PR was created; the user handles PR creation/merge. Map search and configurable game/no-go boundaries remain future slices.
 
 ## Start-Of-Session Procedure
 
