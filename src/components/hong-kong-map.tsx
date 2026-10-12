@@ -42,6 +42,16 @@ import {
 
 const hongKongCenter: [number, number] = [22.3193, 114.1694];
 
+type MapSearchResult = {
+  id: string;
+  name: string;
+  nameZh?: string;
+  category: string;
+  searchTerms: string[];
+  position: [number, number];
+  zoom: number;
+};
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
@@ -503,6 +513,35 @@ function IslandLabels({
   });
 }
 
+function SearchTarget({ result }: { result: MapSearchResult | null }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (result) {
+      map.flyTo(result.position, result.zoom, { duration: 0.8 });
+    }
+  }, [map, result]);
+
+  if (!result) return null;
+
+  return (
+    <CircleMarker
+      center={result.position}
+      pathOptions={{
+        color: "#ffffff",
+        fillColor: "#d16f42",
+        fillOpacity: 1,
+        weight: 3,
+      }}
+      radius={8}
+    >
+      <Tooltip className="map-search-target" direction="top" permanent>
+        {result.name}
+      </Tooltip>
+    </CircleMarker>
+  );
+}
+
 export function HongKongMap() {
   const [mtrData, setMtrData] = useState<MtrMapFeatureCollection | null>(null);
   const [tramData, setTramData] =
@@ -519,6 +558,10 @@ export function HongKongMap() {
     useState<MtrStationValidation | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
+  const [mapSearchQuery, setMapSearchQuery] = useState("");
+  const [mapSearchOpen, setMapSearchOpen] = useState(false);
+  const [selectedMapLocation, setSelectedMapLocation] =
+    useState<MapSearchResult | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -719,6 +762,144 @@ export function HongKongMap() {
       ) ?? [],
     [ferryData],
   );
+  const mapSearchResults = useMemo<MapSearchResult[]>(
+    () =>
+      [
+        ...stationFeatures.map((feature): MapSearchResult => {
+          const [longitude, latitude] = feature.geometry.coordinates;
+          return {
+            id: `mtr-${feature.properties.stationCode}`,
+            name: feature.properties.name,
+            category: "MTR station",
+            searchTerms: [
+              feature.properties.name,
+              feature.properties.stationCode,
+            ],
+            position: [latitude, longitude],
+            zoom: 15,
+          };
+        }),
+        ...tramStopFeatures.map((feature): MapSearchResult => {
+          const [longitude, latitude] = feature.geometry.coordinates;
+          return {
+            id: `tram-${feature.properties.osmNodeIds[0]}`,
+            name: feature.properties.name,
+            category: "Tram stop",
+            searchTerms: [
+              feature.properties.name,
+              feature.properties.reference ?? "",
+            ],
+            position: [latitude, longitude],
+            zoom: 16,
+          };
+        }),
+        ...lightRailStopFeatures.map((feature): MapSearchResult => {
+          const [longitude, latitude] = feature.geometry.coordinates;
+          return {
+            id: `light-rail-${feature.properties.osmNodeIds[0]}`,
+            name: feature.properties.name,
+            category: "Light Rail stop",
+            searchTerms: [
+              feature.properties.name,
+              feature.properties.reference ?? "",
+              ...feature.properties.routeCodes,
+            ],
+            position: [latitude, longitude],
+            zoom: 16,
+          };
+        }),
+        ...ferryTerminalFeatures.map((feature): MapSearchResult => {
+          const [longitude, latitude] = feature.geometry.coordinates;
+          return {
+            id: `ferry-${feature.properties.osmElementIds[0]}`,
+            name: feature.properties.name,
+            category: "Ferry terminal",
+            searchTerms: [
+              feature.properties.name,
+              feature.properties.reference ?? "",
+            ],
+            position: [latitude, longitude],
+            zoom: 15,
+          };
+        }),
+        ...districtFeatures.map(
+          (feature): MapSearchResult => ({
+            id: `district-${feature.properties.osmRelationId}`,
+            name: feature.properties.name,
+            nameZh: feature.properties.nameZh ?? undefined,
+            category: "District",
+            searchTerms: [
+              feature.properties.name,
+              feature.properties.nameZh ?? "",
+            ],
+            position: [
+              feature.properties.center[1],
+              feature.properties.center[0],
+            ],
+            zoom: 12,
+          }),
+        ),
+        ...islandLabelFeatures.map((feature): MapSearchResult => {
+          const [longitude, latitude] = feature.geometry.coordinates;
+          return {
+            id: `island-${feature.properties.osmElementId}`,
+            name: feature.properties.name,
+            nameZh: feature.properties.nameZh ?? undefined,
+            category: "Island",
+            searchTerms: [
+              feature.properties.name,
+              feature.properties.nameZh ?? "",
+            ],
+            position: [latitude, longitude],
+            zoom: 12,
+          };
+        }),
+      ].filter(
+        (result, index, results) =>
+          results.findIndex(
+            (candidate) =>
+              candidate.category === result.category &&
+              candidate.name.toLowerCase() === result.name.toLowerCase() &&
+              (candidate.searchTerms[1] ?? "").toLowerCase() ===
+                (result.searchTerms[1] ?? "").toLowerCase(),
+          ) === index,
+      ),
+    [
+      districtFeatures,
+      ferryTerminalFeatures,
+      islandLabelFeatures,
+      lightRailStopFeatures,
+      stationFeatures,
+      tramStopFeatures,
+    ],
+  );
+  const normalizedMapSearchQuery = mapSearchQuery.trim().toLowerCase();
+  const matchingMapSearchResults = useMemo(() => {
+    if (!normalizedMapSearchQuery) return [];
+
+    return mapSearchResults
+      .map((result, index) => ({
+        result,
+        index,
+        rank: result.searchTerms.some(
+          (term) => term.toLowerCase() === normalizedMapSearchQuery,
+        )
+          ? 0
+          : result.searchTerms.some((term) =>
+                term.toLowerCase().startsWith(normalizedMapSearchQuery),
+              )
+            ? 1
+            : 2,
+      }))
+      .filter(({ result }) =>
+        result.searchTerms.some((term) =>
+          term.toLowerCase().includes(normalizedMapSearchQuery),
+        ),
+      )
+      .sort((left, right) => left.rank - right.rank || left.index - right.index)
+      .slice(0, 8)
+      .map(({ result }) => result);
+  }, [mapSearchResults, normalizedMapSearchQuery]);
   const routeColors = useMemo(
     () => new Map(routeFeatures.map(({ properties }) => [properties.lineCode, properties.color])),
     [routeFeatures],
@@ -802,6 +983,93 @@ export function HongKongMap() {
         Explore OpenStreetMap-derived transit routes, Hong Kong’s 18 district
         boundaries, and major island labels. Toggle each layer independently.
       </p>
+      <form
+        className="map-search"
+        onSubmit={(event) => {
+          event.preventDefault();
+          const result = matchingMapSearchResults[0];
+          if (result) {
+            setMapSearchQuery(result.name);
+            setSelectedMapLocation(result);
+            setMapSearchOpen(false);
+          }
+        }}
+      >
+        <label htmlFor="hong-kong-map-search">Search map locations</label>
+        <p id="hong-kong-map-search-help" className="map-search-help">
+          Search the loaded stations, stops, ferry terminals, districts, and
+          islands by name or code. Street addresses are not included.
+        </p>
+        <div className="map-search-controls">
+          <input
+            aria-controls="hong-kong-map-search-results"
+            aria-describedby="hong-kong-map-search-help"
+            autoComplete="off"
+            id="hong-kong-map-search"
+            onChange={(event) => {
+              setMapSearchQuery(event.currentTarget.value);
+              setMapSearchOpen(true);
+            }}
+            onFocus={() => setMapSearchOpen(true)}
+            placeholder="Try Central, TST, or Lantau"
+            type="search"
+            value={mapSearchQuery}
+          />
+          <button
+            className="button button-secondary"
+            disabled={matchingMapSearchResults.length === 0}
+            type="submit"
+          >
+            Go
+          </button>
+          {mapSearchQuery && (
+            <button
+              aria-label="Clear map search"
+              className="map-search-clear"
+              onClick={() => {
+                setMapSearchQuery("");
+                setSelectedMapLocation(null);
+                setMapSearchOpen(false);
+              }}
+              type="button"
+            >
+              Clear
+            </button>
+          )}
+        </div>
+        <p aria-live="polite" className="map-search-status">
+          {normalizedMapSearchQuery
+            ? matchingMapSearchResults.length > 0
+              ? `${matchingMapSearchResults.length} matching map locations shown`
+              : "No matching map locations"
+            : "Search uses the map’s local reference data; no external geocoder is contacted."}
+        </p>
+        {mapSearchOpen && matchingMapSearchResults.length > 0 && (
+          <ul
+            className="map-search-results"
+            id="hong-kong-map-search-results"
+          >
+            {matchingMapSearchResults.map((result) => (
+              <li key={result.id}>
+                <button
+                  onClick={() => {
+                    setMapSearchQuery(result.name);
+                    setSelectedMapLocation(result);
+                    setMapSearchOpen(false);
+                  }}
+                  type="button"
+                >
+                  <span>
+                    <strong>{result.name}</strong>
+                    {result.nameZh && <span> {result.nameZh}</span>}
+                  </span>
+                  <small>{result.category}</small>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </form>
       <div className="interactive-map-shell">
         <MapContainer
           center={hongKongCenter}
@@ -1029,6 +1297,7 @@ export function HongKongMap() {
               </>
             )}
           </LayersControl>
+          <SearchTarget result={selectedMapLocation} />
           <Circle
             center={hongKongCenter}
             pathOptions={{ color: "#3e765e", fillOpacity: 0.08 }}
