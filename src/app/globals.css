@@ -580,6 +580,17 @@ h1 {
   display: none;
 }
 
+.island-map-label {
+  border-color: #d7c291;
+  background: rgb(255 250 235 / 88%);
+  color: #5d4725;
+  font-size: 0.62rem;
+}
+
+.island-map-label::before {
+  display: none;
+}
+
 .map-legend-pending {
   color: var(--coral);
 }
