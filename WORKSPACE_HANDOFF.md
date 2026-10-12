@@ -8,7 +8,7 @@ This file is the short operational record for resuming work after a Copilot sess
 - Repository: `ThomasKlein90/HideAndSeekGameSite`
 - Integration branch: `main`
 - Verified `origin/main`: `378208f` (merged PR #31, Hong Kong island labels); local `main` was fast-forwarded to this commit.
-- Current feature branch: `feature/hong-kong-map-search`, based on `378208f`; implementation and validation are complete, pending commit/push. No PR was created.
+- Current feature branch: `feature/hong-kong-map-search`, based on `378208f`; feature commit `fd00e5d` is validated and pushed to `origin/feature/hong-kong-map-search`. No PR was created.
 - Product stage: MTR, Tramways, Light Rail, ferries, district boundaries, and island labels are integrated in `main`; this branch adds local search across loaded map reference data.
 
 ## Implemented & Verified in Live Smoke Test
@@ -70,7 +70,7 @@ This file is the short operational record for resuming work after a Copilot sess
 
 MTR routes, Hong Kong Tramways, MTR Light Rail, ferries, district boundaries, and island labels are integrated into `main` through PR #31 (`378208f`). Source details and validation history are recorded above.
 
-The active branch is `feature/hong-kong-map-search`, based on merged PR #31 (`378208f`). It adds local search over MTR stations, tram and Light Rail stops, ferry terminals, districts, and islands; selection recenters the map and shows a target marker. Search requires no third-party geocoder and excludes arbitrary addresses. All six map-data test commands, lint, build, diff check, and browser checks for result matching, selection, clear/no-match states, and phone-width overflow passed. Changes are not yet committed or pushed; finish final review, then push the branch. The user handles PR creation/merge. Configurable game/no-go boundaries remain a future slice.
+The active branch is `feature/hong-kong-map-search`, based on merged PR #31 (`378208f`), with feature commit `fd00e5d` pushed to `origin/feature/hong-kong-map-search`. It adds local search over MTR stations, tram and Light Rail stops, ferry terminals, districts, and islands; selection recenters the map and shows a target marker. Search requires no third-party geocoder and excludes arbitrary addresses. All six map-data test commands, lint, build, diff check, and browser checks for result matching, selection, clear/no-match states, and phone-width overflow passed. No PR was created; the user handles PR creation/merge. Configurable game/no-go boundaries remain a future slice.
 
 ## Start-Of-Session Procedure
 
