@@ -1,4 +1,10 @@
-import type { Feature, FeatureCollection, MultiLineString, Point } from "geojson";
+import type {
+  Feature,
+  FeatureCollection,
+  MultiLineString,
+  MultiPolygon,
+  Point,
+} from "geojson";
 
 export const mtrDataSource = {
   openStreetMap: {
@@ -152,6 +158,25 @@ export type HongKongFerryFeatureCollection = FeatureCollection<
   extractedAt: string | null;
   extractionQuery: string;
   scope: string;
+};
+
+export type DistrictBoundaryProperties = {
+  name: string;
+  nameZh: string | null;
+  osmRelationId: number;
+  center: [number, number];
+};
+
+export type HongKongDistrictFeatureCollection = FeatureCollection<
+  MultiPolygon,
+  DistrictBoundaryProperties
+> & {
+  license: string;
+  attribution: string;
+  source: string;
+  extractedAt: string | null;
+  labelCenterExtractedAt: string | null;
+  extractionQuery: string;
 };
 
 export type MtrStationValidation = {

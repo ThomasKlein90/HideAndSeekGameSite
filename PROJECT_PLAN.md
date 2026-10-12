@@ -53,7 +53,9 @@ website. Update it as rules and priorities are agreed.
 - [x] Select OpenStreetMap as the coordinate-bearing source for the MTR Light Rail layer. The [DATA.GOV.HK MTR Lines & Stations resource](https://data.gov.hk/en-data/dataset/mtr-data-routes-fares-barrier-free-facilities/resource/8daba4fe-b879-4a51-8962-27b4cffdc61c) explicitly excludes Light Rail and has no coordinates; an Overpass review found mapped `route=light_rail` relations and stop/platform nodes. OSM's [ODbL licensing and attribution requirements](https://www.openstreetmap.org/copyright) apply. Keep the derived map as a reference layer, not an operator-certified service feed.
 - [x] Add MTR Light Rail routes and stop/platform locations from a versioned OSM snapshot: 12 route references and 144 stop/platform points, with independent controls and visible ODbL attribution.
 - [x] Add a reference layer of OSM-derived local ferry routes and terminal points, with independent controls and visible ODbL attribution. Coverage is incomplete and does not include Star Ferry route geometry; the Transport Department's official service count is not represented as complete OSM coverage.
-- [ ] Add district boundaries, district labels, island labels, and search.
+- [x] Add the 18 OSM-derived Hong Kong district boundaries as a toggleable ODbL reference layer.
+- [x] Add zoom-dependent English district labels with OSM-name tooltips.
+- [ ] Add island labels and map search.
 - [x] Add independent layer toggles and a clear map legend.
 - [ ] Let the admin configure a game boundary and no-go areas.
 - [ ] Validate geographic layers visually on phone-sized screens.

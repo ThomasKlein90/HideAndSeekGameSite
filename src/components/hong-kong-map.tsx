@@ -6,6 +6,7 @@ import type {
   FeatureCollection,
   GeoJsonProperties,
   MultiLineString,
+  MultiPolygon,
   Point,
 } from "geojson";
 import {
@@ -17,12 +18,14 @@ import {
   MapContainer,
   TileLayer,
   Tooltip,
+  useMap,
   ZoomControl,
 } from "react-leaflet";
 import {
   type FerryRouteProperties,
   type FerryTerminalProperties,
   type HongKongFerryFeatureCollection,
+  type HongKongDistrictFeatureCollection,
   mtrDataSource,
   type HongKongTramwaysFeatureCollection,
   type LightRailRouteProperties,
@@ -325,11 +328,105 @@ function isHongKongFerryData(
   });
 }
 
+function isHongKongDistrictData(
+  value: unknown,
+): value is HongKongDistrictFeatureCollection {
+  if (
+    !isRecord(value) ||
+    value.type !== "FeatureCollection" ||
+    !Array.isArray(value.features) ||
+    value.license !== "ODbL-1.0" ||
+    typeof value.attribution !== "string" ||
+    typeof value.source !== "string" ||
+    (value.extractedAt !== null && typeof value.extractedAt !== "string") ||
+    (value.labelCenterExtractedAt !== null &&
+      typeof value.labelCenterExtractedAt !== "string") ||
+    typeof value.extractionQuery !== "string"
+  ) {
+    return false;
+  }
+
+  return (
+    value.features.length === 18 &&
+    value.features.every((feature: unknown) => {
+      if (
+        !isRecord(feature) ||
+        feature.type !== "Feature" ||
+        !isRecord(feature.properties) ||
+        !isRecord(feature.geometry) ||
+        feature.geometry.type !== "MultiPolygon" ||
+        !Array.isArray(feature.geometry.coordinates) ||
+        feature.geometry.coordinates.length === 0 ||
+        typeof feature.properties.name !== "string" ||
+        (typeof feature.properties.nameZh !== "string" &&
+          feature.properties.nameZh !== null) ||
+        typeof feature.properties.osmRelationId !== "number" ||
+        !isPosition(feature.properties.center)
+      ) {
+        return false;
+      }
+
+      return feature.geometry.coordinates.every(
+        (polygon: unknown) =>
+          Array.isArray(polygon) &&
+          polygon.length > 0 &&
+          polygon.every(
+            (ring: unknown) =>
+              Array.isArray(ring) &&
+              ring.length >= 4 &&
+              ring.every(isPosition),
+          ),
+      );
+    })
+  );
+}
+
 function makeFeatureCollection<
-  G extends MultiLineString | Point,
+  G extends MultiLineString | MultiPolygon | Point,
   P extends GeoJsonProperties,
 >(features: Array<Feature<G, P>>): FeatureCollection<G, P> {
   return { type: "FeatureCollection", features };
+}
+
+function DistrictLabels({
+  features,
+}: {
+  features: HongKongDistrictFeatureCollection["features"];
+}) {
+  const map = useMap();
+  const [zoom, setZoom] = useState(map.getZoom());
+
+  useEffect(() => {
+    const updateZoom = () => setZoom(map.getZoom());
+    map.on("zoomend", updateZoom);
+    return () => {
+      map.off("zoomend", updateZoom);
+    };
+  }, [map]);
+
+  if (zoom < 14) return null;
+
+  return features.map((feature) => {
+    const [longitude, latitude] = feature.properties.center;
+
+    return (
+      <CircleMarker
+        center={[latitude, longitude]}
+        interactive={false}
+        key={feature.properties.osmRelationId}
+        pathOptions={{ opacity: 0, fillOpacity: 0 }}
+        radius={0}
+      >
+        <Tooltip
+          className="district-map-label"
+          direction="center"
+          permanent
+        >
+          {feature.properties.name}
+        </Tooltip>
+      </CircleMarker>
+    );
+  });
 }
 
 export function HongKongMap() {
@@ -340,6 +437,8 @@ export function HongKongMap() {
     useState<MtrLightRailFeatureCollection | null>(null);
   const [ferryData, setFerryData] =
     useState<HongKongFerryFeatureCollection | null>(null);
+  const [districtData, setDistrictData] =
+    useState<HongKongDistrictFeatureCollection | null>(null);
   const [stationValidation, setStationValidation] =
     useState<MtrStationValidation | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -358,6 +457,7 @@ export function HongKongMap() {
           tramResponse,
           lightRailResponse,
           ferryResponse,
+          districtResponse,
         ] = await Promise.all([
           fetch("/data/mtr-osm.geojson", { signal: controller.signal }),
           fetch("/data/mtr-station-validation.json", {
@@ -372,6 +472,9 @@ export function HongKongMap() {
           fetch("/data/hong-kong-ferries.geojson", {
             signal: controller.signal,
           }),
+          fetch("/data/hong-kong-districts.geojson", {
+            signal: controller.signal,
+          }),
         ]);
 
         if (
@@ -379,10 +482,11 @@ export function HongKongMap() {
           !validationResponse.ok ||
           !tramResponse.ok ||
           !lightRailResponse.ok ||
-          !ferryResponse.ok
+          !ferryResponse.ok ||
+          !districtResponse.ok
         ) {
           throw new Error(
-            `Map data requests failed (${mapResponse.status}, ${validationResponse.status}, ${tramResponse.status}, ${lightRailResponse.status}, ${ferryResponse.status}).`,
+            `Map data requests failed (${mapResponse.status}, ${validationResponse.status}, ${tramResponse.status}, ${lightRailResponse.status}, ${ferryResponse.status}, ${districtResponse.status}).`,
           );
         }
 
@@ -392,7 +496,9 @@ export function HongKongMap() {
           tramResult,
           lightRailResult,
           ferryResult,
+          districtResult,
         ]: [
+          unknown,
           unknown,
           unknown,
           unknown,
@@ -404,6 +510,7 @@ export function HongKongMap() {
           tramResponse.json(),
           lightRailResponse.json(),
           ferryResponse.json(),
+          districtResponse.json(),
         ]);
         if (!isMtrMapData(mapResult)) {
           throw new Error("The MTR GeoJSON file has an unexpected format.");
@@ -420,12 +527,16 @@ export function HongKongMap() {
         if (!isHongKongFerryData(ferryResult)) {
           throw new Error("The Hong Kong ferry GeoJSON file is invalid.");
         }
+        if (!isHongKongDistrictData(districtResult)) {
+          throw new Error("The Hong Kong district GeoJSON file is invalid.");
+        }
 
         setMtrData(mapResult);
         setStationValidation(validationResult);
         setTramData(tramResult);
         setLightRailData(lightRailResult);
         setFerryData(ferryResult);
+        setDistrictData(districtResult);
       } catch (error) {
         if (controller.signal.aborted) return;
         setLoadError(
@@ -503,6 +614,10 @@ export function HongKongMap() {
       ) ?? [],
     [ferryData],
   );
+  const districtFeatures = useMemo(
+    () => districtData?.features ?? [],
+    [districtData],
+  );
   const ferryTerminalFeatures = useMemo(
     () =>
       ferryData?.features.filter(
@@ -531,6 +646,10 @@ export function HongKongMap() {
   const ferryRouteCollection = useMemo(
     () => makeFeatureCollection(ferryRouteFeatures),
     [ferryRouteFeatures],
+  );
+  const districtCollection = useMemo(
+    () => makeFeatureCollection(districtFeatures),
+    [districtFeatures],
   );
   const stationDiscrepancies = useMemo(
     () =>
@@ -589,7 +708,8 @@ export function HongKongMap() {
       </div>
       <p className="map-description">
         Explore OpenStreetMap-derived MTR, Hong Kong Tramways, Light Rail, and
-        ferry routes and terminals. Toggle each layer independently.
+        ferry routes and terminals, plus Hong Kong’s 18 district boundaries.
+        Toggle each layer independently.
       </p>
       <div className="interactive-map-shell">
         <MapContainer
@@ -647,6 +767,28 @@ export function HongKongMap() {
                   </FeatureGroup>
                 </LayersControl.Overlay>
               </>
+            )}
+            {districtData && (
+              <LayersControl.Overlay checked name="Hong Kong district boundaries and labels">
+                <FeatureGroup>
+                  <GeoJSON
+                    data={districtCollection}
+                    style={() => ({
+                      color: "#456b75",
+                      fillColor: "#83aeb4",
+                      fillOpacity: 0.035,
+                      opacity: 0.78,
+                      weight: 1.5,
+                    })}
+                    onEachFeature={(feature, layer) => {
+                      layer.bindTooltip(
+                        `${feature.properties?.name ?? "Hong Kong district"}${feature.properties?.nameZh ? ` (${feature.properties.nameZh})` : ""}`,
+                      );
+                    }}
+                  />
+                  <DistrictLabels features={districtFeatures} />
+                </FeatureGroup>
+              </LayersControl.Overlay>
             )}
             {tramData && (
               <>
@@ -820,7 +962,27 @@ export function HongKongMap() {
           <i className="legend-swatch legend-swatch-ferry" /> Hong Kong ferry
           routes and terminals
         </span>
+        <span>
+          <i className="legend-swatch legend-swatch-district" /> District
+          boundaries
+        </span>
       </div>
+      <p className="map-source-note">
+        Hong Kong’s 18 district boundaries are derived from OpenStreetMap{" "}
+        <a
+          href={mtrDataSource.openStreetMap.sourceUrl}
+          rel="noreferrer"
+          target="_blank"
+        >
+          administrative boundary relations
+        </a>{" "}
+        under the ODbL 1.0. Boundary geometry extracted{" "}
+        {districtData?.extractedAt ?? "loading"}; label centers extracted{" "}
+        {districtData?.labelCenterExtractedAt ?? "loading"}. District labels
+        use OSM English names. These are reference boundaries,
+        not a game boundary or an official government GIS dataset. Always-on
+        labels appear when zoomed in to reduce overlap at city scale.
+      </p>
       <p className="map-source-note">
         <strong>Map and transit data:</strong>{" "}
         <a
@@ -944,7 +1106,8 @@ export function HongKongMap() {
           {tramStopFeatures.length} tram stops, {lightRailRouteFeatures.length}{" "}
           Light Rail route references, {lightRailStopFeatures.length} Light
           Rail stop/platform points, {ferryRouteFeatures.length} ferry route
-          groups, and {ferryTerminalFeatures.length} ferry terminals from
+          groups, {ferryTerminalFeatures.length} ferry terminals, and{" "}
+          {districtFeatures.length} districts from
           versioned OSM snapshots.
         </p>
       )}

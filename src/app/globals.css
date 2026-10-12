@@ -558,6 +558,28 @@ h1 {
   border: 3px dashed #d16f42;
 }
 
+.legend-swatch-district {
+  background: rgb(131 174 180 / 15%);
+  border: 1px solid #456b75;
+}
+
+.district-map-label {
+  border: 0;
+  border-radius: 0.2rem;
+  padding: 0.1rem 0.2rem;
+  background: rgb(255 255 255 / 82%);
+  box-shadow: 0 1px 3px rgb(19 42 54 / 30%);
+  color: #244650;
+  font-size: 0.58rem;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.district-map-label::before {
+  display: none;
+}
+
 .map-legend-pending {
   color: var(--coral);
 }
