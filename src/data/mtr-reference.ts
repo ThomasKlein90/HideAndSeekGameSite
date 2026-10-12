@@ -179,6 +179,23 @@ export type HongKongDistrictFeatureCollection = FeatureCollection<
   extractionQuery: string;
 };
 
+export type IslandLabelProperties = {
+  name: string;
+  nameZh: string | null;
+  osmElementId: string;
+};
+
+export type HongKongIslandLabelFeatureCollection = FeatureCollection<
+  Point,
+  IslandLabelProperties
+> & {
+  license: string;
+  attribution: string;
+  source: string;
+  extractedAt: string | null;
+  extractionQuery: string;
+};
+
 export type MtrStationValidation = {
   name: string;
   provider: string;

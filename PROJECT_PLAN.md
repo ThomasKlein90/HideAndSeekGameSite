@@ -55,10 +55,11 @@ website. Update it as rules and priorities are agreed.
 - [x] Add a reference layer of OSM-derived local ferry routes and terminal points, with independent controls and visible ODbL attribution. Coverage is incomplete and does not include Star Ferry route geometry; the Transport Department's official service count is not represented as complete OSM coverage.
 - [x] Add the 18 OSM-derived Hong Kong district boundaries as a toggleable ODbL reference layer.
 - [x] Add zoom-dependent English district labels with OSM-name tooltips.
-- [ ] Add island labels and map search.
+- [x] Add a toggleable OSM/ODbL reference layer for labels on 24 major Hong Kong islands, shown only at closer zoom levels to reduce clutter.
+- [ ] Add map search.
 - [x] Add independent layer toggles and a clear map legend.
 - [ ] Let the admin configure a game boundary and no-go areas.
-- [ ] Validate geographic layers visually on phone-sized screens.
+- [x] Validate geographic layers visually on phone-sized screens, including the island-label layer, independent toggle, and mobile-width overflow.
 
 ## Phase 3 - Seeker Question Board
 
@@ -134,7 +135,7 @@ Next:
 
 1. Refresh the versioned OSM snapshot when Overpass is available and validate major pier-area coverage.
 2. Continue checking public-transit and playable-boundary rules with the group as map layers are added.
-3. Proceed to district/island labels and configurable game/no-go boundaries as source availability and game rules allow.
+3. Add map search, then address configurable game/no-go boundaries as source availability and game rules allow.
 
 ## Open Decisions
 

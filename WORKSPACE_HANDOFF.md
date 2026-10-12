@@ -4,12 +4,12 @@ This file is the short operational record for resuming work after a Copilot sess
 
 ## Current Snapshot
 
-- Last verified: 2026-10-07
+- Last verified: 2026-10-12
 - Repository: `ThomasKlein90/HideAndSeekGameSite`
 - Integration branch: `main`
-- Verified `origin/main`: `d47e0dd` (merged PR #29, Hong Kong ferry layer); local `main` was fast-forwarded to this commit.
-- Current feature branch: `feature/hong-kong-district-boundaries`, based on `d47e0dd`; implementation commit `4c1462e` is complete and validated but not yet pushed. No PR was created.
-- Product stage: MTR, Tramways, Light Rail, and the ferry reference layer are integrated in `main`; this branch adds district outlines and zoom-dependent labels from OSM.
+- Verified `origin/main`: `1a32abd` (merged PR #30, Hong Kong district boundaries); local `main` was fast-forwarded to this commit.
+- Current feature branch: `feature/hong-kong-island-labels`, based on `1a32abd`; implementation and validation are in progress. No PR was created.
+- Product stage: MTR, Tramways, Light Rail, ferries, and district boundaries/labels are integrated in `main`; this branch adds an independently toggleable OSM island-label layer.
 
 ## Implemented & Verified in Live Smoke Test
 
@@ -63,12 +63,13 @@ This file is the short operational record for resuming work after a Copilot sess
 - Ferry validation: all four transit data test files pass together; `npm run lint`, `npm run build`, and `git diff --check` pass. A browser check at a 390px viewport (375px content width) confirmed a 375px document width, all eight map overlays render, and ferry routes and terminals can be independently disabled and restored. The longer ferry status label exposed a mobile map-header overflow; allowing the heading and status pill to wrap fixed it.
 - Hong Kong district boundaries (2026-10-07): extracted the 18 named district relations (OSM `boundary=administrative`, `admin_level=6`) with Overpass. The geometry snapshot is timestamped `2026-10-07T09:17:22Z`; a separate center query used for labels was timestamped `2026-10-07T09:16:18Z`. The data excludes nearby Shenzhen districts and Lok Ma Chau Loop by requiring one of the 18 English district names. The generator stitches relation member ways into valid outer/inner MultiPolygon rings, preserves Sha Tin/Tai Po inner rings, checks all districts are present, and records ODbL attribution and source metadata. Map layer shows subtle district outlines with hover names and zoom-dependent English labels from zoom 14. This is an OSM reference layer, not an official government GIS dataset or playable game boundary.
 - District validation: focused district tests and all four transit tests pass; lint, production build, and `git diff --check` pass. Browser check at 390px viewport (375px content width) confirms all 18 outlines render, 18 labels appear after zooming to 14+, the layer toggles off/on, and there is no horizontal overflow. Labels are hidden at city overview scale after initial validation showed overlap; hover names remain available.
+- Hong Kong island labels (2026-10-12): the curated OSM snapshot at `public/data/hong-kong-islands.geojson` contains 24 named islands with ODbL-1.0 attribution and extraction metadata (`2026-10-12T08:39:49Z`). The generator and focused test are `npm run map:islands:refresh` and `npm run test:map:islands`; labels are independently toggleable and start at zoom 13. All six map-data test commands, lint, production build, and `git diff --check` pass. Browser review at 390px confirms the 375px document does not overflow, all 24 label tooltips mount at the close-zoom threshold, the layer can be independently disabled/restored (0/24 labels), and visible OSM/ODbL attribution and the 24-island status count are present.
 
 ## Current Development Slice
 
-MTR routes, Hong Kong Tramways, MTR Light Rail, and ferries are integrated into `main` through PR #29 (`d47e0dd`). Source details and validation history are recorded above.
+MTR routes, Hong Kong Tramways, MTR Light Rail, ferries, and district boundaries are integrated into `main` through PR #30 (`1a32abd`). Source details and validation history are recorded above.
 
-The active branch is `feature/hong-kong-district-boundaries`, based on merged PR #29 (`d47e0dd`). The OSM district implementation is complete and validated at commit `4c1462e`, not yet pushed. `public/data/hong-kong-districts.geojson` contains all 18 Hong Kong admin-level-6 boundaries under ODbL-1.0; polygon geometry timestamp `2026-10-07T09:17:22Z`, label-center timestamp `2026-10-07T09:16:18Z`. The generator/test commands are `npm run map:districts:refresh` and `npm run test:map:districts`; pass a saved Overpass response to `node scripts/refresh-hk-district-data.mjs <overpass-json>`. The single district layer is independently toggleable, shows outlines and hover names at all scales, and reveals English labels at zoom 14+. Tests, lint, build, diff check, and phone-width visual/toggle checks passed. Push the branch; user handles PR creation/merge. Island labels/search and game boundaries remain future slices.
+The active branch is `feature/hong-kong-island-labels`, based on merged PR #30 (`1a32abd`). It adds 24 curated OSM island labels from a snapshot extracted at `2026-10-12T08:39:49Z`, visible ODbL attribution, an independently toggleable overlay shown from zoom 13, and a refresh utility with focused tests. The six map-data test commands, lint, production build, diff check, and 390px browser verification passed. The browser confirmed loaded map data, all 24 tooltips at close zoom, independent layer toggling, visible attribution, and no page-width overflow. Review final diff, commit, and push; the user handles PR creation/merge. Map search and configurable game/no-go boundaries remain future slices.
 
 ## Start-Of-Session Procedure
 

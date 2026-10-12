@@ -26,6 +26,7 @@ import {
   type FerryTerminalProperties,
   type HongKongFerryFeatureCollection,
   type HongKongDistrictFeatureCollection,
+  type HongKongIslandLabelFeatureCollection,
   mtrDataSource,
   type HongKongTramwaysFeatureCollection,
   type LightRailRouteProperties,
@@ -381,6 +382,38 @@ function isHongKongDistrictData(
   );
 }
 
+function isHongKongIslandLabelData(
+  value: unknown,
+): value is HongKongIslandLabelFeatureCollection {
+  if (
+    !isRecord(value) ||
+    value.type !== "FeatureCollection" ||
+    !Array.isArray(value.features) ||
+    value.features.length !== 24 ||
+    value.license !== "ODbL-1.0" ||
+    typeof value.attribution !== "string" ||
+    typeof value.source !== "string" ||
+    (value.extractedAt !== null && typeof value.extractedAt !== "string") ||
+    typeof value.extractionQuery !== "string"
+  ) {
+    return false;
+  }
+
+  return value.features.every(
+    (feature: unknown) =>
+      isRecord(feature) &&
+      feature.type === "Feature" &&
+      isRecord(feature.properties) &&
+      isRecord(feature.geometry) &&
+      feature.geometry.type === "Point" &&
+      isPosition(feature.geometry.coordinates) &&
+      typeof feature.properties.name === "string" &&
+      (typeof feature.properties.nameZh === "string" ||
+        feature.properties.nameZh === null) &&
+      typeof feature.properties.osmElementId === "string",
+  );
+}
+
 function makeFeatureCollection<
   G extends MultiLineString | MultiPolygon | Point,
   P extends GeoJsonProperties,
@@ -429,6 +462,47 @@ function DistrictLabels({
   });
 }
 
+function IslandLabels({
+  features,
+}: {
+  features: HongKongIslandLabelFeatureCollection["features"];
+}) {
+  const map = useMap();
+  const [zoom, setZoom] = useState(map.getZoom());
+
+  useEffect(() => {
+    const updateZoom = () => setZoom(map.getZoom());
+    map.on("zoomend", updateZoom);
+    return () => {
+      map.off("zoomend", updateZoom);
+    };
+  }, [map]);
+
+  if (zoom < 13) return null;
+
+  return features.map((feature) => {
+    const [longitude, latitude] = feature.geometry.coordinates;
+
+    return (
+      <CircleMarker
+        center={[latitude, longitude]}
+        interactive={false}
+        key={feature.properties.osmElementId}
+        pathOptions={{ opacity: 0, fillOpacity: 0 }}
+        radius={0}
+      >
+        <Tooltip
+          className="island-map-label"
+          direction="center"
+          permanent
+        >
+          {feature.properties.name}
+        </Tooltip>
+      </CircleMarker>
+    );
+  });
+}
+
 export function HongKongMap() {
   const [mtrData, setMtrData] = useState<MtrMapFeatureCollection | null>(null);
   const [tramData, setTramData] =
@@ -439,6 +513,8 @@ export function HongKongMap() {
     useState<HongKongFerryFeatureCollection | null>(null);
   const [districtData, setDistrictData] =
     useState<HongKongDistrictFeatureCollection | null>(null);
+  const [islandLabelData, setIslandLabelData] =
+    useState<HongKongIslandLabelFeatureCollection | null>(null);
   const [stationValidation, setStationValidation] =
     useState<MtrStationValidation | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -458,6 +534,7 @@ export function HongKongMap() {
           lightRailResponse,
           ferryResponse,
           districtResponse,
+          islandResponse,
         ] = await Promise.all([
           fetch("/data/mtr-osm.geojson", { signal: controller.signal }),
           fetch("/data/mtr-station-validation.json", {
@@ -475,6 +552,9 @@ export function HongKongMap() {
           fetch("/data/hong-kong-districts.geojson", {
             signal: controller.signal,
           }),
+          fetch("/data/hong-kong-islands.geojson", {
+            signal: controller.signal,
+          }),
         ]);
 
         if (
@@ -483,10 +563,11 @@ export function HongKongMap() {
           !tramResponse.ok ||
           !lightRailResponse.ok ||
           !ferryResponse.ok ||
-          !districtResponse.ok
+          !districtResponse.ok ||
+          !islandResponse.ok
         ) {
           throw new Error(
-            `Map data requests failed (${mapResponse.status}, ${validationResponse.status}, ${tramResponse.status}, ${lightRailResponse.status}, ${ferryResponse.status}, ${districtResponse.status}).`,
+            `Map data requests failed (${mapResponse.status}, ${validationResponse.status}, ${tramResponse.status}, ${lightRailResponse.status}, ${ferryResponse.status}, ${districtResponse.status}, ${islandResponse.status}).`,
           );
         }
 
@@ -497,7 +578,9 @@ export function HongKongMap() {
           lightRailResult,
           ferryResult,
           districtResult,
+          islandResult,
         ]: [
+          unknown,
           unknown,
           unknown,
           unknown,
@@ -511,6 +594,7 @@ export function HongKongMap() {
           lightRailResponse.json(),
           ferryResponse.json(),
           districtResponse.json(),
+          islandResponse.json(),
         ]);
         if (!isMtrMapData(mapResult)) {
           throw new Error("The MTR GeoJSON file has an unexpected format.");
@@ -530,6 +614,9 @@ export function HongKongMap() {
         if (!isHongKongDistrictData(districtResult)) {
           throw new Error("The Hong Kong district GeoJSON file is invalid.");
         }
+        if (!isHongKongIslandLabelData(islandResult)) {
+          throw new Error("The Hong Kong island-label GeoJSON file is invalid.");
+        }
 
         setMtrData(mapResult);
         setStationValidation(validationResult);
@@ -537,6 +624,7 @@ export function HongKongMap() {
         setLightRailData(lightRailResult);
         setFerryData(ferryResult);
         setDistrictData(districtResult);
+        setIslandLabelData(islandResult);
       } catch (error) {
         if (controller.signal.aborted) return;
         setLoadError(
@@ -617,6 +705,10 @@ export function HongKongMap() {
   const districtFeatures = useMemo(
     () => districtData?.features ?? [],
     [districtData],
+  );
+  const islandLabelFeatures = useMemo(
+    () => islandLabelData?.features ?? [],
+    [islandLabelData],
   );
   const ferryTerminalFeatures = useMemo(
     () =>
@@ -707,9 +799,8 @@ export function HongKongMap() {
         </span>
       </div>
       <p className="map-description">
-        Explore OpenStreetMap-derived MTR, Hong Kong Tramways, Light Rail, and
-        ferry routes and terminals, plus Hong Kong’s 18 district boundaries.
-        Toggle each layer independently.
+        Explore OpenStreetMap-derived transit routes, Hong Kong’s 18 district
+        boundaries, and major island labels. Toggle each layer independently.
       </p>
       <div className="interactive-map-shell">
         <MapContainer
@@ -787,6 +878,13 @@ export function HongKongMap() {
                     }}
                   />
                   <DistrictLabels features={districtFeatures} />
+                </FeatureGroup>
+              </LayersControl.Overlay>
+            )}
+            {islandLabelData && (
+              <LayersControl.Overlay checked name="Hong Kong island labels">
+                <FeatureGroup>
+                  <IslandLabels features={islandLabelFeatures} />
                 </FeatureGroup>
               </LayersControl.Overlay>
             )}
@@ -966,6 +1064,9 @@ export function HongKongMap() {
           <i className="legend-swatch legend-swatch-district" /> District
           boundaries
         </span>
+        <span>
+          <i className="legend-swatch legend-swatch-island" /> Major islands
+        </span>
       </div>
       <p className="map-source-note">
         Hong Kong’s 18 district boundaries are derived from OpenStreetMap{" "}
@@ -982,6 +1083,23 @@ export function HongKongMap() {
         use OSM English names. These are reference boundaries,
         not a game boundary or an official government GIS dataset. Always-on
         labels appear when zoomed in to reduce overlap at city scale.
+      </p>
+      <p className="map-source-note">
+        Major Hong Kong island labels are derived from OpenStreetMap{" "}
+        <a
+          href={mtrDataSource.openStreetMap.sourceUrl}
+          rel="noreferrer"
+          target="_blank"
+        >
+          named island features
+        </a>{" "}
+        under the ODbL 1.0
+        {islandLabelData?.extractedAt
+          ? `, extracted ${islandLabelData.extractedAt}`
+          : ""}
+        . The curated set includes 24 named islands and is shown from zoom 13
+        to limit label overlap. Labels are for map orientation, not a complete
+        inventory of every island or islet.
       </p>
       <p className="map-source-note">
         <strong>Map and transit data:</strong>{" "}
@@ -1107,7 +1225,8 @@ export function HongKongMap() {
           Light Rail route references, {lightRailStopFeatures.length} Light
           Rail stop/platform points, {ferryRouteFeatures.length} ferry route
           groups, {ferryTerminalFeatures.length} ferry terminals, and{" "}
-          {districtFeatures.length} districts from
+          {districtFeatures.length} districts plus{" "}
+          {islandLabelFeatures.length} island labels from
           versioned OSM snapshots.
         </p>
       )}
