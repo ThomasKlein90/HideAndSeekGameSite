@@ -952,6 +952,89 @@ h1 {
   accent-color: var(--coral);
 }
 
+.district-selection {
+  display: grid;
+  gap: 0.65rem;
+  margin: 0;
+  border: 1px solid rgb(248 245 237 / 18%);
+  border-radius: 0.55rem;
+  padding: 0.8rem;
+}
+
+.district-selection legend {
+  padding: 0 0.35rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.district-selection > p {
+  margin: 0;
+  color: rgb(248 245 237 / 73%);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.district-selection-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.78rem;
+}
+
+.district-selection-actions span {
+  color: rgb(248 245 237 / 73%);
+}
+
+.district-selection-actions .text-button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.district-selection-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+  gap: 0.4rem 0.75rem;
+}
+
+.district-selection-list label {
+  display: flex;
+  min-height: 2.5rem;
+  align-items: center;
+  gap: 0.55rem;
+  border-radius: 0.35rem;
+  padding: 0.3rem 0.4rem;
+  background: rgb(248 245 237 / 6%);
+  font-size: 0.82rem;
+  line-height: 1.25;
+}
+
+.district-selection-list input {
+  flex: 0 0 auto;
+  width: 1.1rem;
+  height: 1.1rem;
+  min-height: auto;
+  accent-color: #f5c86d;
+}
+
+.district-boundary-summary {
+  display: grid;
+  gap: 0.4rem;
+  margin-top: 1rem;
+  border-top: 1px solid rgb(248 245 237 / 18%);
+  padding-top: 0.85rem;
+}
+
+.district-boundary-summary h4,
+.district-boundary-summary p {
+  margin: 0;
+}
+
+.district-boundary-summary h4 {
+  color: #f5c86d;
+  font-size: 0.85rem;
+}
+
 .field-pair {
   display: grid;
   gap: 0.8rem;

@@ -7,9 +7,9 @@ This file is the short operational record for resuming work after a Copilot sess
 - Last verified: 2026-10-12
 - Repository: `ThomasKlein90/HideAndSeekGameSite`
 - Integration branch: `main`
-- Verified `origin/main`: `378208f` (merged PR #31, Hong Kong island labels); local `main` was fast-forwarded to this commit.
-- Current feature branch: `feature/hong-kong-map-search`, based on `378208f`; feature commit `fd00e5d` is validated and pushed to `origin/feature/hong-kong-map-search`. No PR was created.
-- Product stage: MTR, Tramways, Light Rail, ferries, district boundaries, and island labels are integrated in `main`; this branch adds local search across loaded map reference data.
+- Verified `origin/main`: `9a9e6b4` (merged PR #32, Hong Kong map search); local `main` was fast-forwarded to this commit.
+- Current feature branch: `feature/game-boundaries`, based on `9a9e6b4`; implementation is complete but not yet committed or pushed. No PR was created.
+- Product stage: MTR, Tramways, Light Rail, ferries, district boundaries, island labels, and map search are integrated in `main`; this branch adds host-configured playable/no-go districts at game creation.
 
 ## Implemented & Verified in Live Smoke Test
 
@@ -65,12 +65,13 @@ This file is the short operational record for resuming work after a Copilot sess
 - District validation: focused district tests and all four transit tests pass; lint, production build, and `git diff --check` pass. Browser check at 390px viewport (375px content width) confirms all 18 outlines render, 18 labels appear after zooming to 14+, the layer toggles off/on, and there is no horizontal overflow. Labels are hidden at city overview scale after initial validation showed overlap; hover names remain available.
 - Hong Kong island labels (2026-10-12): the curated OSM snapshot at `public/data/hong-kong-islands.geojson` contains 24 named islands with ODbL-1.0 attribution and extraction metadata (`2026-10-12T08:39:49Z`). The generator and focused test are `npm run map:islands:refresh` and `npm run test:map:islands`; labels are independently toggleable and start at zoom 13. All six map-data test commands, lint, production build, and `git diff --check` pass. Browser review at 390px confirms the 375px document does not overflow, all 24 label tooltips mount at the close-zoom threshold, the layer can be independently disabled/restored (0/24 labels), and visible OSM/ODbL attribution and the 24-island status count are present.
 - Local map search (2026-10-12): indexes the loaded OSM/MTR station and stop data, ferry terminals, districts, and curated islands; matches English/Chinese names and available station/stop codes, shows up to eight categorized results, and recenters/highlights the selection. It is snapshot-only and does not contact an external geocoder or support arbitrary addresses. All six map-data test commands, lint, production build, and diff check pass. Browser checks confirmed exact/partial and Chinese-name matches, no-match and clear behavior, map recentering/target highlight, and no horizontal overflow at 390px or 320px viewport widths.
+- District boundary configuration (2026-10-12): per user decision, game setup presents all 18 Hong Kong districts checked by default; checked districts are playable and unchecked districts are no-go. The selected names are passed to `create_game`, validated in SQL and persisted in `game_settings.playable_districts`; all existing games default to all districts. Active-game setup reads and summarizes the saved selection for participants. TypeScript/GeoJSON/SQL district-list consistency check passes; all six map-data tests, lint, build, and diff check pass. The authenticated game-creation UI has not been exercised in a browser, and migration `20261012170000_game_playable_districts.sql` has not been applied to Supabase. Apply it before using the updated client.
 
 ## Current Development Slice
 
-MTR routes, Hong Kong Tramways, MTR Light Rail, ferries, district boundaries, and island labels are integrated into `main` through PR #31 (`378208f`). Source details and validation history are recorded above.
+MTR routes, Hong Kong Tramways, MTR Light Rail, ferries, district boundaries, island labels, and map search are integrated into `main` through PR #32 (`9a9e6b4`). Source details and validation history are recorded above.
 
-The active branch is `feature/hong-kong-map-search`, based on merged PR #31 (`378208f`), with feature commit `fd00e5d` pushed to `origin/feature/hong-kong-map-search`. It adds local search over MTR stations, tram and Light Rail stops, ferry terminals, districts, and islands; selection recenters the map and shows a target marker. Search requires no third-party geocoder and excludes arbitrary addresses. All six map-data test commands, lint, build, diff check, and browser checks for result matching, selection, clear/no-match states, and phone-width overflow passed. No PR was created; the user handles PR creation/merge. Configurable game/no-go boundaries remain a future slice.
+The active branch is `feature/game-boundaries`, based on merged PR #32 (`9a9e6b4`). It adds an 18-district checklist to host game setup, defaults all selected, classifies unchecked districts as no-go, persists the selected names in `game_settings.playable_districts`, validates the list through the database constraint/RPC, and displays saved playable/no-go districts to game participants. TypeScript/GeoJSON/SQL district-list consistency check, all six map-data test commands, lint, production build, and `git diff --check` pass. The authenticated game-creation UI has not been exercised in a browser, and migration `20261012170000_game_playable_districts.sql` has not been applied to Supabase; apply it before using the updated client. No PR was created; the user handles PR creation/merge. Future follow-up may add map highlighting and gameplay enforcement.
 
 ## Start-Of-Session Procedure
 
@@ -82,7 +83,7 @@ The active branch is `feature/hong-kong-map-search`, based on merged PR #31 (`37
 ### Copy-ready restart prompt
 
 ```
-Resume from WORKSPACE_HANDOFF.md. The district-boundaries slice is on `feature/hong-kong-district-boundaries`, based on merged PR #29 (`d47e0dd`), implementation commit `4c1462e`. It adds an OSM/ODbL snapshot of 18 Hong Kong district polygons, tested refresh/conversion script, toggleable boundary overlay with hover names and zoom-14 English labels, attribution, plan/handoff updates, and map status count. Tests, lint, build, diff check, and phone-width map/toggle/label checks passed. Push the branch; user creates and merges PRs separately. Island labels/search and game boundaries remain future map slices; refresh stale ferry pier-area data when Overpass is available.
+Resume from WORKSPACE_HANDOFF.md. PR #32 (`9a9e6b4`) merged the map-search slice. Continue `feature/game-boundaries`: host-selected Hong Kong districts define playable areas; unchecked districts are no-go and all 18 are selected by default. Settings persist to `game_settings.playable_districts` via a migration and the create_game RPC. Check the installed Next.js guide before app edits, validate the migration/client flow, update the plan/handoff, run lint/build and targeted checks, then commit/push. User creates and merges PRs separately.
 ```
 
 Before ending a session, leave the worktree either clean on `main` after a
