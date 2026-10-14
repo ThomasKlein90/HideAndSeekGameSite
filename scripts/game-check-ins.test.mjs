@@ -2,6 +2,10 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import {
+  parseLocalDateTimeInput,
+  toLocalDateTimeInput,
+} from "../src/lib/game-check-in-corrections.mjs";
+import {
   canCompareCheckInProximity,
   CHECK_IN_FRESHNESS_MILLISECONDS,
   distanceInMeters,
@@ -43,6 +47,15 @@ test("station proximity uses meter distances", () => {
   assert.equal(distanceInMeters(origin, origin), 0);
   assert.ok(distanceInMeters(origin, withinFiveHundredMeters) < 500);
   assert.ok(distanceInMeters(origin, outsideFiveHundredMeters) > 500);
+});
+
+test("correction timestamps round-trip through the local datetime input", () => {
+  const original = "2026-10-14T07:15:42.317Z";
+  const input = toLocalDateTimeInput(original);
+
+  assert.equal(new Date(parseLocalDateTimeInput(input)).toISOString(), original);
+  assert.equal(parseLocalDateTimeInput(""), null);
+  assert.equal(parseLocalDateTimeInput("not a date"), null);
 });
 
 test("the MTR snapshot contains unique station codes and coordinates", async () => {

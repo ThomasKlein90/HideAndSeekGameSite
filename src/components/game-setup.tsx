@@ -869,7 +869,16 @@ export function GameSetup() {
       {createdGame && currentTeam && isCurrentPlayerTeamAssigned && session && (
         <GameCheckInPanel
           gameId={createdGame.id}
+          hostName={displayName || session.user.email || "Host"}
+          isHost={isGameHost}
           isGameComplete={createdGame.phase === "game_complete"}
+          gamePlayers={players
+            .filter((player) => player.is_team_assigned)
+            .map((player) => ({
+              userId: player.user_id,
+              displayName: player.profiles?.display_name ?? "Player",
+              team: player.team,
+            }))}
           players={players
             .filter(
               (player) =>
