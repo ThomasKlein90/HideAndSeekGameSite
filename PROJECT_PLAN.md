@@ -92,16 +92,13 @@ website. Update it as rules and priorities are agreed.
 - [ ] Test the complete flow with four accounts on real mobile devices.
 - [ ] Check core flows for accessibility and one-handed mobile use.
 
-The district-selection and check-in migrations were manually applied through
-the Supabase Dashboard and verified with catalog queries. The two-account
-check-in smoke test passed role visibility/privacy and inside/outside-radius
-behavior; the live stale-age transition and four-account mobile flow remain
-untested. The correction flow is implemented locally; its migration still
-requires approved deployment and live verification. Hosts may view/correct
-every player's reports (including Hider reports while assigned to Seekers);
-only hosts can see history. Corrections retain before/after station and time
-values, actor, and correction time until the game is deleted; completed games
-are read-only. See [WORKSPACE_HANDOFF.md](./WORKSPACE_HANDOFF.md) for details.
+The district-selection, check-in, and correction migrations were manually
+applied through the Supabase Dashboard and verified with catalog queries.
+Two-account check-in and correction smoke tests passed role visibility/privacy,
+inside/outside-radius behavior, correction history, corrected-report visibility,
+and disabled correction controls after the disposable game was completed. The
+direct post-completion RPC rejection and four-account mobile flow remain
+untested. See [WORKSPACE_HANDOFF.md](./WORKSPACE_HANDOFF.md) for details.
 
 ## Later - Only After a Successful Manual-Check-in Game
 
