@@ -86,7 +86,7 @@ website. Update it as rules and priorities are agreed.
 
 - [x] Allow assigned Seekers to record MTR station check-ins visible to Hiders; optional Hider Team station check-ins are visible only to Hiders and set the hiding-radius center.
 - [x] Display each player's latest station report; mark it stale after 15 minutes and retain it. Show an advisory radius alert from fresh Seeker reports while keeping phase changes host-controlled.
-- [ ] Add admin correction flow that preserves an audit history.
+- [ ] Add a host-only check-in correction flow: allow station and reported-time corrections, retain original and corrected values plus correcting host/time, make history host-only, and retain audit entries for the game's lifetime.
 - [ ] Handle reconnects, duplicate actions, and simultaneous updates safely.
 - [ ] Add clear network, expired-invite, and invalid-game-state error messages.
 - [ ] Test the complete flow with four accounts on real mobile devices.
