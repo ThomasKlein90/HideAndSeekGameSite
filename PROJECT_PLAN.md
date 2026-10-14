@@ -92,6 +92,12 @@ website. Update it as rules and priorities are agreed.
 - [ ] Test the complete flow with four accounts on real mobile devices.
 - [ ] Check core flows for accessibility and one-handed mobile use.
 
+The district-selection and check-in migrations were manually applied through
+the Supabase Dashboard and verified with catalog queries. The two-account
+check-in smoke test passed role visibility/privacy and inside/outside-radius
+behavior; the live stale-age transition and four-account mobile flow remain
+untested. See [WORKSPACE_HANDOFF.md](./WORKSPACE_HANDOFF.md) for details.
+
 ## Later - Only After a Successful Manual-Check-in Game
 
 - [ ] Define consent, visibility, retention, and deletion rules for live location.
@@ -135,9 +141,10 @@ Next:
 
 1. Refresh the versioned OSM snapshot when Overpass is available and validate major pier-area coverage.
 2. Continue checking public-transit and playable-boundary rules with the group as map layers are added.
-3. Apply and smoke-test the manual check-in migration through the approved
-   Supabase workflow before using check-ins in a live game; agree on consent
-   rules before adding live-location sharing.
+3. Design the planned host/admin check-in correction flow with an audit trail;
+   agree on correction permissions and audit semantics before implementation.
+   Reconcile the manually applied migrations with CLI history before using
+   `supabase db push`, and agree on consent before adding live-location sharing.
 
 ## Open Decisions
 
