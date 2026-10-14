@@ -97,11 +97,10 @@ applied through the Supabase Dashboard and verified with catalog queries.
 Two-account check-in and correction smoke tests passed role visibility/privacy,
 inside/outside-radius behavior, correction history, corrected-report visibility,
 and disabled correction controls after the disposable game was completed. The
-database retains both check-in rows after game completion; the Hider row is
-stale by timestamp. The stale badge was not verified because the browser was
-showing a different game. Direct post-completion RPC rejection and four-account
-mobile flow remain untested. See [WORKSPACE_HANDOFF.md](./WORKSPACE_HANDOFF.md)
-for details.
+database retains both check-in rows after game completion. A separate
+disposable Hider check-in remained visible and changed to Stale after 19
+minutes. Direct post-completion RPC rejection and four-account mobile flow
+remain untested. See [WORKSPACE_HANDOFF.md](./WORKSPACE_HANDOFF.md) for details.
 
 ## Later - Only After a Successful Manual-Check-in Game
 
