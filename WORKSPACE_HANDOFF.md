@@ -4,12 +4,13 @@ This file is the short operational record for resuming work after a Copilot sess
 
 ## Current Snapshot
 
-- Last verified: 2026-10-12
+- Last verified: 2026-10-14
 - Repository: `ThomasKlein90/HideAndSeekGameSite`
 - Integration branch: `main`
-- Verified `origin/main`: `9a9e6b4` (merged PR #32, Hong Kong map search); local `main` was fast-forwarded to this commit.
-- Current feature branch: `feature/game-boundaries`, based on `9a9e6b4`; feature commit `90198e4` is validated but not yet pushed. No PR was created.
-- Product stage: MTR, Tramways, Light Rail, ferries, district boundaries, island labels, and map search are integrated in `main`; this branch adds host-configured playable/no-go districts at game creation.
+- Verified `origin/main`: `89982eb` (merged PR #33, playable/no-go district selection); local `main` HEAD matched this commit before the current feature branch was created.
+- Current branch: `feature/seeker-status-panel`, based on `89982eb`; implementation commit `e245b46` is pushed to `origin/feature/seeker-status-panel`.
+- Pull request: not created; the user creates and merges PRs separately.
+- Product stage: MTR, Tramways, Light Rail, ferries, district boundaries, island labels, map search, and host-configured playable/no-go district selection are integrated in `main`.
 
 ## Implemented & Verified in Live Smoke Test
 
@@ -38,7 +39,7 @@ This file is the short operational record for resuming work after a Copilot sess
   - Hider card hand management.
   - Final-hiding radius display and host/Hider Team reference point entry with label and coordinates.
 - **Database & Security**:
-  - All 13 migrations applied to Supabase project `gthvxhakvehnrvvzcglh`.
+  - The remote application status of `20261012170000_game_playable_districts.sql` is unverified. The Supabase CLI is unavailable in this environment, and the read-only API schema probe failed because of a local TLS certificate-chain error. The authenticated game-creation smoke test was not run; do not rely on district selection until migration status is confirmed.
   - Row Level Security (RLS) enabled across all tables with `PL/pgSQL SECURITY DEFINER` helper functions (`is_game_host`, `is_game_member`, `is_seeker`, `is_hider`).
 
 ## Validation Results
@@ -65,25 +66,31 @@ This file is the short operational record for resuming work after a Copilot sess
 - District validation: focused district tests and all four transit tests pass; lint, production build, and `git diff --check` pass. Browser check at 390px viewport (375px content width) confirms all 18 outlines render, 18 labels appear after zooming to 14+, the layer toggles off/on, and there is no horizontal overflow. Labels are hidden at city overview scale after initial validation showed overlap; hover names remain available.
 - Hong Kong island labels (2026-10-12): the curated OSM snapshot at `public/data/hong-kong-islands.geojson` contains 24 named islands with ODbL-1.0 attribution and extraction metadata (`2026-10-12T08:39:49Z`). The generator and focused test are `npm run map:islands:refresh` and `npm run test:map:islands`; labels are independently toggleable and start at zoom 13. All six map-data test commands, lint, production build, and `git diff --check` pass. Browser review at 390px confirms the 375px document does not overflow, all 24 label tooltips mount at the close-zoom threshold, the layer can be independently disabled/restored (0/24 labels), and visible OSM/ODbL attribution and the 24-island status count are present.
 - Local map search (2026-10-12): indexes the loaded OSM/MTR station and stop data, ferry terminals, districts, and curated islands; matches English/Chinese names and available station/stop codes, shows up to eight categorized results, and recenters/highlights the selection. It is snapshot-only and does not contact an external geocoder or support arbitrary addresses. All six map-data test commands, lint, production build, and diff check pass. Browser checks confirmed exact/partial and Chinese-name matches, no-match and clear behavior, map recentering/target highlight, and no horizontal overflow at 390px or 320px viewport widths.
-- District boundary configuration (2026-10-12): per user decision, game setup presents all 18 Hong Kong districts checked by default; checked districts are playable and unchecked districts are no-go. The selected names are passed to `create_game`, validated in SQL and persisted in `game_settings.playable_districts`; all existing games default to all districts. Active-game setup reads and summarizes the saved selection for participants. TypeScript/GeoJSON/SQL district-list consistency check passes; all six map-data tests, lint, build, and diff check pass. The authenticated game-creation UI has not been exercised in a browser, and migration `20261012170000_game_playable_districts.sql` has not been applied to Supabase. Apply it before using the updated client.
+- District boundary configuration (2026-10-12, PR #33): game setup presents all 18 Hong Kong districts checked by default; checked districts are playable and unchecked districts are no-go. The selected names are passed to `create_game`, validated in SQL and persisted in `game_settings.playable_districts`; existing games default to all districts. Active-game setup reads and summarizes the saved selection for participants. TypeScript/GeoJSON/SQL district-list consistency check, all six map-data tests, lint, build, and diff check passed. The migration `20261012170000_game_playable_districts.sql` is merged; whether it has been applied to remote Supabase and the authenticated create-game flow remain unverified. Confirm migration state before relying on the feature.
+- Seeker-status panel (2026-10-14): a seeker-only status snapshot of team assignment and the assigned seeker roster, backed by existing `game_players` membership data. Includes manual refresh and makes clear that check-ins and location sharing are not collected. No schema or tracking changes.
+- Seeker-status panel validation: `npm.cmd run lint`, `npm.cmd run build`, and `git diff --check` passed. No authenticated/live UI smoke test was run because this environment has no authenticated Supabase session; the remote district-migration check also remains blocked as described above.
 
 ## Current Development Slice
 
-MTR routes, Hong Kong Tramways, MTR Light Rail, ferries, district boundaries, island labels, and map search are integrated into `main` through PR #32 (`9a9e6b4`). Source details and validation history are recorded above.
+MTR routes, Hong Kong Tramways, MTR Light Rail, ferries, district boundaries, island labels, map search, and playable/no-go district selection are integrated into `main` through PR #33 (`89982eb`). Source details and validation history are recorded above.
 
-The active branch is `feature/game-boundaries`, based on merged PR #32 (`9a9e6b4`), with feature commit `90198e4`. It adds an 18-district checklist to host game setup, defaults all selected, classifies unchecked districts as no-go, persists the selected names in `game_settings.playable_districts`, validates the list through the database constraint/RPC, and displays saved playable/no-go districts to game participants. TypeScript/GeoJSON/SQL district-list consistency check, all six map-data test commands, lint, production build, and `git diff --check` pass. The authenticated game-creation UI has not been exercised in a browser, and migration `20261012170000_game_playable_districts.sql` has not been applied to Supabase; apply it before using the updated client. Push the branch; no PR was created, and the user handles PR creation/merge. Future follow-up may add map highlighting and gameplay enforcement.
+PR #33 merged playable/no-go district selection at `89982eb`; local `main` HEAD matches `origin/main`. The slice adds an 18-district checklist to host setup (all selected by default), validates and persists the selection through the `create_game` RPC and `game_settings.playable_districts`, and summarizes saved districts in the lobby. The TypeScript/GeoJSON/SQL list consistency check, all six map-data tests, lint, production build, and diff check passed before merge. Remote migration application and authenticated game creation remain unverified; confirm those before relying on the feature.
+
+Current slice: dedicated seeker-status panel (status UI only, no check-in collection or location sharing). Files changed: `src/components/seeker-status-panel.tsx`, `src/components/game-setup.tsx`, `src/app/globals.css`, `PROJECT_PLAN.md`, and this handoff. `npm.cmd run lint`, `npm.cmd run build`, and `git diff --check` passed. Implementation commit `e245b46` is pushed; no PR has been created. Ferry OSM refresh/pier coverage review remains a parallel map-maintenance follow-up.
 
 ## Start-Of-Session Procedure
 
 1. Open the repository at the workspace root.
 2. Read this file, [PROJECT_PLAN.md](PROJECT_PLAN.md), and the repository instructions.
 3. Confirm the active map feature branch and inspect its changes.
-4. If a feature PR is unmerged, continue that branch; after merge, fast-forward `main` and choose the next planned Phase 2 slice.
+4. Verify `origin/main`; fast-forward a clean local `main` after the merged PR.
+5. Confirm whether migration `20261012170000_game_playable_districts.sql` is applied remotely and, if so, smoke-test authenticated game creation with a selected district subset. This could not be verified on 2026-10-14 because the CLI was unavailable and the read-only API probe encountered a local TLS certificate-chain error.
+6. After this feature branch is merged, continue with a separate focused slice. Keep check-ins and location sharing out of scope until consent rules are agreed.
 
 ### Copy-ready restart prompt
 
 ```
-Resume from WORKSPACE_HANDOFF.md. PR #32 (`9a9e6b4`) merged the map-search slice. Continue `feature/game-boundaries`: host-selected Hong Kong districts define playable areas; unchecked districts are no-go and all 18 are selected by default. Settings persist to `game_settings.playable_districts` via a migration and the create_game RPC. Check the installed Next.js guide before app edits, validate the migration/client flow, update the plan/handoff, run lint/build and targeted checks, then commit/push. User creates and merges PRs separately.
+Resume from WORKSPACE_HANDOFF.md. Confirm the seeker-status-panel branch has been reviewed and merged before starting another slice. Verify whether migration `20261012170000_game_playable_districts.sql` is applied to Supabase; if applied, smoke-test authenticated game creation with a district subset, otherwise report the prerequisite and follow the approved migration workflow. Do not add check-ins or location sharing until permission and consent rules are agreed. The user creates and merges PRs separately.
 ```
 
 Before ending a session, leave the worktree either clean on `main` after a

@@ -80,7 +80,7 @@ website. Update it as rules and priorities are agreed.
 - [x] Log physical-card rewards received for answering each question.
 - [x] Show the Hider Team's current card hand/log, including use and expiry where applicable.
 - [x] Display the configured final-hiding radius and a manually selected/reference hiding point.
-- [ ] Add a dedicated seeker-status panel ready for future check-ins or consented locations.
+- [x] Add a dedicated seeker-status panel showing Seeker team assignment and roster only; no check-ins or location sharing.
 
 ## Phase 5 - Manual Check-ins and Operational Reliability
 
@@ -135,7 +135,7 @@ Next:
 
 1. Refresh the versioned OSM snapshot when Overpass is available and validate major pier-area coverage.
 2. Continue checking public-transit and playable-boundary rules with the group as map layers are added.
-3. Add visual highlighting and gameplay checks against the saved playable/no-go districts if the group wants boundary enforcement.
+3. Agree on permission and consent rules before adding manual check-ins or location sharing.
 
 ## Open Decisions
 
