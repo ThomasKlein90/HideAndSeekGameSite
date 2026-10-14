@@ -218,6 +218,46 @@ export type Database = {
           },
         ];
       };
+      game_checkins: {
+        Row: {
+          checked_in_at: string;
+          game_id: string;
+          station_code: string;
+          team: GameTeam;
+          user_id: string;
+        };
+        Insert: {
+          checked_in_at?: string;
+          game_id: string;
+          station_code: string;
+          team: GameTeam;
+          user_id: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["game_checkins"]["Insert"]>;
+        Relationships: [
+          {
+            foreignKeyName: "game_checkins_game_id_fkey";
+            columns: ["game_id"];
+            isOneToOne: false;
+            referencedRelation: "games";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "game_checkins_game_player_fkey";
+            columns: ["game_id", "user_id"];
+            isOneToOne: true;
+            referencedRelation: "game_players";
+            referencedColumns: ["game_id", "user_id"];
+          },
+          {
+            foreignKeyName: "game_checkins_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       games: {
         Row: {
           created_at: string;
@@ -509,6 +549,13 @@ export type Database = {
           reference_latitude?: number | null;
           reference_longitude?: number | null;
           target_game_id: string;
+        };
+        Returns: undefined;
+      };
+      submit_station_checkin: {
+        Args: {
+          target_game_id: string;
+          target_station_code: string;
         };
         Returns: undefined;
       };

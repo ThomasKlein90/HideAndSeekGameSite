@@ -7,10 +7,9 @@ This file is the short operational record for resuming work after a Copilot sess
 - Last verified: 2026-10-14
 - Repository: `ThomasKlein90/HideAndSeekGameSite`
 - Integration branch: `main`
-- Verified `origin/main`: `89982eb` (merged PR #33, playable/no-go district selection); local `main` HEAD matched this commit before the current feature branch was created.
-- Current branch: `feature/seeker-status-panel`, based on `89982eb`; implementation commit `e245b46` is pushed to `origin/feature/seeker-status-panel`.
-- Pull request: not created; the user creates and merges PRs separately.
-- Product stage: MTR, Tramways, Light Rail, ferries, district boundaries, island labels, map search, and host-configured playable/no-go district selection are integrated in `main`.
+- Verified PR #34 (seeker-status panel) merged and closed on 2026-10-14. This feature branch is based on `cfdb435`.
+- Current branch: `feature/manual-checkins`, based on `cfdb435`.
+- Product stage: MTR, Tramways, Light Rail, ferries, district boundaries, island labels, map search, playable/no-go district selection, and the seeker-status panel are integrated in `main`.
 
 ## Implemented & Verified in Live Smoke Test
 
@@ -40,6 +39,7 @@ This file is the short operational record for resuming work after a Copilot sess
   - Final-hiding radius display and host/Hider Team reference point entry with label and coordinates.
 - **Database & Security**:
   - The remote application status of `20261012170000_game_playable_districts.sql` is unverified. The Supabase CLI is unavailable in this environment, and the read-only API schema probe failed because of a local TLS certificate-chain error. The authenticated game-creation smoke test was not run; do not rely on district selection until migration status is confirmed.
+  - New migration `20261014140000_game_station_checkins.sql` is local to this branch and has not been applied. A read-only `npx supabase@latest migration list --linked` attempt failed with a transport/network error; do not apply it without the approved workflow and user authorization.
   - Row Level Security (RLS) enabled across all tables with `PL/pgSQL SECURITY DEFINER` helper functions (`is_game_host`, `is_game_member`, `is_seeker`, `is_hider`).
 
 ## Validation Results
@@ -69,28 +69,33 @@ This file is the short operational record for resuming work after a Copilot sess
 - District boundary configuration (2026-10-12, PR #33): game setup presents all 18 Hong Kong districts checked by default; checked districts are playable and unchecked districts are no-go. The selected names are passed to `create_game`, validated in SQL and persisted in `game_settings.playable_districts`; existing games default to all districts. Active-game setup reads and summarizes the saved selection for participants. TypeScript/GeoJSON/SQL district-list consistency check, all six map-data tests, lint, build, and diff check passed. The migration `20261012170000_game_playable_districts.sql` is merged; whether it has been applied to remote Supabase and the authenticated create-game flow remain unverified. Confirm migration state before relying on the feature.
 - Seeker-status panel (2026-10-14): a seeker-only status snapshot of team assignment and the assigned seeker roster, backed by existing `game_players` membership data. Includes manual refresh and makes clear that check-ins and location sharing are not collected. No schema or tracking changes.
 - Seeker-status panel validation: `npm.cmd run lint`, `npm.cmd run build`, and `git diff --check` passed. No authenticated/live UI smoke test was run because this environment has no authenticated Supabase session; the remote district-migration check also remains blocked as described above.
+- Manual station check-ins (2026-10-14): implemented locally on `feature/manual-checkins`. Assigned Seekers report an MTR station; each latest report is visible to Hiders and the submitting Seeker. Optional Hider Team station reports are visible only to Hiders, and the newest Hider report sets the configured hiding-radius center. Reports become stale at 15 minutes but remain visible. Proximity advisories require both the Hider radius-center report and Seeker report to be fresh, and the host retains phase-transition control. No GPS or automatic location collection. A completed game disables new submissions.
+- Check-in validation: `npm.cmd run test:game:check-ins` passes all three focused tests, including freshness, stale-anchor suppression, meter-distance calculations, and the 98-station OSM snapshot; `npm.cmd run lint`, `npm.cmd run build`, and `git diff --check` pass. No authenticated smoke test was possible because the check-in migration has not been applied by this session and remote migration status remains unverified.
 
 ## Current Development Slice
 
 MTR routes, Hong Kong Tramways, MTR Light Rail, ferries, district boundaries, island labels, map search, and playable/no-go district selection are integrated into `main` through PR #33 (`89982eb`). Source details and validation history are recorded above.
 
-PR #33 merged playable/no-go district selection at `89982eb`; local `main` HEAD matches `origin/main`. The slice adds an 18-district checklist to host setup (all selected by default), validates and persists the selection through the `create_game` RPC and `game_settings.playable_districts`, and summarizes saved districts in the lobby. The TypeScript/GeoJSON/SQL list consistency check, all six map-data tests, lint, production build, and diff check passed before merge. Remote migration application and authenticated game creation remain unverified; confirm those before relying on the feature.
+PR #34 added the dedicated seeker-status panel (seeker assignment and roster only, no check-ins or location sharing) and is merged and closed. Local `main` was fast-forwarded to `cfdb435`, matching `origin/main`.
 
-Current slice: dedicated seeker-status panel (status UI only, no check-in collection or location sharing). Files changed: `src/components/seeker-status-panel.tsx`, `src/components/game-setup.tsx`, `src/app/globals.css`, `PROJECT_PLAN.md`, and this handoff. `npm.cmd run lint`, `npm.cmd run build`, and `git diff --check` passed. Implementation commit `e245b46` is pushed; no PR has been created. Ferry OSM refresh/pier coverage review remains a parallel map-maintenance follow-up.
+The district migration `20261012170000_game_playable_districts.sql` remains unverified remotely; the API probe failed with a local TLS certificate-chain error, and the CLI's read-only `migration list --linked` attempt failed with a transport/network error. The check-in migration `20261014140000_game_station_checkins.sql` is local to the current feature branch; this session has not applied it, and remote status remains unverified.
+
+Current slice: manual station check-ins with team-specific visibility and a 15-minute freshness threshold. Seeker reports are visible to Hiders and the submitting Seeker; Hider Team station reports are private to Hiders and the newest Hider report sets the configured radius center. A fresh Hider anchor and fresh Seeker report within the radius raise an advisory only; the host keeps control of phase changes. The station picker uses the OSM-derived MTR snapshot with visible ODbL attribution. No GPS or automatic location collection. Changes are validated locally but not yet committed or pushed; authenticated smoke testing awaits approved migration deployment and a successful migration-status check.
+
+Ferry OSM refresh/pier coverage review remains a parallel map-maintenance follow-up.
 
 ## Start-Of-Session Procedure
 
 1. Open the repository at the workspace root.
 2. Read this file, [PROJECT_PLAN.md](PROJECT_PLAN.md), and the repository instructions.
-3. Confirm the active map feature branch and inspect its changes.
-4. Verify `origin/main`; fast-forward a clean local `main` after the merged PR.
-5. Confirm whether migration `20261012170000_game_playable_districts.sql` is applied remotely and, if so, smoke-test authenticated game creation with a selected district subset. This could not be verified on 2026-10-14 because the CLI was unavailable and the read-only API probe encountered a local TLS certificate-chain error.
-6. After this feature branch is merged, continue with a separate focused slice. Keep check-ins and location sharing out of scope until consent rules are agreed.
+3. Verify `origin/main` and create a focused branch from current `main`.
+4. Verify remotely whether `20261012170000_game_playable_districts.sql` is applied; previous checks were blocked by TLS/network errors. Do not apply migrations without approval.
+5. The manual station check-in implementation is complete locally on `feature/manual-checkins`; review, commit, and push it after validation. The migration must go through the approved Supabase workflow before authenticated smoke testing. Do not add GPS, live location sharing, or automatic phase changes.
 
 ### Copy-ready restart prompt
 
 ```
-Resume from WORKSPACE_HANDOFF.md. Confirm the seeker-status-panel branch has been reviewed and merged before starting another slice. Verify whether migration `20261012170000_game_playable_districts.sql` is applied to Supabase; if applied, smoke-test authenticated game creation with a district subset, otherwise report the prerequisite and follow the approved migration workflow. Do not add check-ins or location sharing until permission and consent rules are agreed. The user creates and merges PRs separately.
+Resume from WORKSPACE_HANDOFF.md. Verify `origin/main` includes merged PR #34 (`cfdb435`) and continue the validated but uncommitted `feature/manual-checkins` branch. The remote status of `20261012170000_game_playable_districts.sql` and `20261014140000_game_station_checkins.sql` is unknown; do not apply migrations without approval. Manual check-ins are implemented with team-specific visibility, retained latest reports, a 15-minute freshness threshold, and proximity advisories only when both Hider and Seeker reports are fresh; the host controls phase changes. No GPS or automatic location collection. Read relevant installed Next.js guidance before app edits, review the final diff, commit conventionally, and push. The user creates and merges PRs separately.
 ```
 
 Before ending a session, leave the worktree either clean on `main` after a

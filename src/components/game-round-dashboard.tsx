@@ -268,7 +268,7 @@ export function GameRoundDashboard({
       {!error && data && (
         <div className="reference-point-panel">
           <div>
-            <span>Final hiding reference point</span>
+            <span>Optional shared reference point</span>
             <strong>
               {data.referenceLabel ??
                 (data.referenceLatitude !== null &&
@@ -276,13 +276,11 @@ export function GameRoundDashboard({
                   ? `${data.referenceLatitude}, ${data.referenceLongitude}`
                   : "Not set")}
             </strong>
-            {data.referenceLatitude !== null &&
-              data.referenceLongitude !== null && (
-                <small>
-                  Within {data.finalHidingRadiusMeters} m of this reference.
-                </small>
-              )}
           </div>
+          <p>
+            This point is visible to all game members. It is separate from the
+            Hider-only station check-in used as the hiding-radius center.
+          </p>
           {canEditReferencePoint && (
             <form className="reference-point-form" onSubmit={saveReferencePoint}>
               <label htmlFor="reference-label">Location label</label>
@@ -320,7 +318,9 @@ export function GameRoundDashboard({
                 disabled={isSavingReference}
                 type="submit"
               >
-                {isSavingReference ? "Saving point..." : "Save reference point"}
+                {isSavingReference
+                  ? "Saving point..."
+                  : "Save shared reference point"}
               </button>
             </form>
           )}

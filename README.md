@@ -28,6 +28,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - `npm run dev` - start the development server.
 - `npm run lint` - run the ESLint checks.
 - `npm run build` - create a production build.
+- `npm run test:game:check-ins` - test manual check-in freshness and station-radius calculations.
 - `npm run start` - run the production build.
 
 ## Supabase setup
