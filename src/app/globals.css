@@ -210,6 +210,71 @@ a {
   margin: 0;
 }
 
+.game-check-in-corrections {
+  display: grid;
+  gap: 0.8rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgb(19 42 54 / 14%);
+}
+
+.game-check-in-corrections > p {
+  margin: 0;
+}
+
+.game-check-in-correction-list {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.game-check-in-correction-list > li {
+  display: grid;
+  gap: 0.65rem;
+  padding: 0.85rem;
+  border-radius: 0.7rem;
+  background: var(--paper-deep);
+}
+
+.game-check-in-correction-list h4,
+.game-check-in-correction-list p {
+  margin: 0;
+}
+
+.game-check-in-correction-list p,
+.game-check-in-correction-list details {
+  color: var(--muted-ink);
+  font-size: 0.9rem;
+}
+
+.game-check-in-correction-form {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.game-check-in-correction-form select,
+.game-check-in-correction-form input {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid rgb(19 42 54 / 24%);
+  border-radius: 0.5rem;
+  background: white;
+  color: var(--ink);
+  font: inherit;
+}
+
+.game-check-in-correction-form .button {
+  justify-self: start;
+}
+
+.game-check-in-correction-list details ol {
+  display: grid;
+  gap: 0.5rem;
+  padding-left: 1.25rem;
+}
+
 .check-in-fresh {
   color: #236341 !important;
   font-weight: 700;

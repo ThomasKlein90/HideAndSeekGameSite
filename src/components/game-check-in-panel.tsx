@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
 import type { GameTeam } from "@/lib/supabase/database.types";
+import { GameCheckInCorrectionPanel } from "@/components/game-check-in-correction-panel";
 import {
   canCompareCheckInProximity,
   distanceInMeters,
@@ -33,9 +34,16 @@ type SeekerMember = {
   userId: string;
 };
 
+type GameMember = SeekerMember & {
+  team: GameTeam;
+};
+
 type GameCheckInPanelProps = {
   gameId: string;
+  hostName: string;
+  isHost: boolean;
   isGameComplete: boolean;
+  gamePlayers: GameMember[];
   players: SeekerMember[];
   team: GameTeam;
   userId: string;
@@ -62,7 +70,10 @@ function formatCheckInAge(checkedInAt: string, now: number) {
 
 export function GameCheckInPanel({
   gameId,
+  hostName,
+  isHost,
   isGameComplete,
+  gamePlayers,
   players,
   team,
   userId,
@@ -363,7 +374,7 @@ export function GameCheckInPanel({
           ) : (
             <p>No station check-in yet.</p>
           )}
-          <p>Hiders can see this report and its age.</p>
+          <p>Hiders and the game host can see this report and its age.</p>
         </div>
       ) : (
         <>
@@ -372,7 +383,7 @@ export function GameCheckInPanel({
             <p>
               The newest Hider Team station check-in sets the center of the
               configured {hidingRadiusMeters ?? "—"} m radius. This location is
-              visible only to Hiders.
+              visible to Hiders and the game host.
             </p>
             {isLoading ? (
               <p className="board-loading">Loading Hider Team check-ins...</p>
@@ -487,6 +498,17 @@ export function GameCheckInPanel({
                 )}
           </div>
         </>
+      )}
+      {isHost && (
+        <GameCheckInCorrectionPanel
+          checkIns={checkIns}
+          gameId={gameId}
+          gameIsComplete={isGameComplete}
+          hostName={hostName}
+          onCorrected={() => loadCheckIns(true)}
+          players={gamePlayers}
+          stations={stations}
+        />
       )}
     </section>
   );

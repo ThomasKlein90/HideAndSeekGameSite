@@ -258,6 +258,56 @@ export type Database = {
           },
         ];
       };
+      game_checkin_corrections: {
+        Row: {
+          actor_id: string;
+          corrected_checked_in_at: string;
+          corrected_station_code: string;
+          created_at: string;
+          game_id: string;
+          id: string;
+          previous_checked_in_at: string;
+          previous_station_code: string;
+          user_id: string;
+        };
+        Insert: {
+          actor_id: string;
+          corrected_checked_in_at: string;
+          corrected_station_code: string;
+          created_at?: string;
+          game_id: string;
+          id?: string;
+          previous_checked_in_at: string;
+          previous_station_code: string;
+          user_id: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["game_checkin_corrections"]["Insert"]
+        >;
+        Relationships: [
+          {
+            foreignKeyName: "game_checkin_corrections_actor_id_fkey";
+            columns: ["actor_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "game_checkin_corrections_game_id_fkey";
+            columns: ["game_id"];
+            isOneToOne: false;
+            referencedRelation: "games";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "game_checkin_corrections_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       games: {
         Row: {
           created_at: string;
@@ -556,6 +606,15 @@ export type Database = {
         Args: {
           target_game_id: string;
           target_station_code: string;
+        };
+        Returns: undefined;
+      };
+      correct_station_checkin: {
+        Args: {
+          target_checked_in_at: string;
+          target_game_id: string;
+          target_station_code: string;
+          target_user_id: string;
         };
         Returns: undefined;
       };
