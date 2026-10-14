@@ -86,11 +86,17 @@ website. Update it as rules and priorities are agreed.
 
 - [x] Allow assigned Seekers to record MTR station check-ins visible to Hiders; optional Hider Team station check-ins are visible only to Hiders and set the hiding-radius center.
 - [x] Display each player's latest station report; mark it stale after 15 minutes and retain it. Show an advisory radius alert from fresh Seeker reports while keeping phase changes host-controlled.
-- [ ] Add admin correction flow that preserves an audit history.
+- [ ] Add a host-only check-in correction flow: allow station and reported-time corrections, retain original and corrected values plus correcting host/time, make history host-only, and retain audit entries for the game's lifetime.
 - [ ] Handle reconnects, duplicate actions, and simultaneous updates safely.
 - [ ] Add clear network, expired-invite, and invalid-game-state error messages.
 - [ ] Test the complete flow with four accounts on real mobile devices.
 - [ ] Check core flows for accessibility and one-handed mobile use.
+
+The district-selection and check-in migrations were manually applied through
+the Supabase Dashboard and verified with catalog queries. The two-account
+check-in smoke test passed role visibility/privacy and inside/outside-radius
+behavior; the live stale-age transition and four-account mobile flow remain
+untested. See [WORKSPACE_HANDOFF.md](./WORKSPACE_HANDOFF.md) for details.
 
 ## Later - Only After a Successful Manual-Check-in Game
 
@@ -135,9 +141,10 @@ Next:
 
 1. Refresh the versioned OSM snapshot when Overpass is available and validate major pier-area coverage.
 2. Continue checking public-transit and playable-boundary rules with the group as map layers are added.
-3. Apply and smoke-test the manual check-in migration through the approved
-   Supabase workflow before using check-ins in a live game; agree on consent
-   rules before adding live-location sharing.
+3. Design the planned host/admin check-in correction flow with an audit trail;
+   agree on correction permissions and audit semantics before implementation.
+   Reconcile the manually applied migrations with CLI history before using
+   `supabase db push`, and agree on consent before adding live-location sharing.
 
 ## Open Decisions
 
