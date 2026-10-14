@@ -8,7 +8,8 @@ This file is the short operational record for resuming work after a Copilot sess
 - Repository: `ThomasKlein90/HideAndSeekGameSite`
 - Integration branch: `main`
 - Verified `origin/main`: `89982eb` (merged PR #33, playable/no-go district selection); local `main` HEAD matched this commit before the current feature branch was created.
-- Current branch: `feature/seeker-status-panel`, based on `89982eb`.
+- Current branch: `feature/seeker-status-panel`, based on `89982eb`; implementation commit `e245b46` is pushed to `origin/feature/seeker-status-panel`.
+- Pull request: not created; the user creates and merges PRs separately.
 - Product stage: MTR, Tramways, Light Rail, ferries, district boundaries, island labels, map search, and host-configured playable/no-go district selection are integrated in `main`.
 
 ## Implemented & Verified in Live Smoke Test
@@ -75,7 +76,7 @@ MTR routes, Hong Kong Tramways, MTR Light Rail, ferries, district boundaries, is
 
 PR #33 merged playable/no-go district selection at `89982eb`; local `main` HEAD matches `origin/main`. The slice adds an 18-district checklist to host setup (all selected by default), validates and persists the selection through the `create_game` RPC and `game_settings.playable_districts`, and summarizes saved districts in the lobby. The TypeScript/GeoJSON/SQL list consistency check, all six map-data tests, lint, production build, and diff check passed before merge. Remote migration application and authenticated game creation remain unverified; confirm those before relying on the feature.
 
-Current slice: dedicated seeker-status panel (status UI only, no check-in collection or location sharing). Ferry OSM refresh/pier coverage review remains a parallel map-maintenance follow-up.
+Current slice: dedicated seeker-status panel (status UI only, no check-in collection or location sharing). Files changed: `src/components/seeker-status-panel.tsx`, `src/components/game-setup.tsx`, `src/app/globals.css`, `PROJECT_PLAN.md`, and this handoff. `npm.cmd run lint`, `npm.cmd run build`, and `git diff --check` passed. Implementation commit `e245b46` is pushed; no PR has been created. Ferry OSM refresh/pier coverage review remains a parallel map-maintenance follow-up.
 
 ## Start-Of-Session Procedure
 
