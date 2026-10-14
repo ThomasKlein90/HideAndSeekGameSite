@@ -5,6 +5,7 @@ import type { Session } from "@supabase/supabase-js";
 import { HiderQuestionBoard } from "@/components/hider-question-board";
 import { SeekerQuestionBoard } from "@/components/seeker-question-board";
 import { SeekerStatusPanel } from "@/components/seeker-status-panel";
+import { GameCheckInPanel } from "@/components/game-check-in-panel";
 import { GameRoundDashboard } from "@/components/game-round-dashboard";
 import { HONG_KONG_DISTRICT_NAMES } from "@/data/mtr-reference";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
@@ -863,6 +864,23 @@ export function GameSetup() {
           canEditReferencePoint={isGameHost || currentTeam === "hiders"}
           gameId={createdGame.id}
           isHost={isGameHost}
+        />
+      )}
+      {createdGame && currentTeam && isCurrentPlayerTeamAssigned && session && (
+        <GameCheckInPanel
+          gameId={createdGame.id}
+          isGameComplete={createdGame.phase === "game_complete"}
+          players={players
+            .filter(
+              (player) =>
+                player.team === "seekers" && player.is_team_assigned,
+            )
+            .map((player) => ({
+              userId: player.user_id,
+              displayName: player.profiles?.display_name ?? "Player",
+            }))}
+          team={currentTeam}
+          userId={session.user.id}
         />
       )}
       {createdGame && currentTeam === "seekers" && session && (

@@ -13,6 +13,7 @@
     "test:map:ferry": "node --test scripts/refresh-hk-ferry-data.test.mjs",
     "test:map:districts": "node --test scripts/refresh-hk-district-data.test.mjs",
     "test:map:islands": "node --test scripts/refresh-hk-island-labels.test.mjs",
+    "test:game:check-ins": "node --test scripts/game-check-ins.test.mjs",
     "map:mtr:refresh": "node scripts/refresh-mtr-osm-data.mjs",
     "map:tram:refresh": "node scripts/refresh-hk-tramways-data.mjs",
     "map:light-rail:refresh": "node scripts/refresh-mtr-light-rail-data.mjs",

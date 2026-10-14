@@ -14,7 +14,7 @@ website. Update it as rules and priorities are agreed.
 
 - [x] Start with a website rather than a native app.
 - [x] Prioritize phone use during live play.
-- [x] Start with manual check-ins; defer live-location sharing and automated radius validation.
+- [x] Start with manual check-ins; defer live-location sharing and automatic phase changes.
 - [x] Defer push notifications and game replay.
 - [x] Use placeholders for structured seeker questions until the group supplies its authorized list.
 - [x] Model question rewards as physical-card draws and hand management, not currency.
@@ -84,8 +84,8 @@ website. Update it as rules and priorities are agreed.
 
 ## Phase 5 - Manual Check-ins and Operational Reliability
 
-- [ ] Allow permitted players or the admin to record manual district/station check-ins.
-- [ ] Display check-in time and freshness clearly to authorized roles.
+- [x] Allow assigned Seekers to record MTR station check-ins visible to Hiders; optional Hider Team station check-ins are visible only to Hiders and set the hiding-radius center.
+- [x] Display each player's latest station report; mark it stale after 15 minutes and retain it. Show an advisory radius alert from fresh Seeker reports while keeping phase changes host-controlled.
 - [ ] Add admin correction flow that preserves an audit history.
 - [ ] Handle reconnects, duplicate actions, and simultaneous updates safely.
 - [ ] Add clear network, expired-invite, and invalid-game-state error messages.
@@ -96,7 +96,7 @@ website. Update it as rules and priorities are agreed.
 
 - [ ] Define consent, visibility, retention, and deletion rules for live location.
 - [ ] Add optional role-filtered live-location sharing.
-- [ ] Add advisory station-radius and board-boundary checks; retain manual/admin override.
+- [ ] Add board-boundary checks; retain manual/admin override.
 - [ ] Add PWA installation support and consider push notifications.
 - [ ] Add post-game timeline and replay features.
 
@@ -135,7 +135,9 @@ Next:
 
 1. Refresh the versioned OSM snapshot when Overpass is available and validate major pier-area coverage.
 2. Continue checking public-transit and playable-boundary rules with the group as map layers are added.
-3. Agree on permission and consent rules before adding manual check-ins or location sharing.
+3. Apply and smoke-test the manual check-in migration through the approved
+   Supabase workflow before using check-ins in a live game; agree on consent
+   rules before adding live-location sharing.
 
 ## Open Decisions
 
