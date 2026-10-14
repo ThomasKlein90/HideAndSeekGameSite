@@ -4,6 +4,7 @@ import { FormEvent, useCallback, useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { HiderQuestionBoard } from "@/components/hider-question-board";
 import { SeekerQuestionBoard } from "@/components/seeker-question-board";
+import { SeekerStatusPanel } from "@/components/seeker-status-panel";
 import { GameRoundDashboard } from "@/components/game-round-dashboard";
 import { HONG_KONG_DISTRICT_NAMES } from "@/data/mtr-reference";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
@@ -46,13 +47,17 @@ export function GameSetup() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [createdGame, setCreatedGame] = useState<CreatedGame | null>(null);
   const [players, setPlayers] = useState<GamePlayer[]>([]);
+  const [isLoadingPlayers, setIsLoadingPlayers] = useState(true);
   const [isGameHost, setIsGameHost] = useState(false);
+  const [isCurrentPlayerTeamAssigned, setIsCurrentPlayerTeamAssigned] =
+    useState(false);
   const [currentTeam, setCurrentTeam] = useState<"hiders" | "seekers" | null>(
     null,
   );
 
   const loadPlayers = useCallback(
     async (gameId: string): Promise<GamePlayer[] | undefined> => {
+      setIsLoadingPlayers(true);
       const supabase = createSupabaseBrowserClient();
       const { data, error: playersError } = await supabase
         .from("game_players")
@@ -61,12 +66,14 @@ export function GameSetup() {
         .order("created_at");
 
       if (playersError) {
+        setIsLoadingPlayers(false);
         setError(playersError.message);
         return;
       }
 
       const loadedPlayers = data as GamePlayer[];
       setPlayers(loadedPlayers);
+      setIsLoadingPlayers(false);
       return loadedPlayers;
     },
     [],
@@ -142,6 +149,7 @@ export function GameSetup() {
         });
         setIsGameHost(activeEntry.role === "host" || game.host_id === userId);
         setCurrentTeam(activeEntry.team);
+        setIsCurrentPlayerTeamAssigned(activeEntry.is_team_assigned);
         void loadPlayers(game.id);
       }
     },
@@ -353,6 +361,7 @@ export function GameSetup() {
     setCreatedGame(game);
     setIsGameHost(true);
     setCurrentTeam(hostTeam);
+    setIsCurrentPlayerTeamAssigned(true);
     void loadPlayers(game.id);
   }
 
@@ -388,10 +397,11 @@ export function GameSetup() {
       return;
     }
 
-    setCurrentTeam(
-      loadedPlayers.find((player) => player.user_id === session?.user.id)?.team ??
-        null,
+    const currentPlayer = loadedPlayers.find(
+      (player) => player.user_id === session?.user.id,
     );
+    setCurrentTeam(currentPlayer?.team ?? null);
+    setIsCurrentPlayerTeamAssigned(currentPlayer?.is_team_assigned ?? false);
     setStatus("You joined the game. The host will assign your team.");
   }
 
@@ -415,7 +425,32 @@ export function GameSetup() {
       return;
     }
 
-    await loadPlayers(createdGame.id);
+    const updatedPlayers = await loadPlayers(createdGame.id);
+    if (!updatedPlayers) {
+      return;
+    }
+
+    if (player.user_id === session?.user.id) {
+      setCurrentTeam(team);
+      setIsCurrentPlayerTeamAssigned(true);
+    }
+  }
+
+  async function refreshSeekerStatus() {
+    if (!createdGame || !session) {
+      return;
+    }
+
+    const loadedPlayers = await loadPlayers(createdGame.id);
+    if (!loadedPlayers) {
+      return;
+    }
+
+    const currentPlayer = loadedPlayers.find(
+      (player) => player.user_id === session.user.id,
+    );
+    setCurrentTeam(currentPlayer?.team ?? null);
+    setIsCurrentPlayerTeamAssigned(currentPlayer?.is_team_assigned ?? false);
   }
 
   async function signOut() {
@@ -430,6 +465,7 @@ export function GameSetup() {
 
     setCreatedGame(null);
     setCurrentTeam(null);
+    setIsCurrentPlayerTeamAssigned(false);
     setPlayers([]);
     setIsGameHost(false);
   }
@@ -437,6 +473,7 @@ export function GameSetup() {
   function leaveCurrentGame() {
     setCreatedGame(null);
     setCurrentTeam(null);
+    setIsCurrentPlayerTeamAssigned(false);
     setPlayers([]);
     setPlayableDistricts([...HONG_KONG_DISTRICT_NAMES]);
     setIsGameHost(false);
@@ -829,7 +866,23 @@ export function GameSetup() {
         />
       )}
       {createdGame && currentTeam === "seekers" && session && (
-        <SeekerQuestionBoard gameId={createdGame.id} userId={session.user.id} />
+        <>
+          <SeekerStatusPanel
+            isAssigned={isCurrentPlayerTeamAssigned}
+            isLoading={isLoadingPlayers}
+            onRefresh={() => void refreshSeekerStatus()}
+            players={players
+              .filter(
+                (player) => player.team === "seekers" && player.is_team_assigned,
+              )
+              .map((player) => ({
+                userId: player.user_id,
+                displayName: player.profiles?.display_name ?? "Player",
+              }))}
+            userId={session.user.id}
+          />
+          <SeekerQuestionBoard gameId={createdGame.id} userId={session.user.id} />
+        </>
       )}
       {createdGame && currentTeam === "hiders" && session && (
         <HiderQuestionBoard gameId={createdGame.id} userId={session.user.id} />
