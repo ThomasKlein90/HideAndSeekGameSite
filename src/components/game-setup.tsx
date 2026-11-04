@@ -8,6 +8,7 @@ import { SeekerStatusPanel } from "@/components/seeker-status-panel";
 import { GameCheckInPanel } from "@/components/game-check-in-panel";
 import { GameRoundDashboard } from "@/components/game-round-dashboard";
 import { HONG_KONG_DISTRICT_NAMES } from "@/data/mtr-reference";
+import { formatGameJoinError } from "@/lib/game-errors.mjs";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 type CreatedGame = {
@@ -380,7 +381,7 @@ export function GameSetup() {
     setIsSubmitting(false);
 
     if (joinError) {
-      setError(joinError.message);
+      setError(formatGameJoinError(joinError));
       return;
     }
 

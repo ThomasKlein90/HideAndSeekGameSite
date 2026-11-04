@@ -92,6 +92,10 @@ website. Update it as rules and priorities are agreed.
 - [ ] Test the complete flow with four accounts on real mobile devices.
 - [ ] Check core flows for accessibility and one-handed mobile use.
 
+The join flow now gives actionable feedback for an unknown code, a full game,
+and network failures. Join codes currently have no expiration field or rule;
+define expiration behavior before adding an "expired invite" state.
+
 The district-selection, check-in, and correction migrations were manually
 applied through the Supabase Dashboard and verified with catalog queries.
 Two-account check-in and correction smoke tests passed role visibility/privacy,
