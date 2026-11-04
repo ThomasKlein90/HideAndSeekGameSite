@@ -4,11 +4,11 @@ This file is the short operational record for resuming work after a Copilot sess
 
 ## Current Snapshot
 
-- Last verified: 2026-10-14
+- Last verified: 2026-11-04
 - Repository: `ThomasKlein90/HideAndSeekGameSite`
 - Integration branch: `main`
-- Verified PR #39 (check-in retention result) merged and closed on 2026-10-14. Local `main` matches `origin/main` at `e1249c3`.
-- Current branch: `docs/verify-checkin-stale-status`, based on merged PR #39 (`e1249c3`).
+- Verified PR #40 (stale check-in display result) merged and closed on 2026-10-14. `origin/main` remains at `662d93a`, and includes PR #40.
+- Current branch: `feature/game-join-error-feedback`, based on `main` at `662d93a`. Join-error feedback implementation and tests are uncommitted; the previously prepared handoff update is also in the worktree.
 - Product stage: MTR, Tramways, Light Rail, ferries, district boundaries, island labels, map search, playable/no-go district selection, seeker status, manual station check-ins, and audited corrections are integrated in `main`.
 
 ## Implemented & Verified in Live Smoke Test
@@ -92,7 +92,31 @@ The two-account check-in smoke test passed creation/assignment, Seeker report vi
 
 The live stale-age UI is verified: a disposable Hider check-in remained visible and changed from Fresh to Stale after 19 minutes. The read-only query against the earlier completed smoke-test game also verified the Hider and Seeker rows remain stored.
 
-Next planned work: finish the four-player mobile smoke test and address reconnects, duplicate actions, and simultaneous updates in Phase 5. Ferry OSM refresh/pier coverage remains a parallel map-maintenance follow-up.
+## Current Development and Next Validation
+
+The current branch adds actionable join messages for unknown codes, full games,
+and network failures. Focused tests, lint, and production build pass. Check-in
+updates already use a database upsert, repeat joins return existing membership,
+and correction operations lock the report row. No schema change or Supabase
+action is part of this slice.
+
+The four-account smoke test on real mobile phones remains pending until the
+user is available. When run, use a disposable game; confirm join/team
+assignment, role-scoped check-in visibility, proximity advisories, and
+host-controlled phase changes. Note mobile layout, navigation, readability,
+touch-target, accessibility, and one-handed-use problems. No Supabase action
+is needed before this test. Record results in this handoff and `PROJECT_PLAN.md`.
+
+Continue the remaining Phase 5 reliability and error-feedback work afterward.
+The project has no join-code expiration field or behavior, so explicit
+"expired invite" handling needs a product decision rather than being inferred
+from an invalid code. The post-completion correction RPC denial remains
+untested. The question workflow is implemented, but the real seeker-question
+catalogue and exact question/card rules remain pending the group's authorized
+content and decisions. Broad branding/cosmetic polish can wait, but mobile
+usability and accessibility issues found in testing are functional and should
+be addressed. Ferry OSM refresh/pier coverage remains a parallel map-maintenance
+follow-up.
 
 ## Start-Of-Session Procedure
 
@@ -100,12 +124,12 @@ Next planned work: finish the four-player mobile smoke test and address reconnec
 2. Read this file, [PROJECT_PLAN.md](PROJECT_PLAN.md), and the repository instructions.
 3. Verify `origin/main` and create a focused branch from current `main`.
 4. The district-selection, check-in, and correction migrations were manually applied through Dashboard and verified via catalog queries. The migration-history table is absent, so reconcile CLI history before any `supabase db push`.
-5. Two-account check-in and correction smoke tests passed, and the live stale-age UI was confirmed after 19 minutes. The four-player mobile test remains. Continue Phase 5 reliability work. Do not add GPS, live location sharing, or automatic phase changes.
+5. Two-account check-in and correction smoke tests passed, and the live stale-age UI was confirmed after 19 minutes. The current uncommitted branch adds tested feedback for invalid/full game-code joins and network failures. Continue code-level Phase 5 reliability/error work while the four-account real-phone smoke test is deferred; when available, use a disposable game and check team assignment, role-scoped visibility, proximity advisories, host-controlled phase changes, and mobile usability/accessibility. No Supabase action is needed beforehand. The real seeker-question catalogue and exact question/card rules still need authorized content and group decisions. Do not add GPS, live location sharing, or automatic phase changes.
 
 ### Copy-ready restart prompt
 
 ```
-Resume from WORKSPACE_HANDOFF.md. Verify `origin/main` includes merged PR #39 (`e1249c3`). District-selection, station-check-in, and correction migrations were manually applied through Supabase Dashboard; catalog checks passed, but `supabase_migrations.schema_migrations` is absent, so do not run `supabase db push` until migration history is reconciled. Two-account check-in and correction smoke tests passed: role visibility/privacy, proximity, no automatic phase transition, correction before/after history, corrected report visible to the Seeker, and correction form disabled after ending the disposable game. SQL confirms Hider and Seeker rows remain after game completion. A separate disposable Hider check-in remained visible and was marked Stale after 19 minutes. Direct post-completion RPC denial was not separately invoked. Next complete the four-account mobile test and Phase 5 reconnect/duplicate/simultaneous-update reliability. Read relevant installed Next.js guidance before app edits, update plan/handoff, validate, commit, and push; the user creates and merges PRs separately.
+Resume from WORKSPACE_HANDOFF.md. Verify `origin/main` includes merged PR #40 (`662d93a`); current branch `feature/game-join-error-feedback` is based on that main and has uncommitted changes. The branch translates invalid/full join codes and network failures into actionable messages; `npm.cmd run test:game:errors`, `npm.cmd run lint`, and `npm.cmd run build` passed. No Supabase migration was added. District-selection, station-check-in, and correction migrations were manually applied through Supabase Dashboard; catalog checks passed, but `supabase_migrations.schema_migrations` is absent, so do not run `supabase db push` until migration history is reconciled. Two-account check-in/correction tests and the live stale-age check passed as documented above. Direct post-completion correction RPC denial remains untested. Continue Phase 5 code-level reliability/error work while the user defers the four-phone smoke test; when available, use a disposable game and record join/team assignment, role-scoped check-in visibility, proximity advisories, host-controlled phase changes, and mobile usability/accessibility in this handoff and `PROJECT_PLAN.md`. Join codes do not currently expire; do not claim a code is expired without a product decision or schema support. The real seeker-question catalogue and exact question/card rules remain pending authorized content and group decisions. Read relevant installed Next.js guidance before app edits. Validate, commit, and push focused changes; the user creates and merges PRs separately.
 ```
 
 Before ending a session, leave the worktree either clean on `main` after a
