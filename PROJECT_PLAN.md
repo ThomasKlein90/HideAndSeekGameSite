@@ -64,13 +64,41 @@ website. Update it as rules and priorities are agreed.
 ## Phase 3 - Seeker Question Board
 
 - [x] Create an editable placeholder question catalogue with category, card-reward rule, answer type, and active status.
-- [x] Display the six placeholder seeker categories: Matching, Measuring, Thermometer, Radar, Tentacles, and Photos.
+- [x] Display the six seeker categories with their agreed colors and draw/pick rewards; allow browsing multiple question templates within a category.
+- [x] Add nine fixed Radar distance questions and one custom-distance yes/no question; make each option available once per round.
+- [ ] Replace the remaining inactive category placeholders with the group's approved question catalogue and answer requirements.
+- [ ] After the current category/Radar feature is reviewed and merged, apply its migration through the Supabase Dashboard and verify the seeded catalogue and constraints.
+- [ ] Agree on the original prompts and answer/evidence requirements for Matching, Measuring, Thermometer, Tentacles, and Photos before implementing those categories.
+- [ ] After the remaining catalogue rules are agreed, evaluate automatic Radar answers from explicit location checkpoints, using the existing manual check-in system rather than continuous GPS tracking.
 - [x] Define the question-event data model, status values, access policies, and typed database contract.
 - [x] Let seekers submit a question after confirmation.
 - [x] Deliver pending questions to the Hider Team view.
 - [x] Store question status, answers, timestamps, and round history.
 - [x] Prevent accidental duplicate submissions while allowing admin corrections.
 - [x] Add seeker-only notes, pins, and eliminated-area annotations to the map.
+
+The six category colors and card draw/pick rules are recorded from the group's
+provided reference. Radar includes 400 m, 800 m, 1.5 km, 5 km, 8 km, 15 km,
+40 km, 80 km, 150 km, and a custom integer distance from 1 m to 150 km. Each
+Radar option can be asked once per round and is answered yes/no. Other category
+prompts remain inactive placeholders until approved question content is added.
+Do not copy card artwork or proprietary question text from the reference; use
+original question wording.
+
+### Next implementation order
+
+1. Review and merge the current category-board/Radar feature together with its
+   migration. The migration is not yet applied; apply and verify it manually
+   through the Supabase Dashboard after merge. Do not run `supabase db push`
+   until the existing manually-applied migration history is reconciled.
+2. Collect the group's original prompts and agree on answer formats, evidence
+   requirements, and card-reward behavior for the five remaining categories
+   before expanding their templates and interactions.
+3. Then scope automatic yes/no Radar checks based on explicit location
+   checkpoints already submitted through manual check-ins. Before implementing,
+   agree on eligible checkpoint sources, freshness, privacy/visibility, and
+   behavior when a checkpoint is missing or stale. This is not continuous GPS
+   tracking or live-location sharing.
 
 ## Phase 4 - Hider Dashboard
 

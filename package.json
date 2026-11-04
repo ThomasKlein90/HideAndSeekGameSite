@@ -15,6 +15,7 @@
     "test:map:islands": "node --test scripts/refresh-hk-island-labels.test.mjs",
     "test:game:check-ins": "node --test scripts/game-check-ins.test.mjs",
     "test:game:errors": "node --test scripts/game-errors.test.mjs",
+    "test:game:radar": "node --test scripts/radar-questions.test.mjs",
     "map:mtr:refresh": "node scripts/refresh-mtr-osm-data.mjs",
     "map:tram:refresh": "node scripts/refresh-hk-tramways-data.mjs",
     "map:light-rail:refresh": "node scripts/refresh-mtr-light-rail-data.mjs",
