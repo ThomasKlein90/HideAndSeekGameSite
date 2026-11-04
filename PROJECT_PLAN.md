@@ -95,6 +95,15 @@ website. Update it as rules and priorities are agreed.
 The join flow now gives actionable feedback for an unknown code, a full game,
 and network failures. Join codes currently have no expiration field or rule;
 define expiration behavior before adding an "expired invite" state.
+The check-in panel now refreshes after connectivity returns or the page becomes
+active, skips overlapping refresh requests, and warns when displayed reports
+may be out of date after a refresh failure. This does not complete the broader
+reconnect/duplicate/simultaneous-action reliability work.
+
+After this reliability slice, prioritize replacing the placeholder seeker
+question catalogue once the group supplies its authorized questions and rules.
+Review the question form, answer controls, and card-reward flow against that
+catalogue and adjust them where needed.
 
 The district-selection, check-in, and correction migrations were manually
 applied through the Supabase Dashboard and verified with catalog queries.

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import type { GameTeam } from "@/lib/supabase/database.types";
 import { GameCheckInCorrectionPanel } from "@/components/game-check-in-correction-panel";
@@ -89,45 +89,70 @@ export function GameCheckInPanel({
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [now, setNow] = useState(0);
+  const isLoadingCheckIns = useRef(false);
+  const lastResumeRefreshAt = useRef(0);
 
   const loadCheckIns = useCallback(
     async (showLoading = false) => {
+      if (isLoadingCheckIns.current) {
+        return;
+      }
+
+      isLoadingCheckIns.current = true;
       if (showLoading) {
         setIsLoading(true);
       }
-      setError("");
-      const supabase = createSupabaseBrowserClient();
-      const checkInsPromise = supabase
-        .from("game_checkins")
-        .select("game_id, user_id, team, station_code, checked_in_at")
-        .eq("game_id", gameId)
-        .order("checked_in_at", { ascending: false });
-      const settingsPromise =
-        team === "hiders"
-          ? supabase
-              .from("game_settings")
-              .select("final_hiding_radius_meters")
-              .eq("game_id", gameId)
-              .single()
-          : Promise.resolve(null);
-      const [checkInsResult, settingsResult] = await Promise.all([
-        checkInsPromise,
-        settingsPromise,
-      ]);
-      setIsLoading(false);
+      try {
+        const supabase = createSupabaseBrowserClient();
+        const checkInsPromise = supabase
+          .from("game_checkins")
+          .select("game_id, user_id, team, station_code, checked_in_at")
+          .eq("game_id", gameId)
+          .order("checked_in_at", { ascending: false });
+        const settingsPromise =
+          team === "hiders"
+            ? supabase
+                .from("game_settings")
+                .select("final_hiding_radius_meters")
+                .eq("game_id", gameId)
+                .single()
+            : Promise.resolve(null);
+        const [checkInsResult, settingsResult] = await Promise.all([
+          checkInsPromise,
+          settingsPromise,
+        ]);
 
-      if (checkInsResult.error) {
-        setError(checkInsResult.error.message);
-        return;
-      }
-      if (settingsResult && settingsResult.error) {
-        setError(settingsResult.error.message);
-        return;
-      }
+        if (checkInsResult.error) {
+          setError(
+            `Check-ins couldn't be refreshed. The displayed reports may be out of date. ${checkInsResult.error.message}`,
+          );
+          return;
+        }
+        if (settingsResult && settingsResult.error) {
+          setError(
+            `Check-ins couldn't be refreshed. The displayed reports may be out of date. ${settingsResult.error.message}`,
+          );
+          return;
+        }
 
-      setCheckIns(checkInsResult.data);
-      if (settingsResult?.data) {
-        setHidingRadiusMeters(settingsResult.data.final_hiding_radius_meters);
+        setCheckIns(checkInsResult.data);
+        if (settingsResult?.data) {
+          setHidingRadiusMeters(
+            settingsResult.data.final_hiding_radius_meters,
+          );
+        }
+        setError("");
+      } catch (refreshError) {
+        const details =
+          refreshError instanceof Error
+            ? refreshError.message
+            : "The game service could not be reached.";
+        setError(
+          `Check-ins couldn't be refreshed. The displayed reports may be out of date. ${details}`,
+        );
+      } finally {
+        isLoadingCheckIns.current = false;
+        setIsLoading(false);
       }
     },
     [gameId, team],
@@ -164,17 +189,41 @@ export function GameCheckInPanel({
     queueMicrotask(() => void loadCheckIns(true));
     queueMicrotask(() => setNow(Date.now()));
     const refreshInterval = window.setInterval(
-      () => void loadCheckIns(),
+      () => {
+        if (document.visibilityState === "visible") {
+          void loadCheckIns();
+        }
+      },
       REFRESH_INTERVAL_MILLISECONDS,
     );
     const clockInterval = window.setInterval(
       () => setNow(Date.now()),
       30 * 1000,
     );
+    const refreshWhenActive = () => {
+      if (document.visibilityState !== "visible") {
+        return;
+      }
+
+      const currentTime = Date.now();
+      if (currentTime - lastResumeRefreshAt.current < 5_000) {
+        return;
+      }
+
+      lastResumeRefreshAt.current = currentTime;
+      void loadCheckIns();
+    };
+
+    window.addEventListener("online", refreshWhenActive);
+    window.addEventListener("focus", refreshWhenActive);
+    document.addEventListener("visibilitychange", refreshWhenActive);
 
     return () => {
       window.clearInterval(refreshInterval);
       window.clearInterval(clockInterval);
+      window.removeEventListener("online", refreshWhenActive);
+      window.removeEventListener("focus", refreshWhenActive);
+      document.removeEventListener("visibilitychange", refreshWhenActive);
     };
   }, [loadCheckIns]);
 
