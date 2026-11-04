@@ -7,9 +7,9 @@ This file is the short operational record for resuming work after a Copilot sess
 - Last verified: 2026-11-04
 - Repository: `ThomasKlein90/HideAndSeekGameSite`
 - Integration branch: `main`
-- Verified PR #40 (stale check-in display result) merged and closed on 2026-10-14. `origin/main` remains at `662d93a`, and includes PR #40.
-- Verified PR #41 (game join error feedback) merged and closed on 2026-11-04. Local `main` matches `origin/main` at `d336e09`.
-- Current branch: `feature/check-in-reconnect-refresh`, based on merged PR #41 (`d336e09`). Reconnect/focus check-in refresh implementation and handoff updates are uncommitted.
+- Verified PR #42 (check-in reconnect refresh) merged and closed on 2026-11-04. Local `main` matches `origin/main` at `94a4f37`.
+- Current branch: `feature/seeker-question-category-board`, based on merged PR #42 (`94a4f37`), containing the category board and Radar implementation, migration, tests, and handoff updates.
+- Current branch validation: `npm.cmd run test:game:radar`, `npm.cmd run test:game:check-ins`, `npm.cmd run test:game:errors`, `npm.cmd run lint`, `npm.cmd run build`, and `git diff --check` all passed on 2026-11-04. The migration remains unapplied.
 - Product stage: MTR, Tramways, Light Rail, ferries, district boundaries, island labels, map search, playable/no-go district selection, seeker status, manual station check-ins, and audited corrections are integrated in `main`.
 
 ## Implemented & Verified in Live Smoke Test
@@ -95,13 +95,39 @@ The live stale-age UI is verified: a disposable Hider check-in remained visible 
 
 ## Current Development and Next Validation
 
-The merged PR #41 adds actionable join messages for unknown codes, full games,
-and network failures. Check-in updates already use a database upsert, repeat
-joins return existing membership, and correction operations lock the report
-row. The current branch refreshes check-ins when connectivity returns or the
-page becomes active, skips overlapping loads, and makes failed refreshes warn
-that displayed reports may be out of date. No schema change or Supabase action
-is part of this slice.
+PR #41 adds actionable join messages for unknown codes, full games, and network
+failures. PR #42 refreshes check-ins when connectivity returns or the page
+becomes active, skips overlapping loads, and warns when displayed reports may
+be out of date after refresh failure.
+
+The current branch presents all six seeker categories with the agreed colors
+and draw/pick rewards, and supports browsing multiple question templates in a
+category. Radar includes nine fixed yes/no distance prompts (400 m through
+150 km) and one custom yes/no distance from 1 m through 150 km. Radar prompts
+are limited to one use per template per round; the existing database unique
+index enforces that rule, and the Seeker UI marks already-used options. The
+new migration updates category rewards, deactivates all six old placeholders,
+adds the custom-distance fields
+and validation, and seeds the 10 Radar questions. It has not been applied to
+Supabase; do not use `supabase db push` because migration history is
+unreconciled. After review and merge, apply the migration manually through the
+Dashboard and verify it before using the updated board. Its insert policy also
+requires a Seeker-owned submission to be a pending event in the game's active
+round, so the per-round uniqueness index cannot be bypassed with a null or
+ended round.
+
+The screenshot is used only as reference for category names/colors and reward
+counts. The Radar question wording was supplied by the user. Do not copy card
+artwork or proprietary question wording. Next steps, in order: review and merge
+this feature together with its migration; apply and verify that migration
+manually through the Supabase Dashboard; then obtain the group's original
+Matching, Measuring, Thermometer, Tentacles, and Photos question content and
+confirm answer/evidence requirements before implementing those categories.
+After those catalogue rules are agreed, scope automatic Radar answers using
+explicit checkpoints from the existing manual check-in system. Agree on
+eligible checkpoint sources, freshness, privacy/visibility, and missing/stale
+behavior first. This must not introduce continuous GPS tracking or
+live-location sharing. The four-account mobile smoke test remains deferred.
 
 The four-account smoke test on real mobile phones remains pending until the
 user is available. When run, use a disposable game; confirm join/team
@@ -110,17 +136,15 @@ host-controlled phase changes. Note mobile layout, navigation, readability,
 touch-target, accessibility, and one-handed-use problems. No Supabase action
 is needed before this test. Record results in this handoff and `PROJECT_PLAN.md`.
 
-After this reliability slice, prioritize implementing the real seeker-question
-catalogue when the group supplies its authorized list and question/card rules.
-Review the current question submission, answer, and reward flows against the
-catalogue and adjust functionality as needed. The four-account smoke test on
-real mobile phones remains deferred until the user is available. The project
-has no join-code expiration field or behavior, so explicit "expired invite"
-handling needs a product decision rather than being inferred from an invalid
-code. The post-completion correction RPC denial remains untested. Broad
-branding/cosmetic polish can wait, but mobile usability and accessibility
-issues found in testing are functional and should be addressed. Ferry OSM
-refresh/pier coverage remains a parallel map-maintenance follow-up.
+After the ordered question-catalogue and checkpoint-based Radar follow-ups,
+review submission, answer, and reward behavior with the group. The four-account
+smoke test on real mobile phones remains deferred until the user is available.
+The project has no join-code expiration field or behavior, so explicit
+"expired invite" handling needs a product decision rather than being inferred
+from an invalid code. The post-completion correction RPC denial remains
+untested. Broad branding/cosmetic polish can wait, but mobile usability and
+accessibility issues found in testing are functional and should be addressed.
+Ferry OSM refresh/pier coverage remains a parallel map-maintenance follow-up.
 
 ## Start-Of-Session Procedure
 
@@ -128,12 +152,12 @@ refresh/pier coverage remains a parallel map-maintenance follow-up.
 2. Read this file, [PROJECT_PLAN.md](PROJECT_PLAN.md), and the repository instructions.
 3. Verify `origin/main` and create a focused branch from current `main`.
 4. The district-selection, check-in, and correction migrations were manually applied through Dashboard and verified via catalog queries. The migration-history table is absent, so reconcile CLI history before any `supabase db push`.
-5. Two-account check-in and correction smoke tests passed, and the live stale-age UI was confirmed after 19 minutes. PR #41 merged the tested join-error feedback. The current uncommitted branch adds check-in refresh on reconnect/page return and warns when displayed reports may be stale after a failed refresh. Continue code-level Phase 5 reliability/error work while the four-account real-phone smoke test is deferred; when available, use a disposable game and check team assignment, role-scoped visibility, proximity advisories, host-controlled phase changes, and mobile usability/accessibility. No Supabase action is needed beforehand. After this reliability slice, prioritize implementing the real question catalogue and adjusting its submission/answer/reward functionality based on authorized questions and group rules. Do not add GPS, live location sharing, or automatic phase changes.
+5. Two-account check-in/correction tests and the live stale-age UI passed. PR #41 added join-error feedback; PR #42 added reconnect/page-return check-in refresh and stale-data warnings. Current branch `feature/seeker-question-category-board` adds the six agreed categories, reward rules, multi-template browsing, and 10 user-specified Radar questions with custom distance and once-per-round availability. Review and merge its code and migration together; then apply and verify the migration manually through the Dashboard. Do not run `supabase db push` until migration history is reconciled. Next collect the remaining categories' original prompts and requirements, then scope automatic Radar checks against explicit manual location checkpoints with agreed freshness and privacy behavior. Do not introduce continuous GPS/live-location sharing or automatic phase changes. The four-phone smoke test remains deferred.
 
 ### Copy-ready restart prompt
 
 ```
-Resume from WORKSPACE_HANDOFF.md. Verify `origin/main` includes PR #41 (`d336e09`). Current branch `feature/check-in-reconnect-refresh` is based on it and has uncommitted reconnect-refresh changes. The check-in panel now refreshes on online, focus, and visibility return, avoids overlapping requests, and reports when displayed check-ins may be out of date after a failed refresh. Validate focused tests, lint, and build before committing/pushing; no Supabase action is needed. PR #41 added actionable feedback for invalid/full game codes and network failures. District-selection, station-check-in, and correction migrations were manually applied through Supabase Dashboard; catalog checks passed, but `supabase_migrations.schema_migrations` is absent, so do not run `supabase db push` until migration history is reconciled. Two-account check-in/correction tests and the live stale-age check passed as documented above. Direct post-completion correction RPC denial remains untested. The four-phone smoke test is deferred; when run, use a disposable game and record join/team assignment, role-scoped check-in visibility, proximity advisories, host-controlled phase changes, and mobile usability/accessibility in this handoff and `PROJECT_PLAN.md`. After this reliability slice, prioritize implementing the real seeker-question catalogue and adjusting question submission, answering, and reward flows based on authorized content and group decisions. Join codes do not currently expire; do not claim a code is expired without a product decision or schema support. Read relevant installed Next.js guidance before app edits. Validate, commit, and push focused changes; the user creates and merges PRs separately.
+Resume from WORKSPACE_HANDOFF.md. Verify `origin/main` includes PR #42 (`94a4f37`). Current branch `feature/seeker-question-category-board` contains the category-board, Radar, migration, tests, and docs changes. It shows six categories with supplied colors/rewards, supports multiple templates per category, and adds nine fixed Radar yes/no ranges plus a custom 1 m–150 km distance; each option is usable once per round. The migration adds the custom-distance fields/validation, updates rewards, deactivates old placeholders, and inserts Radar prompts. The focused Radar and regression tests, lint, build, and diff checks passed. The migration is not applied; review and merge code and migration together, then apply manually through Dashboard. Do not run `supabase db push` because `supabase_migrations.schema_migrations` is absent and history is unreconciled. Next, agree on original content and requirements for the remaining categories, then scope automatic Radar answers from explicit manual location checkpoints, including freshness/privacy and missing/stale behavior; do not add continuous GPS tracking. Use category names/colors/reward counts from the reference only; do not reproduce card art or proprietary prompts. Existing two-account check-in/correction and stale-age tests passed; the four-phone smoke test remains deferred. Direct post-completion correction RPC denial remains untested. Join codes do not expire. Read relevant installed Next.js guidance before further app edits. Validate, commit, and push; the user creates and merges PRs separately.
 ```
 
 Before ending a session, leave the worktree either clean on `main` after a

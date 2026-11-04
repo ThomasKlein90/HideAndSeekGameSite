@@ -364,6 +364,7 @@ export type Database = {
           id: string;
           is_active: boolean;
           prompt: string;
+          requires_distance_input: boolean;
           reward_rule: string;
           sort_order: number;
           title: string;
@@ -376,6 +377,7 @@ export type Database = {
           id?: string;
           is_active?: boolean;
           prompt: string;
+          requires_distance_input?: boolean;
           reward_rule?: string;
           sort_order: number;
           title: string;
@@ -394,6 +396,7 @@ export type Database = {
           game_id: string;
           id: string;
           question_template_id: string;
+          radar_distance_meters: number | null;
           reward_logged_at: string | null;
           reward_logged_by: string | null;
           reward_note: string | null;
@@ -410,6 +413,7 @@ export type Database = {
           game_id: string;
           id?: string;
           question_template_id: string;
+          radar_distance_meters?: number | null;
           reward_logged_at?: string | null;
           reward_logged_by?: string | null;
           reward_note?: string | null;

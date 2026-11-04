@@ -6,15 +6,18 @@ import type {
   CardLogStatus,
   QuestionAnswerType,
 } from "@/lib/supabase/database.types";
+import { formatRadarDistance } from "@/lib/radar-questions.mjs";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 type PendingQuestion = {
   id: string;
   created_at: string;
+  radar_distance_meters: number | null;
   question_templates: {
     title: string;
     prompt: string;
     answer_type: QuestionAnswerType;
+    requires_distance_input: boolean;
     reward_rule: string;
   } | null;
 };
@@ -55,7 +58,7 @@ export function HiderQuestionBoard({ gameId, userId }: HiderQuestionBoardProps) 
     const { data, error: loadError } = await supabase
       .from("question_events")
       .select(
-        "id, created_at, question_templates(title, prompt, answer_type, reward_rule)",
+        "id, created_at, radar_distance_meters, question_templates(title, prompt, answer_type, requires_distance_input, reward_rule)",
       )
       .eq("game_id", gameId)
       .eq("status", "pending")
@@ -236,7 +239,12 @@ export function HiderQuestionBoard({ gameId, userId }: HiderQuestionBoardProps) 
             <article className="hider-question" key={question.id}>
               <p className="eyebrow">Pending question</p>
               <h3>{question.question_templates?.title ?? "Question"}</h3>
-              <p>{question.question_templates?.prompt}</p>
+              <p>
+                {question.question_templates?.requires_distance_input &&
+                question.radar_distance_meters !== null
+                  ? `Am I within ${formatRadarDistance(question.radar_distance_meters)} of you?`
+                  : question.question_templates?.prompt}
+              </p>
               <dl>
                 <div>
                   <dt>Answer format</dt>
@@ -308,7 +316,7 @@ export function HiderQuestionBoard({ gameId, userId }: HiderQuestionBoardProps) 
                       [question.id]: event.target.value,
                     }))
                   }
-                  placeholder="For example: draw 1, keep 1"
+                  placeholder="For example: card names or choices received"
                 />
                 <button
                   className="button button-primary"
