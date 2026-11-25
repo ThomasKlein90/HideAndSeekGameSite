@@ -1,0 +1,2 @@
+# Needed to read OSM PBF snapshots when refreshing elevation-bearing map data.
+osmium>=4.0,<5

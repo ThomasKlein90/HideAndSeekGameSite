@@ -1,0 +1,31 @@
+{
+  "description": "Print-only game selection, based on the numbered focused POI draft. The shared web dataset is unchanged.",
+  "source": "https://download.geofabrik.de/asia/china/hong-kong.html",
+  "extractedAt": "2026-11-22T21:20:48Z",
+  "groups": [
+    {
+      "name": "Tai Mo Shan area",
+      "keep": 1852935107,
+      "remove": [11619360171, 9518540500, 9518784260, 4040138591, 1305380614, 4513239598, 9555420685, 11001815737, 1895738510, 1167751507, 11625826437, 10587277722, 10063916088, 10052506652, 9555884267, 10563568720, 10563501815, 9555420684, 9617213780, 9521393941, 9617213777, 10563501814, 10563501813, 10591624219, 9555420687, 9617213784, 9601752220, 4040133553, 1505154253, 7874362707]
+    },
+    {
+      "name": "Ma On Shan area",
+      "keep": 714977855,
+      "remove": [1227752757, 1227755218, 9612625666, 12121421075, 9597789966, 9946354255, 2196036418, 3732785700]
+    },
+    {
+      "name": "Tate's Cairn (previous 17 and 24)",
+      "keep": 1167607524,
+      "remove": [9520155392]
+    },
+    {
+      "name": "Buffalo Hill (previous 1, 45 and 48)",
+      "keep": 1263051656,
+      "remove": [1263051657, 9520155416]
+    }
+  ],
+  "exceptions": [
+    {"name": "Lion Rock", "osmNodeId": 1167628556, "elevationMetres": 495, "coordinates": [114.1871656, 22.3530064]},
+    {"name": "Beacon Hill", "osmNodeId": 5437296836, "elevationMetres": 457, "coordinates": [114.17039, 22.349754]}
+  ]
+}

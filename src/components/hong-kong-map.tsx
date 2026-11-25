@@ -16,17 +16,25 @@ import {
   GeoJSON,
   LayersControl,
   MapContainer,
+  Marker,
   TileLayer,
   Tooltip,
   useMap,
   ZoomControl,
 } from "react-leaflet";
+import { divIcon, Marker as LeafletMarker } from "leaflet";
 import {
   type FerryRouteProperties,
   type FerryTerminalProperties,
   type HongKongFerryFeatureCollection,
   type HongKongDistrictFeatureCollection,
   type HongKongIslandLabelFeatureCollection,
+  type HongKongNamedPlaces,
+  type HongKongHighSpeedRail,
+  type HongKongMountainPeaks,
+  type HongKongParks,
+  NAMED_PLACE_CATEGORIES,
+  type NamedPlaceCategory,
   mtrDataSource,
   type HongKongTramwaysFeatureCollection,
   type LightRailRouteProperties,
@@ -41,6 +49,22 @@ import {
 } from "@/data/mtr-reference";
 
 const hongKongCenter: [number, number] = [22.3193, 114.1694];
+
+const namedPlaceStyles: Record<
+  Exclude<NamedPlaceCategory, "landmass">,
+  { label: string; color: string; symbol: string }
+> = {
+  airport: { label: "Airport", color: "#12618a", symbol: "A" },
+  "high-speed station": { label: "High-speed rail station", color: "#6d447e", symbol: "R" },
+  "amusement park": { label: "Amusement parks", color: "#b45732", symbol: "P" },
+  aquarium: { label: "Aquariums", color: "#087c92", symbol: "Q" },
+  zoo: { label: "Zoo", color: "#31704f", symbol: "Z" },
+  golf: { label: "Golf courses (approximate)", color: "#756522", symbol: "G" },
+  museum: { label: "Museums (selected)", color: "#893b75", symbol: "U" },
+  cinema: { label: "Cinemas (selected)", color: "#9b3970", symbol: "C" },
+  hospital: { label: "Hospitals (selected)", color: "#bd3030", symbol: "H" },
+  library: { label: "Libraries (selected)", color: "#793b91", symbol: "L" },
+};
 
 type MapSearchResult = {
   id: string;
@@ -424,6 +448,172 @@ function isHongKongIslandLabelData(
   );
 }
 
+function isHongKongNamedPlaces(value: unknown): value is HongKongNamedPlaces {
+  if (
+    !isRecord(value) ||
+    value.type !== "FeatureCollection" ||
+    value.license !== "ODbL-1.0" ||
+    typeof value.attribution !== "string" ||
+    typeof value.source !== "string" ||
+    typeof value.retrievedOn !== "string" ||
+    typeof value.scope !== "string" ||
+    !Array.isArray(value.features)
+  ) return false;
+
+  return value.features.every((feature: unknown) => {
+    if (!isRecord(feature) || feature.type !== "Feature" ||
+        !isRecord(feature.properties) || !isRecord(feature.geometry)) return false;
+    const category = feature.properties.category;
+    return (
+      feature.geometry.type === "Point" &&
+      isPosition(feature.geometry.coordinates) &&
+      typeof feature.properties.name === "string" &&
+      typeof feature.properties.osmElementId === "string" &&
+      (category !== "hospital" || (
+        typeof feature.properties.beds === "number" &&
+        Number.isFinite(feature.properties.beds) &&
+        feature.properties.beds >= 500 &&
+        typeof feature.properties.bedBasis === "string" &&
+        typeof feature.properties.bedSource === "string"
+      )) &&
+      (category !== "library" || (
+        (feature.properties.libraryClass === "central" ||
+          feature.properties.libraryClass === "major" ||
+          (feature.properties.libraryClass === "district" &&
+            ((typeof feature.properties.listedFloors === "number" &&
+              Number.isInteger(feature.properties.listedFloors) &&
+              feature.properties.listedFloors >= 2) ||
+             (typeof feature.properties.areaSquareMetres === "number" &&
+              Number.isFinite(feature.properties.areaSquareMetres) &&
+              feature.properties.areaSquareMetres >= 1600)))) &&
+        (feature.properties.areaSquareMetres === undefined || (
+          typeof feature.properties.areaSquareMetres === "number" &&
+          Number.isFinite(feature.properties.areaSquareMetres) &&
+          feature.properties.areaSquareMetres > 0 &&
+          typeof feature.properties.areaBasis === "string" &&
+          typeof feature.properties.areaSource === "string"
+        ))
+      )) &&
+      NAMED_PLACE_CATEGORIES.some((candidate) => candidate === category)
+    );
+  });
+}
+
+function isHongKongHighSpeedRail(value: unknown): value is HongKongHighSpeedRail {
+  if (
+    !isRecord(value) || value.type !== "FeatureCollection" ||
+    value.license !== "ODbL-1.0" ||
+    typeof value.attribution !== "string" ||
+    typeof value.source !== "string" ||
+    typeof value.relationVersion !== "string" ||
+    typeof value.relationTimestamp !== "string" ||
+    typeof value.relationRetrievedOn !== "string" ||
+    typeof value.geometryExtractDownloadedOn !== "string" ||
+    typeof value.geometrySource !== "string" ||
+    typeof value.scope !== "string" ||
+    !Array.isArray(value.features) || value.features.length !== 1
+  ) return false;
+  return value.features.every((feature: unknown) => {
+    if (!isRecord(feature) || feature.type !== "Feature" ||
+        !isRecord(feature.properties) || !isRecord(feature.geometry)) return false;
+    return (
+      typeof feature.properties.name === "string" &&
+      typeof feature.properties.osmRelationId === "number" &&
+      Array.isArray(feature.properties.osmWayIds) &&
+      feature.properties.osmWayIds.every((id: unknown) => typeof id === "number") &&
+      feature.geometry.type === "MultiLineString" &&
+      Array.isArray(feature.geometry.coordinates) &&
+      feature.geometry.coordinates.length > 0 &&
+      feature.geometry.coordinates.every((line: unknown) =>
+        Array.isArray(line) && line.length >= 2 && line.every(isPosition))
+    );
+  });
+}
+
+function isHongKongMountainPeaks(value: unknown): value is HongKongMountainPeaks {
+  if (
+    !isRecord(value) || value.type !== "FeatureCollection" ||
+    value.license !== "ODbL-1.0" ||
+    typeof value.attribution !== "string" ||
+    typeof value.source !== "string" ||
+    typeof value.extractedAt !== "string" ||
+    typeof value.districtExtractedAt !== "string" ||
+    typeof value.scope !== "string" ||
+    !Number.isInteger(value.peakNodesInScope) ||
+    !Number.isInteger(value.missingElevation) ||
+    !Number.isInteger(value.unusableElevation) ||
+    !Array.isArray(value.features)
+  ) return false;
+  return value.features.every((feature: unknown) =>
+    isRecord(feature) && feature.type === "Feature" &&
+    isRecord(feature.properties) && isRecord(feature.geometry) &&
+    feature.geometry.type === "Point" && isPosition(feature.geometry.coordinates) &&
+    typeof feature.properties.name === "string" &&
+    typeof feature.properties.elevationMetres === "number" &&
+    Number.isFinite(feature.properties.elevationMetres) &&
+    feature.properties.elevationMetres > 500 &&
+    Number.isInteger(feature.properties.osmNodeId),
+  );
+}
+
+function isHongKongParks(value: unknown): value is HongKongParks {
+  if (
+    !isRecord(value) || value.type !== "FeatureCollection" ||
+    value.license !== "ODbL-1.0" ||
+    typeof value.attribution !== "string" ||
+    typeof value.source !== "string" ||
+    typeof value.extractedAt !== "string" ||
+    typeof value.districtExtractedAt !== "string" ||
+    typeof value.scope !== "string" ||
+    !Number.isInteger(value.duplicateAreasRemoved) ||
+    !Array.isArray(value.features)
+  ) return false;
+  return value.features.every((feature: unknown) =>
+    isRecord(feature) && feature.type === "Feature" &&
+    isRecord(feature.properties) && isRecord(feature.geometry) &&
+    feature.geometry.type === "Point" && isPosition(feature.geometry.coordinates) &&
+    typeof feature.properties.name === "string" &&
+    (feature.properties.parkType === "urban" || feature.properties.parkType === "country") &&
+    typeof feature.properties.areaHectares === "number" &&
+    Number.isFinite(feature.properties.areaHectares) &&
+    feature.properties.areaHectares > 5 &&
+    typeof feature.properties.osmElementId === "string",
+  );
+}
+
+function PlacePin({ position, name, category, color, symbol }: {
+  position: [number, number];
+  name: string;
+  category: string;
+  color: string;
+  symbol: string;
+}) {
+  const label = `${name} (${category})`;
+  return (
+    <Marker
+      position={position}
+      title={label}
+      alt={label}
+      eventHandlers={{
+        add: (event) => {
+          if (event.target instanceof LeafletMarker) {
+            event.target.getElement()?.setAttribute("aria-label", label);
+          }
+        },
+      }}
+      icon={divIcon({
+        className: "named-place-icon",
+        html: `<span style="background-color:${color}"><b>${symbol}</b></span>`,
+        iconSize: [26, 30],
+        iconAnchor: [13, 30],
+        tooltipAnchor: [0, -27],
+      })}
+    >
+      <Tooltip>{label}</Tooltip>
+    </Marker>
+  );
+}
+
 function makeFeatureCollection<
   G extends MultiLineString | MultiPolygon | Point,
   P extends GeoJsonProperties,
@@ -490,7 +680,9 @@ function IslandLabels({
 
   if (zoom < 13) return null;
 
-  return features.map((feature) => {
+  return features.filter((feature) =>
+    !["Hong Kong Island", "Tsing Yi", "Ap Lei Chau"].includes(feature.properties.name),
+  ).map((feature) => {
     const [longitude, latitude] = feature.geometry.coordinates;
 
     return (
@@ -554,6 +746,14 @@ export function HongKongMap() {
     useState<HongKongDistrictFeatureCollection | null>(null);
   const [islandLabelData, setIslandLabelData] =
     useState<HongKongIslandLabelFeatureCollection | null>(null);
+  const [namedPlaces, setNamedPlaces] = useState<HongKongNamedPlaces | null>(null);
+  const [namedPlacesError, setNamedPlacesError] = useState<string | null>(null);
+  const [highSpeedRail, setHighSpeedRail] = useState<HongKongHighSpeedRail | null>(null);
+  const [highSpeedRailError, setHighSpeedRailError] = useState<string | null>(null);
+  const [mountainPeaks, setMountainPeaks] = useState<HongKongMountainPeaks | null>(null);
+  const [mountainPeaksError, setMountainPeaksError] = useState<string | null>(null);
+  const [parks, setParks] = useState<HongKongParks | null>(null);
+  const [parksError, setParksError] = useState<string | null>(null);
   const [stationValidation, setStationValidation] =
     useState<MtrStationValidation | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -562,6 +762,82 @@ export function HongKongMap() {
   const [mapSearchOpen, setMapSearchOpen] = useState(false);
   const [selectedMapLocation, setSelectedMapLocation] =
     useState<MapSearchResult | null>(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    async function loadNamedPlaces() {
+      setNamedPlacesError(null);
+      try {
+        const response = await fetch("/data/hong-kong-named-places.geojson", { signal: controller.signal });
+        if (!response.ok) throw new Error(`Named places request failed (${response.status}).`);
+        const data: unknown = await response.json();
+        if (!isHongKongNamedPlaces(data)) throw new Error("Named places GeoJSON is invalid.");
+        setNamedPlaces(data);
+      } catch (error) {
+        if (controller.signal.aborted) return;
+        setNamedPlacesError(error instanceof Error ? error.message : "Named places could not be loaded.");
+      }
+    }
+    void loadNamedPlaces();
+    return () => controller.abort();
+  }, [retryCount]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    async function loadParks() {
+      setParksError(null);
+      try {
+        const response = await fetch("/data/hong-kong-parks.geojson", { signal: controller.signal });
+        if (!response.ok) throw new Error(`Parks request failed (${response.status}).`);
+        const data: unknown = await response.json();
+        if (!isHongKongParks(data)) throw new Error("Parks GeoJSON is invalid.");
+        setParks(data);
+      } catch (error) {
+        if (controller.signal.aborted) return;
+        setParksError(error instanceof Error ? error.message : "Parks could not be loaded.");
+      }
+    }
+    void loadParks();
+    return () => controller.abort();
+  }, [retryCount]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    async function loadMountainPeaks() {
+      setMountainPeaksError(null);
+      try {
+        const response = await fetch("/data/hong-kong-mountain-peaks.geojson", { signal: controller.signal });
+        if (!response.ok) throw new Error(`Mountain peaks request failed (${response.status}).`);
+        const data: unknown = await response.json();
+        if (!isHongKongMountainPeaks(data)) throw new Error("Mountain peaks GeoJSON is invalid.");
+        setMountainPeaks(data);
+      } catch (error) {
+        if (controller.signal.aborted) return;
+        setMountainPeaksError(error instanceof Error ? error.message : "Mountain peaks could not be loaded.");
+      }
+    }
+    void loadMountainPeaks();
+    return () => controller.abort();
+  }, [retryCount]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    async function loadHighSpeedRail() {
+      setHighSpeedRailError(null);
+      try {
+        const response = await fetch("/data/hong-kong-high-speed-rail.geojson", { signal: controller.signal });
+        if (!response.ok) throw new Error(`High-speed railway request failed (${response.status}).`);
+        const data: unknown = await response.json();
+        if (!isHongKongHighSpeedRail(data)) throw new Error("High-speed railway GeoJSON is invalid.");
+        setHighSpeedRail(data);
+      } catch (error) {
+        if (controller.signal.aborted) return;
+        setHighSpeedRailError(error instanceof Error ? error.message : "High-speed railway could not be loaded.");
+      }
+    }
+    void loadHighSpeedRail();
+    return () => controller.abort();
+  }, [retryCount]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -854,6 +1130,39 @@ export function HongKongMap() {
             zoom: 12,
           };
         }),
+        ...(namedPlaces?.features ?? []).map((feature): MapSearchResult => {
+          const [longitude, latitude] = feature.geometry.coordinates;
+          return {
+            id: `place-${feature.properties.osmElementId}`,
+            name: feature.properties.name,
+            category: feature.properties.category === "landmass"
+              ? "Landmass"
+              : namedPlaceStyles[feature.properties.category].label,
+            searchTerms: [feature.properties.name],
+            position: [latitude, longitude],
+            zoom: feature.properties.category === "landmass" ? 12 : 15,
+          };
+        }),
+        ...(mountainPeaks?.features ?? [])
+          .filter((feature) => feature.properties.name !== "Unnamed peak")
+          .map((feature): MapSearchResult => ({
+            id: `peak-${feature.properties.osmNodeId}`,
+            name: feature.properties.name,
+            category: `Mountain peak (${feature.properties.elevationMetres} m)`,
+            searchTerms: [feature.properties.name],
+            position: [feature.geometry.coordinates[1], feature.geometry.coordinates[0]],
+            zoom: 15,
+          })),
+        ...(parks?.features ?? [])
+          .filter((feature) => feature.properties.name !== "Unnamed park")
+          .map((feature): MapSearchResult => ({
+            id: `park-${feature.properties.osmElementId}`,
+            name: feature.properties.name,
+            category: feature.properties.parkType === "country" ? "Country park" : "Urban park",
+            searchTerms: [feature.properties.name],
+            position: [feature.geometry.coordinates[1], feature.geometry.coordinates[0]],
+            zoom: 14,
+          })),
       ].filter(
         (result, index, results) =>
           results.findIndex(
@@ -869,6 +1178,9 @@ export function HongKongMap() {
       ferryTerminalFeatures,
       islandLabelFeatures,
       lightRailStopFeatures,
+      namedPlaces,
+      mountainPeaks,
+      parks,
       stationFeatures,
       tramStopFeatures,
     ],
@@ -981,8 +1293,32 @@ export function HongKongMap() {
       </div>
       <p className="map-description">
         Explore OpenStreetMap-derived transit routes, Hong Kong’s 18 district
-        boundaries, and major island labels. Toggle each layer independently.
+        boundaries, island labels and selected places. Toggle each layer independently.
       </p>
+      {namedPlacesError && (
+        <p role="alert" className="map-source-note">
+          Named places unavailable: {namedPlacesError}{" "}
+          <button type="button" onClick={() => setRetryCount((count) => count + 1)}>Retry map data</button>
+        </p>
+      )}
+      {highSpeedRailError && (
+        <p role="alert" className="map-source-note">
+          High-speed railway unavailable: {highSpeedRailError}{" "}
+          <button type="button" onClick={() => setRetryCount((count) => count + 1)}>Retry map data</button>
+        </p>
+      )}
+      {mountainPeaksError && (
+        <p role="alert" className="map-source-note">
+          Mountain peaks unavailable: {mountainPeaksError}{" "}
+          <button type="button" onClick={() => setRetryCount((count) => count + 1)}>Retry map data</button>
+        </p>
+      )}
+      {parksError && (
+        <p role="alert" className="map-source-note">
+          Parks unavailable: {parksError}{" "}
+          <button type="button" onClick={() => setRetryCount((count) => count + 1)}>Retry map data</button>
+        </p>
+      )}
       <form
         className="map-search"
         onSubmit={(event) => {
@@ -998,7 +1334,7 @@ export function HongKongMap() {
         <label htmlFor="hong-kong-map-search">Search map locations</label>
         <p id="hong-kong-map-search-help" className="map-search-help">
           Search the loaded stations, stops, ferry terminals, districts, and
-          islands by name or code. Street addresses are not included.
+          islands, selected places, parks and named mountain peaks by name or code. Street addresses are not included.
         </p>
         <div className="map-search-controls">
           <input
@@ -1154,6 +1490,69 @@ export function HongKongMap() {
                 <FeatureGroup>
                   <IslandLabels features={islandLabelFeatures} />
                 </FeatureGroup>
+              </LayersControl.Overlay>
+            )}
+            {namedPlaces && (
+              <>
+                {(Object.entries(namedPlaceStyles) as Array<[Exclude<NamedPlaceCategory, "landmass">, (typeof namedPlaceStyles)[Exclude<NamedPlaceCategory, "landmass">]]>).map(([category, style]) => (
+                  <LayersControl.Overlay checked key={category} name={style.label}>
+                    <FeatureGroup>
+                      {namedPlaces.features.filter((feature) => feature.properties.category === category).map((feature) => (
+                        <PlacePin
+                          key={feature.properties.osmElementId}
+                          position={[feature.geometry.coordinates[1], feature.geometry.coordinates[0]]}
+                          name={feature.properties.name}
+                          category={style.label}
+                          color={style.color}
+                          symbol={style.symbol}
+                        />
+                      ))}
+                    </FeatureGroup>
+                  </LayersControl.Overlay>
+                ))}
+              </>
+            )}
+            {mountainPeaks && (
+              <LayersControl.Overlay checked name="Mountain peaks above 500 m (OSM, incomplete)">
+                <FeatureGroup>
+                  {mountainPeaks.features.map((feature) => (
+                    <PlacePin
+                      key={feature.properties.osmNodeId}
+                      position={[feature.geometry.coordinates[1], feature.geometry.coordinates[0]]}
+                      name={`${feature.properties.name} — ${feature.properties.elevationMetres} m`}
+                      category="Mountain peak"
+                      color="#5f5345"
+                      symbol="M"
+                    />
+                  ))}
+                </FeatureGroup>
+              </LayersControl.Overlay>
+            )}
+            {parks && (
+              <LayersControl.Overlay checked name="Urban and country parks above 5 ha (OSM, incomplete)">
+                <FeatureGroup>
+                  {parks.features.map((feature) => (
+                    <PlacePin
+                      key={feature.properties.osmElementId}
+                      position={[feature.geometry.coordinates[1], feature.geometry.coordinates[0]]}
+                      name={`${feature.properties.name} — ${feature.properties.areaHectares.toFixed(2)} ha`}
+                      category={feature.properties.parkType === "country" ? "Country park" : "Urban park"}
+                      color="#258366"
+                      symbol="K"
+                    />
+                  ))}
+                </FeatureGroup>
+              </LayersControl.Overlay>
+            )}
+            {highSpeedRail && (
+              <LayersControl.Overlay checked name="High-speed railway (Hong Kong section)">
+                <GeoJSON
+                  data={highSpeedRail}
+                  style={() => ({ color: "#6d447e", weight: 3, opacity: 0.9, dashArray: "6 4" })}
+                  onEachFeature={(feature, layer) => {
+                    layer.bindTooltip(feature.properties?.name ?? "High-speed railway");
+                  }}
+                />
               </LayersControl.Overlay>
             )}
             {tramData && (
@@ -1330,6 +1729,10 @@ export function HongKongMap() {
           routes and terminals
         </span>
         <span>
+          <i className="legend-swatch legend-swatch-high-speed" /> High-speed railway
+          (Hong Kong section)
+        </span>
+        <span>
           <i className="legend-swatch legend-swatch-district" /> District
           boundaries
         </span>
@@ -1366,9 +1769,58 @@ export function HongKongMap() {
         {islandLabelData?.extractedAt
           ? `, extracted ${islandLabelData.extractedAt}`
           : ""}
-        . The curated set includes 24 named islands and is shown from zoom 13
-        to limit label overlap. Labels are for map orientation, not a complete
+        . The curated set includes 24 named islands. The app overlay displays
+        other islands from zoom 13; Hong Kong Island, Tsing Yi and Ap Lei Chau
+        are reserved for the print map. Labels are for orientation, not a complete
         inventory of every island or islet.
+      </p>
+      <p className="map-source-note">
+        Selected named places use OpenStreetMap locations, including{" "}
+        <a href="https://nominatim.openstreetmap.org/" target="_blank" rel="noreferrer">Nominatim</a>{" "}
+        (most retrieved {namedPlaces?.retrievedOn ?? "loading"}). Hospital
+        positions also use the local OSM extract. Area-derived points
+        are approximate representatives, not entrances. The Eden and New courses
+        share an approximate Fanling site pin; Discovery Bay Ruby and Diamond
+        share a club pin. Individual course positions are not verified.
+        Museums follow the selected game list, not an attendance threshold;
+        the Oil Street pin is an approximate location at Oi! Warehouse.
+        Cinemas follow the selected game list; some pins use approximate
+        mall locations. The ONE cinema names share one site pin.
+        Cube O Discovery Park uses an approximate Plaza 88 location.
+        Hospitals are a provisional selection of reported capacities of at least
+        500 beds; dates and bed definitions differ. Ruttonjee and Tang Shiu Kin
+        are reported together and shown at Ruttonjee. The hospital selection may
+        omit qualifying private hospitals.
+        Libraries use{" "}
+        <a href="https://www.hkpl.gov.hk/en/common/attachments/about-us/services/library_list_eng.pdf" target="_blank" rel="noreferrer">HKPL&apos;s 2023 categories and listed floors</a>{" "}
+        plus selected historical areas as a provisional size proxy, not a ranking
+        by floor area.
+        Pin letters: A airport, R high-speed station, P amusement park, Z zoo,
+        Q aquarium, G golf course, U museum, C cinema, H hospital, L library,
+        M mountain peak, and K park.
+      </p>
+      <p className="map-source-note">
+        Parks include mapped urban parks and country park boundaries above 5 ha.
+        Areas are estimated from OSM polygons; pins are representative points,
+        not entrances or boundaries. The OSM selection may omit, duplicate, or
+        misclassify parks. Source snapshot: {parks?.extractedAt ?? "loading"}.
+      </p>
+      <p className="map-source-note">
+        Mountain peaks are OpenStreetMap peak nodes with tagged elevations
+        strictly above 500 m, inside the district boundary snapshot. Source
+        snapshot: {mountainPeaks?.extractedAt ?? "loading"}.
+        The layer is incomplete where peaks or elevations are missing or
+        inaccurate, and is not survey-grade;{" "}
+        {mountainPeaks?.missingElevation ?? "loading"} mapped peak nodes lack an
+        elevation and {mountainPeaks?.unusableElevation ?? "loading"} have an
+        unrecognized elevation value.
+      </p>
+      <p className="map-source-note">
+        The high-speed railway is the OpenStreetMap{" "}
+        <a href="https://www.openstreetmap.org/relation/8707713" target="_blank" rel="noreferrer">Hong Kong track relation</a>,
+        with geometry from Geofabrik downloaded {highSpeedRail?.geometryExtractDownloadedOn ?? "loading"}.
+        It ends at the border area; the mainland continuation to Shenzhen North
+        is not included. Parallel tracks and station approaches are shown.
       </p>
       <p className="map-source-note">
         <strong>Map and transit data:</strong>{" "}

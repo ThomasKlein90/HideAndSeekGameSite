@@ -3,6 +3,11 @@
 This is a living, checkbox-based plan for the private four-player companion
 website. Update it as rules and priorities are agreed.
 
+**Paused:** Web app development and the pending Supabase migration are on hold
+at the user's request while a separate printable Hong Kong game map is
+developed. See [WORKSPACE_HANDOFF.md](./WORKSPACE_HANDOFF.md) and
+[print-map/README.md](./print-map/README.md) for the draft and resume state.
+
 ## Product Scope
 
 - [ ] Build a mobile-first website for a two-hiders-versus-two-seekers game in Hong Kong.
@@ -66,8 +71,9 @@ website. Update it as rules and priorities are agreed.
 - [x] Create an editable placeholder question catalogue with category, card-reward rule, answer type, and active status.
 - [x] Display the six seeker categories with their agreed colors and draw/pick rewards; allow browsing multiple question templates within a category.
 - [x] Add nine fixed Radar distance questions and one custom-distance yes/no question; make each option available once per round.
+- [x] Merge the category board and Radar implementation with its database migration (PR #43).
 - [ ] Replace the remaining inactive category placeholders with the group's approved question catalogue and answer requirements.
-- [ ] After the current category/Radar feature is reviewed and merged, apply its migration through the Supabase Dashboard and verify the seeded catalogue and constraints.
+- [ ] Apply the merged category/Radar migration through the Supabase Dashboard and verify the seeded catalogue and constraints.
 - [ ] Agree on the original prompts and answer/evidence requirements for Matching, Measuring, Thermometer, Tentacles, and Photos before implementing those categories.
 - [ ] After the remaining catalogue rules are agreed, evaluate automatic Radar answers from explicit location checkpoints, using the existing manual check-in system rather than continuous GPS tracking.
 - [x] Define the question-event data model, status values, access policies, and typed database contract.
@@ -87,13 +93,13 @@ original question wording.
 
 ### Next implementation order
 
-1. Review and merge the current category-board/Radar feature together with its
-   migration. The migration is not yet applied; apply and verify it manually
-   through the Supabase Dashboard after merge. Do not run `supabase db push`
-   until the existing manually-applied migration history is reconciled.
-2. Collect the group's original prompts and agree on answer formats, evidence
-   requirements, and card-reward behavior for the five remaining categories
-   before expanding their templates and interactions.
+1. Apply the merged Radar/category migration through the Supabase Dashboard
+   and verify its schema, ten Radar templates, placeholder deactivation, and
+   insert-policy constraints. Do not run `supabase db push` until the existing
+   manually-applied migration history is reconciled.
+2. Collect the group's original prompts for Matching, Measuring, Thermometer,
+   Tentacles, and Photos, and agree on their answer formats, evidence
+   requirements, and card-reward behavior before expanding the catalogue.
 3. Then scope automatic yes/no Radar checks based on explicit location
    checkpoints already submitted through manual check-ins. Before implementing,
    agree on eligible checkpoint sources, freshness, privacy/visibility, and
@@ -184,13 +190,19 @@ Current state:
 
 Next:
 
-1. Refresh the versioned OSM snapshot when Overpass is available and validate major pier-area coverage.
-2. Continue checking public-transit and playable-boundary rules with the group as map layers are added.
-3. Apply and smoke-test the host check-in correction migration after merge
-   through the approved Dashboard workflow. Complete the four-account mobile
-   smoke test and Phase 5 reconnect/duplicate/simultaneous-update reliability
-   work. Reconcile manually applied migrations with CLI history before using
-   `supabase db push`, and agree on consent before adding live-location sharing.
+1. Apply and verify the merged Radar/category migration through the Supabase
+   Dashboard. Check its current state first and do not use `supabase db push`
+   until manually applied migration history is reconciled.
+2. Collect original prompts and agree on answer/evidence requirements for the
+   remaining question categories.
+3. Scope automatic Radar answers from explicit manual check-in checkpoints,
+   including source eligibility, freshness, privacy, and missing/stale behavior;
+   do not introduce continuous GPS or live-location sharing.
+4. Complete the four-account mobile smoke test and continue Phase 5
+   reconnect/duplicate/simultaneous-update reliability work.
+5. Refresh the versioned OSM snapshot when Overpass is available and validate
+   major pier-area coverage; continue checking public-transit and
+   playable-boundary rules with the group.
 
 ## Open Decisions
 
