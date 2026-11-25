@@ -4,12 +4,225 @@ This file is the short operational record for resuming work after a Copilot sess
 
 ## Current Snapshot
 
+- Printable map and shared POI layers are being published from
+  `feature/hong-kong-printable-poi-map`, based on `main` at `e1af1e2`.
+  The latest PDF was reviewed by the user. Print-map tests, data tests, lint
+  and production build passed on 2026-11-25. Review and merge the pull request
+  before starting another development slice.
+- Current print draft: `print-map/hong-kong-game-map-a3-focused-poi-station-legend.pdf`
+  has 148 numbered POIs and station-or-district annotations in the legend.
+  The museum shortlist retains the original 13 venues and adds three using a
+  provisional 50,000-visit cutoff in the 2025–26 LCSD venue table; this is
+  not a comprehensive city-wide ranking. The High Speed Train Line label is
+  rotated close to the track. The Ocean Park aquarium is displayed
+  beside the existing Ocean Park amusement symbol at its approximate park
+  point; the shared web data instead uses the OSM aquarium feature. Cube O
+  Discovery Park uses an approximate Plaza 88 mall point. See
+  `print-map/README.md` for sources, classification rules and qualifications. This draft also
+  adds the existing Hong Kong high-speed rail geometry and all six numbered
+  golf entries. Five golf indicators sit at the crop edge and display a
+  geodesic distance from the arrow's anchor. The airport label has a plane icon
+  and distance without a POI number. Eden and New share an approximate
+  Fanling site, not verified individual locations. The railway stops at the
+  Hong Kong border in the source; mainland geometry is not included. Only the
+  latest PDF is retained, per the user's cleanup request. No PNG preview is
+  generated for the POI draft.
+- Earlier PDF and PNG drafts were cleaned up; older references below are
+  historical and those files have been removed.
+- The previous library draft showed 138 numbered in-crop POIs, including 20
+  libraries.
+  The shared web dataset has 24 library branches across Hong Kong. With the
+  user's approval, the proxy includes central/major branches plus district
+  branches whose April 2023 HKPL directory address lists at least two floors,
+  or that have a published area at least 1,600 m². This is not a verified
+  floor-area ranking. Tuen Mun, Ping Shan Tin Shui Wai, Yuen Long and Tung
+  Chung lie outside the focused crop. See `print-map/README.md` and the shared
+  GeoJSON for sources and qualifications. Print-map and named-place tests,
+  lint and build passed.
+- Library research: no comprehensive, comparable current branch-by-branch
+  area table was found. Evidence for 12 current-site candidates is scattered
+  across sources: Hong Kong Central (33,800 m², HKPL); Ping Shan Tin Shui
+  Wai (6,100 m², 2013); Sha Tin (~4,000 m²), Quarry Bay (~2,300), Shui Wo
+  Street (~2,300), Lockhart Road (~2,100), Fa Yuen Street (~1,800), To Kwa
+  Wan (~1,600), all approximate construction floor areas in a 2006 LegCo
+  paper; Yuen Chau Kok (~2,900 m², 2017); Yuen Long (~2,900 m², 2017);
+  Tsuen Wan (~3,000 m², 2021, later expansion status unverified); and Tseung
+  Kwan O (2,200 m², 2001). Historical sizes and different definitions are not
+  directly comparable and do not establish a top-20 ranking. Branch attendance
+  is available historically for the six 2006-paper libraries (2005 figures),
+  but no comprehensive current series was located. Sources:
+  https://www.hkpl.gov.hk/en/about-us/HKCL/intro.html
+  https://www.news.gov.hk/tc/categories/health/html/2013/02/20130225_124546.shtml
+  https://www.legco.gov.hk/yr05-06/english/panels/ha/papers/ha0512cb2-1912-1e.pdf
+  https://www.info.gov.hk/gia/general/201703/29/P2017032900336.htm
+  https://www.info.gov.hk/gia/general/201711/20/P2017111700567.htm
+  https://www.legco.gov.hk/yr20-21/english/panels/ha/papers/ha20210208cb4-463-6-e.pdf
+  https://www.info.gov.hk/gia/general/200107/20/0720145.htm
+  The later library draft uses the user-approved proxy described above.
+- Hospital and Grassy Hill draft: `print-map/hong-kong-game-map-a3-focused-poi-hospitals.pdf`
+  and its preview show 118 numbered points, including ten mountains and 22
+  hospitals; Grassy Hill and Tai Mo Shan are separate. Shared web data includes
+  28 hospital entries throughout Hong Kong. The provisional 500-bed selection
+  combines 24 HA entries from 31 March 2025 (one is Ruttonjee and Tang Shiu Kin
+  combined, pinned at Ruttonjee) and four private hospitals with less-comparable
+  or uncertain figures. Gleneagles is a secondary-source boundary estimate.
+  Selection is not an exhaustive ranking; see `print-map/README.md` and the
+  shared GeoJSON for sources and qualifications. Libraries remain pending.
+- Curated printable POI draft (2026-11-23):
+  `print-map/hong-kong-game-map-a3-focused-poi-curated.pdf` and the matching
+  preview contain 95 renumbered points and an updated page-2 list. Upper
+  mountain clusters retain Tai Mo Shan and Ma On Shan only; the old 17/24
+  group retains Tate's Cairn and old 1/45/48 retains Buffalo Hill. Lion Rock
+  (495 m) and Beacon Hill (457 m) are print-only exceptions to the 550 m
+  threshold. `print-map/mountain-selection.json` records selected OSM IDs;
+  this consolidation also removes other named peaks including Tai To Yan and
+  Grassy Hill at that time. The later draft restores Grassy Hill; the web
+  mountain dataset and earlier PDFs remain unchanged.
+- Numbered printable POI draft (2026-11-23):
+  `print-map/hong-kong-game-map-a3-focused-poi-numbered.pdf` and its matching
+  preview contain 135 uniquely numbered in-crop POIs; page 2 lists their
+  numbers and names in dynamically sized category boxes. Print-only mountains
+  are at least 550 m (49 points); the web layer remains strictly above 500 m.
+  Airport arrow direction follows the projected airport point, with adjacent
+  geodesic distance from the arrow anchor. Libraries and hospitals remain
+  placeholders. The preceding unnumbered PDF remains unchanged. See
+  `print-map/README.md` for details and regeneration.
+- Printable POI draft (2026-11-23): `print-map/hong-kong-game-map-a3-focused-poi-draft.pdf`
+  has two A3 portrait pages: a focused map with 155 in-crop POIs and a blank
+  category-list template on the reverse. The separate PNG preview shows the
+  map. Symbols use original vector drawings and short leader lines when moved
+  to avoid collisions. The district key fits its text; an edge arrow gives the
+  straight-line distance to the airport. Library and hospital data are still
+  missing and have only placeholder boxes. The shared input points are
+  approximate or incomplete and the crop omits out-of-bounds places. The
+  previous PDF drafts are unchanged. See `print-map/README.md` for source
+  details, category counts, printing and regeneration instructions.
+- Cinema follow-up (2026-11-23): the user's list is represented by 23
+  searchable, toggleable web-map site pins, including separate Tai Wai and
+  THE SOUTHSIDE Emperor branches and separate Hollywood and Maritime Square
+  CineArt branches. MCL The ONE and Broadway The ONE share a site pin because
+  both names identify the same mall; operator history is not verified. Some
+  pins are explicitly approximate mall positions. The list is user-selected,
+  not independently checked against the former screen-count threshold. See
+  `print-map/README.md` for sources. Five map-data tests, 14 print-map tests,
+  lint and build passed; a mobile browser check verified the 23 cinema markers,
+  layer toggle, shared-site search and both Emperor branches. The later POI
+  draft above includes in-crop cinemas.
+- Museum follow-up (2026-11-23): the web map has a searchable, toggleable
+  layer for the user's 13 selected museums. These are an explicit game list,
+  not an attendance-based selection. Coordinates are OSM/Nominatim points;
+  Oil Street Art Space uses an approximate Oi! Warehouse building point.
+  Details and source notes are in `print-map/README.md`; the later POI draft
+  includes the in-crop museums. Five map-data tests, lint and build passed; a mobile
+  browser check confirmed all 13 markers, the layer toggle, searches for M Plus
+  and Oil Street, and the absence of the cinema layer.
+- The temporary M+ Cinema pin was removed at the user's request; the new
+  cinema layer above instead follows the subsequently provided list.
+- Golf follow-up (2026-11-23): all six requested course entries are represented
+  by five OSM site pins: Discovery Bay Ruby and Diamond share a club point,
+  and Hong Kong Golf Club Eden and New share a Fanling site point. Both club
+  websites confirm the named courses at their respective sites; individual
+  course locations are not verified and the pins explicitly say approximate.
+  Other golf pins are also representative locations, not course boundaries.
+  Five map-data tests, lint and production build passed. A mobile browser check
+  confirmed five golf markers, the layer toggle, and searches for Eden and
+  Diamond. See `print-map/README.md` for sources. The later POI draft includes
+  the in-crop golf site.
+- Museum research: the LCSD museum portal's
+  [visitor information](https://www.museums.gov.hk/en/web/portal/plan-your-visit.html)
+  supplies venue names and addresses, but not comparable annual attendance
+  figures. Search results were inconclusive and attempted annual-report links
+  returned 404. This research was superseded by the user's explicit museum
+  selection above; no attendance eligibility is inferred.
+- Map follow-up: `print-map/hong-kong-game-map-a3-focused-landmasses-v2.pdf`
+  moves Kowloon to the upper-right margin at the user's request (not a
+  geographic label position) and Ap Lei Chau below the hiding-zone circles.
+  The earlier PDFs remain unchanged; a locked prior PDF required a new name.
+  `public/data/hong-kong-mountain-peaks.geojson` contains 123 OSM peak nodes
+  strictly above 500 m in a searchable, toggleable web layer, including 47 unnamed points.
+  OSM is incomplete/not survey-grade: 3 mapped peaks have no elevation and 1
+  has an unusable value. Snapshot is 2026-11-22; exact source and regeneration
+  instructions are in `print-map/README.md`. The later POI draft above includes
+  the in-crop mountain points.
+  User confirmed parks include both urban and country parks above 5 hectares.
+  The web map now has a partial, searchable OSM layer with 47 urban/recreation
+  areas and 25 country-park boundaries over 5 ha, based on full polygon area.
+  It excludes museum-tagged areas, removes one duplicated relation/way, and
+  treats extensions separately. Pins are representative interior points, not
+  entrances; OSM mapping may be incomplete or misclassified. Park POIs have
+  were later added to the separate POI draft above. Lint, production build, seven map-data tests and
+  four Python selection tests passed; the mobile browser check verified both
+  cutoff layers, the park toggle and country-park search.
+  The PBF used to generate them is in this session's `files` directory.
+- Map follow-up (2026-11-23): the separate
+  `print-map/hong-kong-game-map-a3-focused-landmasses.pdf` and preview add the
+  four requested landmass names; the original focused PDF remains unchanged.
+  The web overlay no longer displays those four labels (the OSM base tiles
+  may contain their own labels). The web map now also has a toggleable
+  high-speed railway layer, generated from OSM relation 8707713 and the
+  Geofabrik extract. Its 51 ways form a connected network from West Kowloon
+  to the border area; the mainland continuation is not included. No POIs or
+  high-speed rail were added to the print revision. See `print-map/README.md`
+  for provenance, regeneration and pending work.
+- POI work (2026-11-23): `public/data/hong-kong-named-places.geojson`
+  contains a partial OSM/Nominatim snapshot of the airport, West Kowloon
+  high-speed station, three requested amusement parks, selected zoo, three
+  golf locations and Kowloon. The web map loads these independently, offers
+  searchable toggleable category pins and shows the three requested island
+  labels in the original implementation (superseded by the follow-up above).
+  At that stage golf was partial; see the golf follow-up above. Polygon-derived
+  points are approximate representatives. The focused print PDF has not been
+  changed. Source details and gaps are in `print-map/README.md`. Named-place
+  and island data tests, all 12 print-map tests, lint, build and diff checks
+  passed. Browser checks confirmed nine accessible pins, all four requested
+  landmass labels, search, the amusement-park toggle and mobile map layout.
+- The prior long-running source research was cancelled without a report.
+  External search challenges and an Overpass timeout remain blockers, not
+  evidence of absent data. Still needed: verify individual positions of
+  Discovery Bay Ruby/Diamond and Hong Kong Golf Club Eden/New if required;
+  review partial park coverage and find
+  comparable private hospital bed counts and library floor area. The high-speed Hong Kong track relation is now verified as
+  connected as described above; its mainland continuation remains uncollected.
+  Agree on comparable
+  reference years/definitions where required, and do not claim completeness
+  or add threshold categories based on unverified data. Keep research bounded
+  and document each category separately. The user has now requested a combined
+  POI PDF draft for review; several locations lie outside its crop.
+- Web app development is **on hold** at the user's request while a printable
+  Hong Kong game map is developed. Do not apply the pending Supabase migration
+  or resume the web app until the user asks.
+- Focused second draft (2026-11-18): `print-map/hong-kong-game-map-a3-focused.pdf`
+  and `print-map/hong-kong-game-map-focused-preview.png` crop to the complete
+  500 m zones at Tai Wo, Tsing Yi, South Horizons and LOHAS Park, with 83 named
+  station zones, 16 visible numbered districts and a compact southwest legend.
+  It is A3 portrait, with a 350 dpi background and vector labels/overlays;
+  print at actual size. Areas outside station zones are gently dimmed. A
+  true-scale bar shows 250 m, 500 m, 1 km, 2.5 km and 5 km. Per the user's
+  choice, an original "HIDE + SEEK / HONG KONG" heading replaces the requested
+  official logo, whose reuse permission was not verified. The wider detailed
+  draft remains separate and unchanged.
+- Updated print-map draft (2026-11-18): `print-map/hong-kong-game-map-a3-detailed.pdf`
+  and `print-map/hong-kong-game-map-detailed-preview.png` add a quiet,
+  label-free OSM-derived roads/parks/water background, station names, a tighter
+  railway-network view, numbered districts and a district key. The shoreline
+  is generalized Natural Earth land geometry, not a navigation-grade
+  coastline. The Geofabrik and Natural Earth extracts used by the renderer are
+  stored in this session's `files` directory, not in the repository. Sources,
+  regeneration, dependencies and snapshot caveats are in `print-map/README.md`.
+- Print-map draft: `print-map/hong-kong-game-map-a3-draft.pdf` (A3 landscape,
+  actual-size printing) and `print-map/hong-kong-game-map-preview.png`. Its
+  independent renderer and provenance/limitations are in `print-map/`. It
+  shows the nine non-Airport-Express railway lines, 96 station centers with
+  approximately 500 m zones, and 18 district outlines. Light Rail, trams,
+  Airport Express and Airport-Express-only stations are excluded; shared
+  stations remain. The draft uses historical snapshots and omits station names
+  and a detailed coastline/basemap; obtain user feedback before further changes.
 - Last verified: 2026-11-04
 - Repository: `ThomasKlein90/HideAndSeekGameSite`
 - Integration branch: `main`
-- Verified PR #42 (check-in reconnect refresh) merged and closed on 2026-11-04. Local `main` matches `origin/main` at `94a4f37`.
-- Current branch: `feature/seeker-question-category-board`, based on merged PR #42 (`94a4f37`), published to `origin/feature/seeker-question-category-board`. Feature commit `8220302` adds the category board and Radar implementation; handoff update is also pushed. Ready for user-created PR; migration remains unapplied.
-- Current branch validation: `npm.cmd run test:game:radar`, `npm.cmd run test:game:check-ins`, `npm.cmd run test:game:errors`, `npm.cmd run lint`, `npm.cmd run build`, and `git diff --check` all passed on 2026-11-04. The migration remains unapplied.
+- Verified PR #43 (seeker category board and Radar questions) merged and branch deleted on 2026-11-04. Local `main` matches `origin/main` at `e1af1e2`.
+- The PR's migration `20261104170000_question_category_rewards.sql` has not yet been applied to Supabase. The next task is to apply and verify it manually through the Supabase Dashboard; do not run `supabase db push` while migration history remains unreconciled.
+- PR validation passed: `npm.cmd run test:game:radar`, `npm.cmd run test:game:check-ins`, `npm.cmd run test:game:errors`, `npm.cmd run lint`, `npm.cmd run build`, and `git diff --check`.
 - Product stage: MTR, Tramways, Light Rail, ferries, district boundaries, island labels, map search, playable/no-go district selection, seeker status, manual station check-ins, and audited corrections are integrated in `main`.
 
 ## Implemented & Verified in Live Smoke Test
@@ -98,36 +311,33 @@ The live stale-age UI is verified: a disposable Hider check-in remained visible 
 PR #41 adds actionable join messages for unknown codes, full games, and network
 failures. PR #42 refreshes check-ins when connectivity returns or the page
 becomes active, skips overlapping loads, and warns when displayed reports may
-be out of date after refresh failure.
+be out of date after refresh failure. PR #43 adds the six seeker categories
+with agreed colors and draw/pick rewards, multiple-template browsing, and nine
+fixed Radar yes/no distance prompts (400 m through 150 km) plus one custom
+yes/no distance from 1 m through 150 km. Each Radar template can be used once
+per round; the database unique index enforces this, and the Seeker UI shows
+used options.
 
-The current branch presents all six seeker categories with the agreed colors
-and draw/pick rewards, and supports browsing multiple question templates in a
-category. Radar includes nine fixed yes/no distance prompts (400 m through
-150 km) and one custom yes/no distance from 1 m through 150 km. Radar prompts
-are limited to one use per template per round; the existing database unique
-index enforces that rule, and the Seeker UI marks already-used options. The
-new migration updates category rewards, deactivates all six old placeholders,
-adds the custom-distance fields
-and validation, and seeds the 10 Radar questions. It has not been applied to
-Supabase; do not use `supabase db push` because migration history is
-unreconciled. After review and merge, apply the migration manually through the
-Dashboard and verify it before using the updated board. Its insert policy also
-requires a Seeker-owned submission to be a pending event in the game's active
-round, so the per-round uniqueness index cannot be bypassed with a null or
-ended round.
+The merged PR migration `20261104170000_question_category_rewards.sql` updates
+category rewards, deactivates all six old placeholders, adds and validates
+custom Radar distances, seeds the 10 Radar templates, and restricts Seeker
+inserts to pending questions in the game's active round. It is not yet applied
+to Supabase. The next task is to apply it manually through the Supabase
+Dashboard and verify the schema, seeded templates, inactive placeholders, and
+RLS policy. First check whether the migration has already been applied to avoid
+reapplying it. Do not run `supabase db push`: `supabase_migrations.schema_migrations`
+is absent and migration history is unreconciled.
 
 The screenshot is used only as reference for category names/colors and reward
 counts. The Radar question wording was supplied by the user. Do not copy card
-artwork or proprietary question wording. Next steps, in order: review and merge
-this feature together with its migration; apply and verify that migration
-manually through the Supabase Dashboard; then obtain the group's original
-Matching, Measuring, Thermometer, Tentacles, and Photos question content and
-confirm answer/evidence requirements before implementing those categories.
-After those catalogue rules are agreed, scope automatic Radar answers using
-explicit checkpoints from the existing manual check-in system. Agree on
-eligible checkpoint sources, freshness, privacy/visibility, and missing/stale
-behavior first. This must not introduce continuous GPS tracking or
-live-location sharing. The four-account mobile smoke test remains deferred.
+artwork or proprietary question wording. After applying and verifying the
+migration, collect the group's original Matching, Measuring, Thermometer,
+Tentacles, and Photos prompts and agree on answer/evidence requirements.
+Then scope automatic Radar answers using explicit checkpoints from the
+existing manual check-in system. Agree on eligible checkpoint sources,
+freshness, privacy/visibility, and missing/stale behavior first. This must not
+introduce continuous GPS tracking or live-location sharing. The four-account
+mobile smoke test remains deferred.
 
 The four-account smoke test on real mobile phones remains pending until the
 user is available. When run, use a disposable game; confirm join/team
@@ -150,14 +360,14 @@ Ferry OSM refresh/pier coverage remains a parallel map-maintenance follow-up.
 
 1. Open the repository at the workspace root.
 2. Read this file, [PROJECT_PLAN.md](PROJECT_PLAN.md), and the repository instructions.
-3. Verify `origin/main` and create a focused branch from current `main`.
+3. Verify `origin/main`; PR #43 is merged, and local `main` matches `origin/main` at `e1af1e2`.
 4. The district-selection, check-in, and correction migrations were manually applied through Dashboard and verified via catalog queries. The migration-history table is absent, so reconcile CLI history before any `supabase db push`.
-5. Two-account check-in/correction tests and the live stale-age UI passed. PR #41 added join-error feedback; PR #42 added reconnect/page-return check-in refresh and stale-data warnings. Current branch `feature/seeker-question-category-board` adds the six agreed categories, reward rules, multi-template browsing, and 10 user-specified Radar questions with custom distance and once-per-round availability. Review and merge its code and migration together; then apply and verify the migration manually through the Dashboard. Do not run `supabase db push` until migration history is reconciled. Next collect the remaining categories' original prompts and requirements, then scope automatic Radar checks against explicit manual location checkpoints with agreed freshness and privacy behavior. Do not introduce continuous GPS/live-location sharing or automatic phase changes. The four-phone smoke test remains deferred.
+5. Two-account check-in/correction tests and the live stale-age UI passed. PR #41 added join-error feedback; PR #42 added reconnect/page-return check-in refresh and stale-data warnings; PR #43 added the category board and Radar templates and is merged. The immediate next task is to apply and verify `20261104170000_question_category_rewards.sql` manually through the Supabase Dashboard; first check whether it has already been applied. Do not run `supabase db push` until migration history is reconciled. Then collect the remaining categories' original prompts and requirements, followed by scoping automatic Radar answers against explicit manual location checkpoints with agreed freshness and privacy behavior. Do not introduce continuous GPS/live-location sharing or automatic phase changes. The four-phone smoke test remains deferred.
 
 ### Copy-ready restart prompt
 
 ```
-Resume from WORKSPACE_HANDOFF.md. Verify `origin/main` includes PR #42 (`94a4f37`). Current branch `feature/seeker-question-category-board` contains the category-board, Radar, migration, tests, and docs changes. It shows six categories with supplied colors/rewards, supports multiple templates per category, and adds nine fixed Radar yes/no ranges plus a custom 1 m–150 km distance; each option is usable once per round. The migration adds the custom-distance fields/validation, updates rewards, deactivates old placeholders, and inserts Radar prompts. The focused Radar and regression tests, lint, build, and diff checks passed. The migration is not applied; review and merge code and migration together, then apply manually through Dashboard. Do not run `supabase db push` because `supabase_migrations.schema_migrations` is absent and history is unreconciled. Next, agree on original content and requirements for the remaining categories, then scope automatic Radar answers from explicit manual location checkpoints, including freshness/privacy and missing/stale behavior; do not add continuous GPS tracking. Use category names/colors/reward counts from the reference only; do not reproduce card art or proprietary prompts. Existing two-account check-in/correction and stale-age tests passed; the four-phone smoke test remains deferred. Direct post-completion correction RPC denial remains untested. Join codes do not expire. Read relevant installed Next.js guidance before further app edits. Validate, commit, and push; the user creates and merges PRs separately.
+Resume from WORKSPACE_HANDOFF.md. Web app development is paused while the user works on a printable Hong Kong game map; continue with feedback on `print-map/hong-kong-game-map-a3-focused.pdf` and `print-map/hong-kong-game-map-focused-preview.png`. This A3 portrait draft crops the wider separate A3 landscape draft to the full zones around Tai Wo, Tsing Yi, South Horizons and LOHAS Park. It includes a quiet OSM-derived background, 83 named station centers with approximately 500 m zones, 16 visible numbered districts and a compact southwest legend; background is 350 dpi with vector labels and overlays. The wider map remains `print-map/hong-kong-game-map-a3-detailed.pdf`. Exclude Light Rail, trams, Airport Express, and Airport-Express-only stations; keep stations shared with an included railway line. The generalized Natural Earth coastline is not navigation-grade. Read `print-map/README.md` for sources, print instructions, dependencies, and accuracy/coverage limitations. Preserve the existing uncommitted project-plan and handoff updates. Do not resume the web app or apply its Supabase migration until the user asks. When resumed, PR #43 is merged at `e1af1e2`; the pending migration `supabase/migrations/20261104170000_question_category_rewards.sql` must first be checked, then applied and verified manually through the Supabase Dashboard. Do not run `supabase db push` because `supabase_migrations.schema_migrations` is absent and history is unreconciled. Later, collect original remaining question prompts and answer/evidence requirements, then scope Radar answers from explicit manual checkpoints, including freshness, privacy, and missing/stale behavior. Do not introduce continuous GPS tracking. The four-phone smoke test remains deferred; direct post-completion correction RPC denial remains untested. Read relevant installed Next.js guidance before app edits. The user creates and merges PRs separately.
 ```
 
 Before ending a session, leave the worktree either clean on `main` after a

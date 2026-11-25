@@ -871,6 +871,11 @@ h1 {
   border: 3px solid #8552a3;
 }
 
+.legend-swatch-high-speed {
+  background: #fff;
+  border: 3px dashed #6d447e;
+}
+
 .legend-swatch-ferry {
   background: #fff4ec;
   border: 3px dashed #d16f42;
@@ -907,6 +912,24 @@ h1 {
 
 .island-map-label::before {
   display: none;
+}
+
+.named-place-icon span {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  place-items: center;
+  border: 2px solid white;
+  border-radius: 50% 50% 50% 0;
+  box-shadow: 0 1px 4px #3338;
+  color: white;
+  font-size: 13px;
+  font-weight: 800;
+  transform: rotate(-45deg);
+}
+
+.named-place-icon b {
+  transform: rotate(45deg);
 }
 
 .map-search-target {

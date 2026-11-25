@@ -217,6 +217,94 @@ export type HongKongIslandLabelFeatureCollection = FeatureCollection<
   extractionQuery: string;
 };
 
+export const NAMED_PLACE_CATEGORIES = [
+  "airport",
+  "high-speed station",
+  "amusement park",
+  "aquarium",
+  "zoo",
+  "golf",
+  "museum",
+  "cinema",
+  "hospital",
+  "library",
+  "landmass",
+] as const;
+
+export type NamedPlaceCategory = (typeof NAMED_PLACE_CATEGORIES)[number];
+export type NamedPlaceProperties = {
+  name: string;
+  osmElementId: string;
+} & (
+  | { category: Exclude<NamedPlaceCategory, "hospital" | "library"> }
+  | { category: "hospital"; beds: number; bedBasis: string; bedSource: string }
+  | {
+      category: "library";
+      libraryClass: "central" | "major" | "district";
+      listedFloors?: number;
+      areaSquareMetres?: number;
+      areaBasis?: string;
+      areaSource?: string;
+    }
+);
+export type HongKongNamedPlaces = FeatureCollection<Point, NamedPlaceProperties> & {
+  license: string;
+  attribution: string;
+  source: string;
+  retrievedOn: string;
+  scope: string;
+};
+
+export type HighSpeedRailProperties = {
+  name: string;
+  osmRelationId: number;
+  osmWayIds: number[];
+};
+export type HongKongHighSpeedRail = FeatureCollection<MultiLineString, HighSpeedRailProperties> & {
+  license: string;
+  attribution: string;
+  source: string;
+  relationVersion: string;
+  relationTimestamp: string;
+  relationRetrievedOn: string;
+  geometryExtractDownloadedOn: string;
+  geometrySource: string;
+  scope: string;
+};
+
+export type MountainPeakProperties = {
+  name: string;
+  elevationMetres: number;
+  osmNodeId: number;
+};
+export type HongKongMountainPeaks = FeatureCollection<Point, MountainPeakProperties> & {
+  license: string;
+  attribution: string;
+  source: string;
+  extractedAt: string;
+  districtExtractedAt: string;
+  scope: string;
+  peakNodesInScope: number;
+  missingElevation: number;
+  unusableElevation: number;
+};
+
+export type ParkProperties = {
+  name: string;
+  parkType: "urban" | "country";
+  areaHectares: number;
+  osmElementId: string;
+};
+export type HongKongParks = FeatureCollection<Point, ParkProperties> & {
+  license: string;
+  attribution: string;
+  source: string;
+  extractedAt: string;
+  districtExtractedAt: string;
+  scope: string;
+  duplicateAreasRemoved: number;
+};
+
 export type MtrStationValidation = {
   name: string;
   provider: string;
